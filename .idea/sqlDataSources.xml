@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DdlMappings">
+    <mapping uuid="dc6f0628-7963-4440-bed9-7af9c7d566ef" name="SoftwareMarket Mapping">
+      <data-sources db="82574987-68fd-4394-a236-11625072315e" />
+    </mapping>
+    <mapping uuid="bd94d4e0-843c-4e09-9b7b-1fa1d835d234" name="@localhost Mapping">
+      <data-sources db="c63477f3-0c3f-4bd3-8cf2-0a0e07c69e23" />
+      <scope>
+        <node kind="database" qname="FivePigs" />
+      </scope>
+    </mapping>
+  </component>
+</project>
