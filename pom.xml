@@ -39,6 +39,14 @@
       <scope>provided</scope>
     </dependency>
 
+      <!-- Jakarta Servlet API (provided by server) -->
+      <dependency>
+          <groupId>jakarta.servlet</groupId>
+          <artifactId>jakarta.servlet-api</artifactId>
+          <version>6.0.0</version>
+          <scope>provided</scope>
+      </dependency>
+
     <!-- JSTL (Jakarta) - Versions are managed in dependencyManagement -->
     <dependency>
       <groupId>jakarta.servlet.jsp.jstl</groupId>
