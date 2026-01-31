@@ -70,12 +70,21 @@ public class RegisterServlet extends HttpServlet {
             session.setAttribute("reg_otp_expire",
                     System.currentTimeMillis() + 5 * 60 * 1000);
 
-            // gửi mail async để không block
+            // Chuẩn bị nội dung email HTML
+            String emailBody = "<div style='font-family: Arial, sans-serif; line-height: 1.6;'>"
+                    + "<h2>Xác thực tài khoản của bạn</h2>"
+                    + "<p>Cảm ơn bạn đã đăng ký. Vui lòng sử dụng mã OTP dưới đây để hoàn tất quá trình:</p>"
+                    + "<h3 style='color: #007bff; font-size: 24px; letter-spacing: 2px;'><b>" + otp + "</b></h3>"
+                    + "<p>Mã OTP này sẽ hết hạn trong 5 phút.</p>"
+                    + "<p>Trân trọng,<br/>Đội ngũ FivePigs</p>"
+                    + "</div>";
+
+            // Gửi mail async để không block request
             new Thread(() ->
-                    com.fivepigs.app.util.EmailService.sendEmail(
+                    com.fivepigs.app.util.EmailService.sendHtmlEmail(
                             email,
-                            "Verify Email OTP",
-                            "<h2>Mã OTP của bạn: <b>" + otp + "</b></h2>"
+                            "Mã xác thực OTP của bạn",
+                            emailBody
                     )
             ).start();
 
