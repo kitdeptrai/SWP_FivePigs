@@ -31,20 +31,19 @@ public class RegisterServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+
         req.setCharacterEncoding("UTF-8");
 
-        // Lấy dữ liệu từ form
         String fullName = trim(req.getParameter("fullName"));
         String email = trim(req.getParameter("email"));
         String password = req.getParameter("password");
         String confirmPassword = req.getParameter("confirmPassword");
 
-        // Giữ lại giá trị đã nhập để hiển thị lại nếu có lỗi
         req.setAttribute("fullName", fullName);
         req.setAttribute("email", email);
 
-        // Validation (delegate to Service layer)
         String error = userService.validateRegistration(fullName, email, password, confirmPassword);
         if (error != null) {
             req.setAttribute("error", error);
@@ -53,24 +52,40 @@ public class RegisterServlet extends HttpServlet {
         }
 
         try {
-            // Kiểm tra email đã tồn tại chưa
             if (userService.emailExists(email)) {
                 req.setAttribute("error", "Email đã tồn tại");
                 req.getRequestDispatcher("/WEB-INF/views/register.jsp").forward(req, resp);
                 return;
             }
 
-            // Đăng ký user (delegate to Service layer)
-            userService.registerUser(fullName, email, password);
+            // ===== OTP FLOW START =====
 
-            // Chuyển đến trang thành công
-            req.setAttribute("fullName", fullName);
-            req.getRequestDispatcher("/WEB-INF/views/register_success.jsp").forward(req, resp);
+            String otp = com.fivepigs.app.util.OtpUtil.generateOtp();
+
+            var session = req.getSession();
+            session.setAttribute("reg_fullName", fullName);
+            session.setAttribute("reg_email", email);
+            session.setAttribute("reg_password", password);
+            session.setAttribute("reg_otp", otp);
+            session.setAttribute("reg_otp_expire",
+                    System.currentTimeMillis() + 5 * 60 * 1000);
+
+            // gửi mail async để không block
+            new Thread(() ->
+                    com.fivepigs.app.util.EmailService.sendEmail(
+                            email,
+                            "Verify Email OTP",
+                            "<h2>Mã OTP của bạn: <b>" + otp + "</b></h2>"
+                    )
+            ).start();
+
+            resp.sendRedirect(req.getContextPath() + "/verify-register-otp");
+
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw new ServletException("Lỗi kết nối database", e);
+            throw new ServletException("Lỗi database", e);
         }
     }
+
 
     private static String trim(String s) {
         if (s == null) return null;
