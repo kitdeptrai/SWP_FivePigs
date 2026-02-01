@@ -1,6 +1,0 @@
-# SQL Server Database Configuration
-# Copy this file to db.properties and update with your actual values
-
-db.url=jdbc:sqlserver://localhost:1433;databaseName=SoftwareMarketencrypt=true;trustServerCertificate=true
-db.user=sa
-db.password=123

@@ -9,10 +9,23 @@ import java.time.LocalDateTime;
 
 /**
  *
+<<<<<<< HEAD
  * @author thanh
  */
 public class Software {
-   private Integer softwareId;
+//        software_id INT IDENTITY(1,1) PRIMARY KEY,
+//    name NVARCHAR(150) NOT NULL,
+//    short_description NVARCHAR(255),
+//    vendor_id INT NOT NULL,
+//    category_id INT,
+//    price DECIMAL(10,2) DEFAULT 0,
+//    is_free BIT DEFAULT 0,
+//    status VARCHAR(30) DEFAULT 'PENDING_REVIEW',
+//    -- PENDING_REVIEW / REVIEWED / APPROVED / REJECTED
+//    download_count INT DEFAULT 0,
+//    avg_rating DECIMAL(2,1) DEFAULT 0,
+//    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    private Integer softwareId;
     private String name;
     private String short_description;
     private Integer vendorId;
@@ -48,6 +61,8 @@ public class Software {
         this.reviewDate = reviewDate;
         this.recommendation = recommendation;
     }
+    
+    
 
     public Integer getSoftwareId() {
         return softwareId;

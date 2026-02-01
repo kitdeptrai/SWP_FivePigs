@@ -89,4 +89,14 @@ public class UserDao {
         }
         return null;
     }
+
+    public void updatePassword(String email, String newPassword) throws SQLException {
+        String sql = "UPDATE Users SET password = ? WHERE email = ?";
+        try (Connection c = DbApproval.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, newPassword);
+            ps.setString(2, email);
+            ps.executeUpdate();
+        }
+    }
 }
