@@ -5,6 +5,7 @@
 package com.fivepigs.app.model;
 
 import java.sql.Date;
+import java.time.LocalDateTime;
 
 /**
  *
@@ -21,7 +22,62 @@ public class Order {
 //    FOREIGN KEY (payment_status_id) REFERENCES Payment_Status(payment_status_id)
 //);
     
-    private int orderId,customerId,paymentStatusId;
-    private double totalAmount;
-    private Date orderDate;
+    private Integer orderId;
+    private Integer customerId;
+    private Integer paymentStatusId;
+    private Double totalAmount;
+    private LocalDateTime orderDatel;
+
+    public Order() {
+    }
+
+    public Order(Integer orderId, Integer customerId, Integer paymentStatusId, Double totalAmount, LocalDateTime orderDatel) {
+        this.orderId = orderId;
+        this.customerId = customerId;
+        this.paymentStatusId = paymentStatusId;
+        this.totalAmount = totalAmount;
+        this.orderDatel = orderDatel;
+    }
+
+    public Integer getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(Integer orderId) {
+        this.orderId = orderId;
+    }
+
+    public Integer getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(Integer customerId) {
+        this.customerId = customerId;
+    }
+
+    public Integer getPaymentStatusId() {
+        return paymentStatusId;
+    }
+
+    public void setPaymentStatusId(Integer paymentStatusId) {
+        this.paymentStatusId = paymentStatusId;
+    }
+
+    public Double getTotalAmount() {
+        return totalAmount;
+    }
+
+    public void setTotalAmount(Double totalAmount) {
+        this.totalAmount = totalAmount;
+    }
+
+    public LocalDateTime getOrderDatel() {
+        return orderDatel;
+    }
+
+    public void setOrderDatel(LocalDateTime orderDatel) {
+        this.orderDatel = orderDatel;
+    }
+    
+    
 }

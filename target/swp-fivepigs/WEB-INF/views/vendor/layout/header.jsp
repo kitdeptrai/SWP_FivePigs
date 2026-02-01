@@ -17,9 +17,8 @@
             <input type="text" placeholder="Search for anything..." />
         </div>
 
-        <span class="header-icon">🔔</span>
-        <span class="header-icon">❓</span>
-
-        <button class="upgrade-btn">Upgrade Pro</button>
+        
+        <form action="logout"><button class="upgrade-btn" href="/logout">Logout</button></form>
+        
     </div>
 </header>

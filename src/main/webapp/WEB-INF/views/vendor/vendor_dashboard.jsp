@@ -26,27 +26,30 @@
                     <!-- Cards -->
                     <div class="cards">
                         <div class="card">
-                            <p>Total Sales</p>
-                            <h2>1,284</h2>
+                            <p>Approved Apps</p>
+                            <h2>${sumApprovedApps}</h2>
+                        </div>
+                        <div class="card">
+                            <p>Pending Apps</p>
+                            <h2>${sumPendingApps}</h2>
                         </div>
                         <div class="card">
                             <p>Total Revenue</p>
-                            <h2>$42,500</h2>
+                            <h2>$${sumRevenue}</h2>
                         </div>
-                        <div class="card">
-                            <p>Active Users</p>
-                            <h2>856</h2>
-                        </div>
+
                         <div class="card">
                             <p>Avg Rating</p>
-                            <h2>4.85</h2>
+                            <h2>${avgRating}</h2>
                         </div>
                     </div>
 
                     <!-- Chart -->
                     <div class="box">
-                        <h3>Revenue Performance</h3>
-                        <div id="chart"></div>
+                        <h3>Revenue Performance (Last 4 Weeks)</h3>
+
+                        <!-- Chart container -->
+                        <canvas id="revenueChart" height="120"></canvas>
                     </div>
 
                     <!-- Table -->
@@ -64,31 +67,70 @@
                                     <th>Revenue</th>
                                     <th>Rating</th>
                                     <th>Status</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <c:forEach var="item" items="${top3revenue}">
                                     <tr>
-                                        <td class="product-name">${item.getName()}</td>
-                                        <td>${item.getDownloadCount()}</td>
-                                        <td class="revenue">${item.getRevenue()}</td>
-                                        <td>
-                                             ${item.getAvg_rating()}
-                                        </td>
+                                        <td class="product-name">${item.name}</td>
+                                        <td>${item.downloadCount}</td>
+                                        <td class="revenue">$${item.revenue}</td>
+                                        <td>${item.avgRating}</td>
                                         <td>
                                             <span class="status approved">APPROVED</span>
+                                        </td>
+                                        <td>
+                                            <a 
+                                                href="#" 
+                                                class="btn-action">
+                                                View detail
+                                            </a>
                                         </td>
                                     </tr>
                                 </c:forEach>
                             </tbody>
+
                         </table>
                     </div>
 
                 </section>
             </div>
         </div>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+            const labels = [];
+            const revenues = [];
+
+            <c:forEach var="entry" items="${revenueByWeek}">
+            labels.push("Week ${entry.key}");
+            revenues.push(${entry.value});
+            </c:forEach>
+
+            const ctx = document.getElementById('revenueChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                            label: 'Revenue ($)',
+                            data: revenues,
+                            borderWidth: 1
+                        }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        </script>
 
         <!-- React Chart -->
+
         <script type="text/babel" src="${pageContext.request.contextPath}/assets/vendor/js/chart.jsx"></script>
     </body>
 </html>

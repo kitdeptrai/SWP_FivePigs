@@ -15,34 +15,39 @@ public class SoftwareDetail {
 //version VARCHAR(50),
 //system_requirement NVARCHAR(MAX),
 //release_note NVARCHAR(MAX),
-    private int detailId,softwareId;
-    private String description,version,systemRequirement,releaseNote;
+
+    private Integer detailId;
+    private Integer softwareId;
+    private String description;
+    private String version;
+    private String sysRequirement;
+    private String releaseNote;
 
     public SoftwareDetail() {
     }
 
-    public SoftwareDetail(int detailId, int softwareId, String description, String version, String systemRequirement, String releaseNote) {
+    public SoftwareDetail(Integer detailId, Integer softwareId, String description, String version, String sysRequirement, String releaseNote) {
         this.detailId = detailId;
         this.softwareId = softwareId;
         this.description = description;
         this.version = version;
-        this.systemRequirement = systemRequirement;
+        this.sysRequirement = sysRequirement;
         this.releaseNote = releaseNote;
     }
 
-    public int getDetailId() {
+    public Integer getDetailId() {
         return detailId;
     }
 
-    public void setDetailId(int detailId) {
+    public void setDetailId(Integer detailId) {
         this.detailId = detailId;
     }
 
-    public int getSoftwareId() {
+    public Integer getSoftwareId() {
         return softwareId;
     }
 
-    public void setSoftwareId(int softwareId) {
+    public void setSoftwareId(Integer softwareId) {
         this.softwareId = softwareId;
     }
 
@@ -62,12 +67,12 @@ public class SoftwareDetail {
         this.version = version;
     }
 
-    public String getSystemRequirement() {
-        return systemRequirement;
+    public String getSysRequirement() {
+        return sysRequirement;
     }
 
-    public void setSystemRequirement(String systemRequirement) {
-        this.systemRequirement = systemRequirement;
+    public void setSysRequirement(String sysRequirement) {
+        this.sysRequirement = sysRequirement;
     }
 
     public String getReleaseNote() {
@@ -77,6 +82,5 @@ public class SoftwareDetail {
     public void setReleaseNote(String releaseNote) {
         this.releaseNote = releaseNote;
     }
-    
-    
+
 }

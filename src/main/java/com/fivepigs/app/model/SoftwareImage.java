@@ -5,6 +5,7 @@
 package com.fivepigs.app.model;
 
 import java.sql.Date;
+import java.time.LocalDateTime;
 
 /**
  *
@@ -20,14 +21,16 @@ public class SoftwareImage {
 //    FOREIGN KEY (software_id) REFERENCES Software(software_id) ON DELETE CASCADE
 //);
     
-    private int imageId,softwareId,imageUrl;
-    private int isThumbnail;
-    private Date createdTime;
+    private Integer imageId;
+    private Integer softwareId;
+    private String imageUrl;
+    private Integer isThumbnail;
+    private LocalDateTime createdTime;
 
     public SoftwareImage() {
     }
 
-    public SoftwareImage(int imageId, int softwareId, int imageUrl, int isThumbnail, Date createdTime) {
+    public SoftwareImage(Integer imageId, Integer softwareId, String imageUrl, Integer isThumbnail, LocalDateTime createdTime) {
         this.imageId = imageId;
         this.softwareId = softwareId;
         this.imageUrl = imageUrl;
@@ -35,45 +38,45 @@ public class SoftwareImage {
         this.createdTime = createdTime;
     }
 
-    public int getImageId() {
+    public Integer getImageId() {
         return imageId;
     }
 
-    public void setImageId(int imageId) {
+    public void setImageId(Integer imageId) {
         this.imageId = imageId;
     }
 
-    public int getSoftwareId() {
+    public Integer getSoftwareId() {
         return softwareId;
     }
 
-    public void setSoftwareId(int softwareId) {
+    public void setSoftwareId(Integer softwareId) {
         this.softwareId = softwareId;
     }
 
-    public int getImageUrl() {
+    public String getImageUrl() {
         return imageUrl;
     }
 
-    public void setImageUrl(int imageUrl) {
+    public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }
 
-    public int getIsThumbnail() {
+    public Integer getIsThumbnail() {
         return isThumbnail;
     }
 
-    public void setIsThumbnail(int isThumbnail) {
+    public void setIsThumbnail(Integer isThumbnail) {
         this.isThumbnail = isThumbnail;
     }
 
-    public Date getCreatedTime() {
+    public LocalDateTime getCreatedTime() {
         return createdTime;
     }
 
-    public void setCreatedTime(Date createdTime) {
+    public void setCreatedTime(LocalDateTime createdTime) {
         this.createdTime = createdTime;
     }
-    
+
     
 }

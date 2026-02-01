@@ -5,7 +5,7 @@
 package com.fivepigs.app.model;
 
 import java.sql.Date;
-
+import java.time.LocalDateTime;
 /**
  *
  * @author MinhPD
@@ -22,45 +22,33 @@ public class License {
 //
 //FOREIGN KEY (software_id) REFERENCES Software(software_id),
 //FOREIGN KEY (customer_id) REFERENCES Users(user_id)
-    private int licenseId,softwareId,customerId;
-    private String licenseKey,status;
-    private Date purchaseDate,expireDate;
+    private Integer licenseId;
+    private String licenseKey;
+    private Integer softwareId;
+    private Integer customerId;
+    private LocalDateTime purchaseDate;
+    private LocalDateTime expireDate;
+    private String status;
 
     public License() {
     }
 
-    public License(int licenseId, int softwareId, int customerId, String licenseKey, String status, Date purchaseDate, Date expireDate) {
+    public License(Integer licenseId, String licenseKey, Integer softwareId, Integer customerId, LocalDateTime purchaseDate, LocalDateTime expireDate, String status) {
         this.licenseId = licenseId;
+        this.licenseKey = licenseKey;
         this.softwareId = softwareId;
         this.customerId = customerId;
-        this.licenseKey = licenseKey;
-        this.status = status;
         this.purchaseDate = purchaseDate;
         this.expireDate = expireDate;
+        this.status = status;
     }
 
-    public int getLicenseId() {
+    public Integer getLicenseId() {
         return licenseId;
     }
 
-    public void setLicenseId(int licenseId) {
+    public void setLicenseId(Integer licenseId) {
         this.licenseId = licenseId;
-    }
-
-    public int getSoftwareId() {
-        return softwareId;
-    }
-
-    public void setSoftwareId(int softwareId) {
-        this.softwareId = softwareId;
-    }
-
-    public int getCustomerId() {
-        return customerId;
-    }
-
-    public void setCustomerId(int customerId) {
-        this.customerId = customerId;
     }
 
     public String getLicenseKey() {
@@ -71,6 +59,38 @@ public class License {
         this.licenseKey = licenseKey;
     }
 
+    public Integer getSoftwareId() {
+        return softwareId;
+    }
+
+    public void setSoftwareId(Integer softwareId) {
+        this.softwareId = softwareId;
+    }
+
+    public Integer getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(Integer customerId) {
+        this.customerId = customerId;
+    }
+
+    public LocalDateTime getPurchaseDate() {
+        return purchaseDate;
+    }
+
+    public void setPurchaseDate(LocalDateTime purchaseDate) {
+        this.purchaseDate = purchaseDate;
+    }
+
+    public LocalDateTime getExpireDate() {
+        return expireDate;
+    }
+
+    public void setExpireDate(LocalDateTime expireDate) {
+        this.expireDate = expireDate;
+    }
+
     public String getStatus() {
         return status;
     }
@@ -79,21 +99,5 @@ public class License {
         this.status = status;
     }
 
-    public Date getPurchaseDate() {
-        return purchaseDate;
-    }
-
-    public void setPurchaseDate(Date purchaseDate) {
-        this.purchaseDate = purchaseDate;
-    }
-
-    public Date getExpireDate() {
-        return expireDate;
-    }
-
-    public void setExpireDate(Date expireDate) {
-        this.expireDate = expireDate;
-    }
-    
     
 }

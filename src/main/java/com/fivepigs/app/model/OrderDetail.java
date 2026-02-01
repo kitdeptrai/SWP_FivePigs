@@ -13,48 +13,50 @@ public class OrderDetail {
 //order_id INT,
 //software_id INT,
 //price DECIMAL(10,2),
-    private int orderDetailId,orderId,softwareId;
-    private double price;
+    private Integer orderDetailId;
+    private Integer orderId;
+    private Integer softwareId;
+    private Double price;
 
     public OrderDetail() {
     }
 
-    public OrderDetail(int orderDetailId, int orderId, int softwareId, double price) {
+    public OrderDetail(Integer orderDetailId, Integer orderId, Integer softwareId, Double price) {
         this.orderDetailId = orderDetailId;
         this.orderId = orderId;
         this.softwareId = softwareId;
         this.price = price;
     }
 
-    public int getOrderDetailId() {
+    public Integer getOrderDetailId() {
         return orderDetailId;
     }
 
-    public void setOrderDetailId(int orderDetailId) {
+    public void setOrderDetailId(Integer orderDetailId) {
         this.orderDetailId = orderDetailId;
     }
 
-    public int getOrderId() {
+    public Integer getOrderId() {
         return orderId;
     }
 
-    public void setOrderId(int orderId) {
+    public void setOrderId(Integer orderId) {
         this.orderId = orderId;
     }
 
-    public int getSoftwareId() {
+    public Integer getSoftwareId() {
         return softwareId;
     }
 
-    public void setSoftwareId(int softwareId) {
+    public void setSoftwareId(Integer softwareId) {
         this.softwareId = softwareId;
     }
 
-    public double getPrice() {
+    public Double getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
     

@@ -19,7 +19,7 @@ import java.util.List;
  */
 public class SoftwareDao {
 
-    public List<Software> Top3RevenueByVendor(int vendorId) {
+    public List<Software> Top3RevenueByVendor(Integer vendorId) throws SQLException{
         List<Software> list=new ArrayList<>();
         String sql = "SELECT s.name AS app_name,SUM(od.price) AS revenue,s.avg_rating  AS rating,s.status,download_count,vendor_id FROM Software s\n"
                 + "JOIN Order_Detail od ON s.software_id = od.software_id\n"
@@ -37,15 +37,13 @@ public class SoftwareDao {
                     sw.setName(rs.getString("app_name"));
                     sw.setRevenue(rs.getDouble("revenue"));
                     sw.setStatus(rs.getString("status"));
-                    sw.setAvg_rating(rs.getDouble("rating"));
-                    sw.setDownloadCount(rs.getString("download_count"));
+                    sw.setAvgRating(rs.getDouble("rating"));
+                    sw.setDownloadCount(rs.getInt("download_count"));
                     sw.setVendorId(rs.getInt("vendor_id"));
                     list.add(sw);
                 }
-            }catch(SQLException e){              
             }
-            }catch(SQLException m){
-        }
+            }
         return list;
     }
 }
