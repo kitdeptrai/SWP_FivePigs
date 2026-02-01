@@ -6,9 +6,9 @@ import java.sql.SQLException;
 
 public final class Db {
     // Cấu hình MySQL - THAY ĐỔI THEO CẤU HÌNH CỦA BẠN
-    private static final String JDBC_URL = "jdbc:mysql://localhost:3306/fivepigs?useSSL=false&serverTimezone=UTC";
+    private static final String JDBC_URL = "jdbc:mysql://localhost:3306/fivepigs?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
     private static final String JDBC_USER = "root";
-    private static final String JDBC_PASS = "123456";
+    private static final String JDBC_PASS = "trnThanh2904";
 
     static {
         try {

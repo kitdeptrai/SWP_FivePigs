@@ -1,6 +1,7 @@
 package com.fivepigs.app.dao;
 
-import com.fivepigs.app.config.Db;
+import com.fivepigs.app.config.DbApproval;
+import com.fivepigs.app.config.DbApproval;
 import com.fivepigs.app.model.User;
 
 import java.sql.Connection;
@@ -12,7 +13,7 @@ public class UserDao {
 
     public boolean emailExists(String email) throws SQLException {
         String sql = "SELECT 1 FROM Users WHERE email = ?";
-        try (Connection c = Db.getConnection();
+        try (Connection c = DbApproval.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setString(1, email);
             try (ResultSet rs = ps.executeQuery()) {
@@ -23,7 +24,7 @@ public class UserDao {
 
     public void insertUser(User user) throws SQLException {
         String sql = "INSERT INTO Users(full_name, email, password, role_id, status) VALUES(?,?,?,?,?)";
-        try (Connection c = Db.getConnection();
+        try (Connection c = DbApproval.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setString(1, user.getFullName());
             ps.setString(2, user.getEmail());
@@ -36,7 +37,7 @@ public class UserDao {
 
     public Integer getRoleIdByName(String roleName) throws SQLException {
         String sql = "SELECT role_id FROM Role WHERE role_name = ?";
-        try (Connection c = Db.getConnection();
+        try (Connection c = DbApproval.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setString(1, roleName);
             try (ResultSet rs = ps.executeQuery()) {
@@ -53,7 +54,7 @@ public class UserDao {
                      "FROM Users u " +
                      "INNER JOIN Role r ON u.role_id = r.role_id " +
                      "WHERE u.email = ?";
-        try (Connection c = Db.getConnection();
+        try (Connection c = DbApproval.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setString(1, email);
             try (ResultSet rs = ps.executeQuery()) {
@@ -77,7 +78,7 @@ public class UserDao {
 
     public String getRoleNameById(Integer roleId) throws SQLException {
         String sql = "SELECT role_name FROM Role WHERE role_id = ?";
-        try (Connection c = Db.getConnection();
+        try (Connection c = DbApproval.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, roleId);
             try (ResultSet rs = ps.executeQuery()) {
