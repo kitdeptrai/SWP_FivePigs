@@ -20,8 +20,8 @@ public class UserService {
 
     public User registerUser(String fullName, String email, String password) throws SQLException {
         // Hash password (TẠM THỜI VÔ HIỆU HÓA)
-        // String passwordHash = PasswordUtil.sha256(password);
-        String passwordHash = password; // Sử dụng mật khẩu gốc
+         String passwordHash = PasswordUtil.sha256(password);
+//        String passwordHash = password; // Sử dụng mật khẩu gốc
         
         // Lấy role_id của CUSTOMER (role mặc định)
         Integer roleId = userDao.getRoleIdByName(DEFAULT_ROLE);
@@ -64,16 +64,16 @@ public class UserService {
             return null; // Tài khoản bị khóa
         }
         
-        // Kiểm tra password (TẠM THỜI VÔ HIỆU HÓA MÃ HÓA)
-        // String passwordHash = PasswordUtil.sha256(password);
-        // if (!passwordHash.equals(user.getPassword())) {
-        //     return null; // Password sai
-        // }
+//         Kiểm tra password (TẠM THỜI VÔ HIỆU HÓA MÃ HÓA)
+         String passwordHash = PasswordUtil.sha256(password);
+         if (!passwordHash.equals(user.getPassword())) {
+             return null; // Password sai
+         }
 
         // So sánh mật khẩu gốc (plain text)
-        if (!password.equals(user.getPassword())) {
-            return null; // Password sai
-        }
+//        if (!password.equals(user.getPassword())) {
+//            return null; // Password sai
+//        }
         
         return user;
     }
@@ -84,8 +84,8 @@ public class UserService {
 
     public void resetPassword(String email, String newPassword) throws SQLException {
         // Tạm thời vô hiệu hóa mã hóa, chỉ lưu mật khẩu gốc
-        // String passwordHash = PasswordUtil.sha256(newPassword);
-        String passwordHash = newPassword;
+         String passwordHash = PasswordUtil.sha256(newPassword);
+//        String passwordHash = newPassword;
         userDao.updatePassword(email, passwordHash);
     }
 }
