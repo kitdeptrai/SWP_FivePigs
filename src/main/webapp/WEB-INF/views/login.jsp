@@ -14,6 +14,10 @@
       <h1>Đăng nhập</h1>
       <p class="subtitle">Nhập thông tin để truy cập hệ thống</p>
 
+      <c:if test="${param.reset == 'success'}">
+        <div class="alert success">Đặt lại mật khẩu thành công. Vui lòng đăng nhập.</div>
+      </c:if>
+
       <c:if test="${not empty error}">
         <div class="alert danger">${error}</div>
       </c:if>
@@ -34,7 +38,10 @@
           <button type="submit">Đăng nhập</button>
         </div>
 
-        <p class="small">Chưa có tài khoản? <a href="${pageContext.request.contextPath}/register">Đăng ký ngay</a></p>
+        <div style="display: flex; justify-content: space-between; margin-top: 15px;">
+            <a href="${pageContext.request.contextPath}/forgot-password" class="small">Quên mật khẩu?</a>
+            <a href="${pageContext.request.contextPath}/register" class="small">Chưa có tài khoản? Đăng ký</a>
+        </div>
       </form>
     </div>
   </div>
