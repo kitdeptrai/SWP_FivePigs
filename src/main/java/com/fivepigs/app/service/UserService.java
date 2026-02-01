@@ -64,9 +64,14 @@ public class UserService {
             return null; // Tài khoản bị khóa
         }
         
-        // Kiểm tra password
-        String passwordHash = PasswordUtil.sha256(password);
-        if (!passwordHash.equals(user.getPassword())) {
+        // Kiểm tra password (TẠM THỜI VÔ HIỆU HÓA MÃ HÓA)
+        // String passwordHash = PasswordUtil.sha256(password);
+        // if (!passwordHash.equals(user.getPassword())) {
+        //     return null; // Password sai
+        // }
+
+        // So sánh mật khẩu gốc (plain text)
+        if (!password.equals(user.getPassword())) {
             return null; // Password sai
         }
         
@@ -75,5 +80,12 @@ public class UserService {
 
     public String getRoleName(Integer roleId) throws SQLException {
         return userDao.getRoleNameById(roleId);
+    }
+
+    public void resetPassword(String email, String newPassword) throws SQLException {
+        // Tạm thời vô hiệu hóa mã hóa, chỉ lưu mật khẩu gốc
+        // String passwordHash = PasswordUtil.sha256(newPassword);
+        String passwordHash = newPassword;
+        userDao.updatePassword(email, passwordHash);
     }
 }
