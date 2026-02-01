@@ -12,7 +12,7 @@ public class UserDao {
 
     public boolean emailExists(String email) throws SQLException {
         String sql = "SELECT 1 FROM Users WHERE email = ?";
-        try (Connection c = DbApproval.getConnection();
+        try (Connection c = Db.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setString(1, email);
             try (ResultSet rs = ps.executeQuery()) {
@@ -77,7 +77,7 @@ public class UserDao {
 
     public String getRoleNameById(Integer roleId) throws SQLException {
         String sql = "SELECT role_name FROM Role WHERE role_id = ?";
-        try (Connection c = DbApproval.getConnection();
+        try (Connection c = Db.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, roleId);
             try (ResultSet rs = ps.executeQuery()) {
@@ -91,7 +91,7 @@ public class UserDao {
 
     public void updatePassword(String email, String newPassword) throws SQLException {
         String sql = "UPDATE Users SET password = ? WHERE email = ?";
-        try (Connection c = DbApproval.getConnection();
+        try (Connection c = Db.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setString(1, newPassword);
             ps.setString(2, email);
