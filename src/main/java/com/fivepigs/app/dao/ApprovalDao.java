@@ -8,7 +8,7 @@ package com.fivepigs.app.dao;
  *
  * @author thanh
  */
-import com.fivepigs.app.config.DbApproval;
+import com.fivepigs.app.config.Db;
 import com.fivepigs.app.model.Software;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -33,7 +33,7 @@ public class ApprovalDao {
             VALUES (?, ?, ?, ?)
         """;
 
-        try (Connection c = DbApproval.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
+        try (Connection c = Db.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
 
             ps.setInt(1, softwareId);
             ps.setInt(2, approverId);
@@ -51,7 +51,7 @@ public class ApprovalDao {
         String sql
                 = "UPDATE Software SET status = ? WHERE software_id = ?";
 
-        try (Connection c = DbApproval.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
+        try (Connection c = Db.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
 
             ps.setString(1, status);
             ps.setInt(2, softwareId);
@@ -62,7 +62,7 @@ public class ApprovalDao {
 
     public Integer countStatusApps(String status) throws SQLException {
         String sql = "SELECT COUNT(*) AS COUNT FROM software WHERE status = ?";
-        try (Connection c = DbApproval.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
+        try (Connection c = Db.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setString(1, status);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -88,7 +88,7 @@ public class ApprovalDao {
             ORDER BY sa.approval_date DESC;
     """;
 
-        try (Connection c = DbApproval.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
+        try (Connection c = Db.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
 
 //            ps.setInt(1, approval_id);
             ResultSet rs = ps.executeQuery();
