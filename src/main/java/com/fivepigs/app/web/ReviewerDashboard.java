@@ -61,13 +61,15 @@ throws ServletException, IOException {
     try {
         SoftwareDao sDao = new SoftwareDao();
 
-        Integer pendingReviewApp = sDao.pendindReviewApp();
+        Integer pendingReviewApp = sDao.pendingReviewApp();
         Integer completeReviewApp = sDao.completeReviewApp();
         Integer reviewedToday = sDao.reviewedToday();
+        Integer qualityScore = sDao.getQualityScore();
 
         request.setAttribute("pendingReviewApp", pendingReviewApp);
         request.setAttribute("completeReviewApp", completeReviewApp);
         request.setAttribute("reviewedToday", reviewedToday);
+        request.setAttribute("qualityScore", qualityScore);
 
         request.getRequestDispatcher("/WEB-INF/views/reviewer/reviewer_dashboard.jsp")
                .forward(request, response);
@@ -76,7 +78,6 @@ throws ServletException, IOException {
         e.printStackTrace();
     }
 }
-
 
     /** 
      * Handles the HTTP <code>POST</code> method.

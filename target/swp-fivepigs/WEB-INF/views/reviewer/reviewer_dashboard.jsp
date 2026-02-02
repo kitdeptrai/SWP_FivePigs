@@ -79,7 +79,7 @@
         </div>
 
         <p class="card-title">Completed Reviews</p>
-        <h2>1</h2>
+        <h2>${completeReviewApp}</h2>
         <span class="success-text">50% completion rate</span>
     </div>
 
@@ -96,8 +96,9 @@
         </div>
 
         <p class="card-title">Quality Score</p>
-        <h2>92%</h2>
-        <span class="info-text">Above average</span>
+<h2>${qualityScore}%</h2>
+<span class="info-text">Above average</span>
+
     </div>
 
     <!-- Card 4 -->
@@ -112,9 +113,9 @@
             </svg>
         </div>
 
-        <p class="card-title">Avg. Review Time</p>
-        <h2>2.5h</h2>
-        <span class="purple-text">Per software</span>
+        <p class="card-title">Reviewed Today</p>
+        <h2>${reviewedToday}</h2>
+        <span class="purple-text">Total</span>
     </div>
 
 </div>

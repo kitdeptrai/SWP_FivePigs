@@ -1,8 +1,13 @@
+D:\SPRING2026\SWP391\FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\web\test.java
+D:\SPRING2026\SWP391\FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\model\License.java
 D:\SPRING2026\SWP391\FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\web\AdminDashboardServlet.java
-D:\SPRING2026\SWP391\FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\web\VendorDashboardServlet.java
 D:\SPRING2026\SWP391\FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\dao\ReviewerDao.java
 D:\SPRING2026\SWP391\FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\web\VerifyResetOtpServlet.java
+D:\SPRING2026\SWP391\FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\dao\VendorDao.java
+D:\SPRING2026\SWP391\FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\model\SoftwareImage.java
+D:\SPRING2026\SWP391\FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\model\SoftwareDetail.java
 D:\SPRING2026\SWP391\FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\web\ReviewerDashboard.java
+D:\SPRING2026\SWP391\FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\web\VendorDashboard.java
 D:\SPRING2026\SWP391\FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\web\LogoutServlet.java
 D:\SPRING2026\SWP391\FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\web\LoginServlet.java
 D:\SPRING2026\SWP391\FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\config\Db.java
@@ -21,6 +26,8 @@ D:\SPRING2026\SWP391\FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\web\Re
 D:\SPRING2026\SWP391\FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\web\VerifyRegisterOtpServlet.java
 D:\SPRING2026\SWP391\FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\util\EmailService.java
 D:\SPRING2026\SWP391\FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\util\OtpUtil.java
+D:\SPRING2026\SWP391\FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\model\OrderDetail.java
 D:\SPRING2026\SWP391\FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\model\ApprovalSoftware.java
 D:\SPRING2026\SWP391\FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\model\Software.java
+D:\SPRING2026\SWP391\FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\model\Order.java
 D:\SPRING2026\SWP391\FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\dao\UserDao.java
