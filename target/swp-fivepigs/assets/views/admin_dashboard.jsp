@@ -6,13 +6,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Vendor Dashboard</title>
+  <title>Admin Dashboard</title>
   <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css" />
 </head>
 <body>
   <div class="container">
     <div class="card">
-      <h1>Vendor Dashboard</h1>
+      <h1>Admin Dashboard</h1>
       <p class="subtitle">Chào mừng, <c:out value="${user.fullName}"/>!</p>
 
       <div class="alert">
