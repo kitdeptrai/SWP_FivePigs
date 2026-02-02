@@ -15,10 +15,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- *
- * @author Admin
- */
+
+
 public class SoftwareDao {
 
     public Integer pendingReviewApp() throws SQLException {
@@ -38,9 +36,9 @@ public class SoftwareDao {
     // Đếm số app đã được review (completed)
     public Integer completeReviewApp() throws SQLException {
         String sql = """
-        SELECT COUNT(DISTINCT software_id) AS count
-        FROM Software_Review_Process
-    """;
+                    SELECT COUNT(DISTINCT software_id) AS count
+                    FROM Software_Review_Process
+                """;
 
         try (Connection c = Db.getConnection(); PreparedStatement ps = c.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 
@@ -51,44 +49,44 @@ public class SoftwareDao {
         return 0;
     }
 
-// Đếm số app được review hôm nay
+    // Đếm số app được review hôm nay
     public Integer reviewedToday() throws SQLException {
-    String sql = """
-        SELECT COUNT(DISTINCT software_id) AS count
-        FROM Software_Review_Process
-        WHERE CONVERT_TZ(reviewed_at, '+00:00', '+07:00') >= CURDATE()
-          AND CONVERT_TZ(reviewed_at, '+00:00', '+07:00') < CURDATE() + INTERVAL 1 DAY
-    """;
+        String sql = """
+                    SELECT COUNT(DISTINCT software_id) AS count
+                    FROM Software_Review_Process
+                    WHERE CONVERT_TZ(reviewed_at, '+00:00', '+07:00') >= CURDATE()
+                      AND CONVERT_TZ(reviewed_at, '+00:00', '+07:00') < CURDATE() + INTERVAL 1 DAY
+                """;
 
-    try (Connection c = Db.getConnection();
-         PreparedStatement ps = c.prepareStatement(sql);
-         ResultSet rs = ps.executeQuery()) {
+        try (Connection c = Db.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
 
-        if (rs.next()) {
-            return rs.getInt("count");
+            if (rs.next()) {
+                return rs.getInt("count");
+            }
         }
+        return 0;
     }
-    return 0;
-}
 
     // Tính Quality Score trung bình (%)
-public Integer getQualityScore() throws SQLException {
-    String sql = """
-        SELECT ROUND(AVG(quality_score)) AS score
-        FROM Software_Review_Process
-        WHERE quality_score > 0
-    """;
+    public Integer getQualityScore() throws SQLException {
+        String sql = """
+                    SELECT ROUND(AVG(quality_score)) AS score
+                    FROM Software_Review_Process
+                    WHERE quality_score > 0
+                """;
 
-    try (Connection c = Db.getConnection();
-         PreparedStatement ps = c.prepareStatement(sql);
-         ResultSet rs = ps.executeQuery()) {
+        try (Connection c = Db.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
 
-        if (rs.next()) {
-            return rs.getInt("score");
+            if (rs.next()) {
+                return rs.getInt("score");
+            }
         }
+        return 0;
     }
-    return 0;
-}
 
 
     /**
@@ -122,5 +120,5 @@ public Integer getQualityScore() throws SQLException {
         }
         return list;
     }
-
 }
+
