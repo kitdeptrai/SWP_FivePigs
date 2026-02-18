@@ -19,10 +19,12 @@ public class UserService {
     }
 
     public User registerUser(String fullName, String email, String password) throws SQLException {
-        // Hash password (TẠM THỜI VÔ HIỆU HÓA)
-//         String passwordHash = PasswordUtil.sha256(password);
-       String passwordHash = password; // Sử dụng mật khẩu gốc
-        
+        // Hash password (SHA-256 để test)
+        String passwordHash = PasswordUtil.sha256(password);
+
+        // BCrypt (khuyến nghị) - bật khi bạn đã thêm dependency jBCrypt
+        // String passwordHash = PasswordUtil.bcryptHash(password);
+
         // Lấy role_id của CUSTOMER (role mặc định)
         Integer roleId = userDao.getRoleIdByName(DEFAULT_ROLE);
         if (roleId == null) {
@@ -64,17 +66,17 @@ public class UserService {
             return null; // Tài khoản bị khóa
         }
         
-//         Kiểm tra password (TẠM THỜI VÔ HIỆU HÓA MÃ HÓA)
-//         String passwordHash = PasswordUtil.sha256(password);
-//         if (!passwordHash.equals(user.getPassword())) {
-//             return null; // Password sai
-//         }
-
-        // So sánh mật khẩu gốc (plain text)
-        if (!password.equals(user.getPassword())) {
+        // Kiểm tra password (SHA-256 để test)
+        String passwordHash = PasswordUtil.sha256(password);
+        if (!passwordHash.equals(user.getPassword())) {
             return null; // Password sai
         }
-        
+
+        // BCrypt (khuyến nghị) - bật khi bạn đã thêm dependency jBCrypt
+        // if (!PasswordUtil.bcryptCheck(password, user.getPassword())) {
+        //     return null;
+        // }
+
         return user;
     }
 
@@ -83,9 +85,12 @@ public class UserService {
     }
 
     public void resetPassword(String email, String newPassword) throws SQLException {
-        // Tạm thời vô hiệu hóa mã hóa, chỉ lưu mật khẩu gốc
-//         String passwordHash = PasswordUtil.sha256(newPassword);
-        String passwordHash = newPassword;
+        // Hash password (SHA-256 để test)
+        String passwordHash = PasswordUtil.sha256(newPassword);
+
+        // BCrypt (khuyến nghị) - bật khi bạn đã thêm dependency jBCrypt
+        // String passwordHash = PasswordUtil.bcryptHash(newPassword);
+
         userDao.updatePassword(email, passwordHash);
     }
 }
