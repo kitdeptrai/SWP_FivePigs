@@ -5,6 +5,7 @@
 package com.fivepigs.app.model;
 
 import java.sql.Date;
+
 import java.time.LocalDateTime;
 
 /**
@@ -61,8 +62,8 @@ public class Software {
         this.reviewDate = reviewDate;
         this.recommendation = recommendation;
     }
-    
-    
+
+
 
     public Integer getSoftwareId() {
         return softwareId;
@@ -183,7 +184,7 @@ public class Software {
     public void setRecommendation(String recommendation) {
         this.recommendation = recommendation;
     }
-    
-    
-    
+
+
+
 }

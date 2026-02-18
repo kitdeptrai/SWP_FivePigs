@@ -5,7 +5,9 @@
 package com.fivepigs.app.dao;
 
 import com.fivepigs.app.config.Db;
+
 import com.fivepigs.app.model.*;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -13,14 +15,86 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- *
- * @author MinhPD
- */
+
+
 public class SoftwareDao {
 
-    public List<Software> Top3RevenueByVendor(Integer vendorId) throws SQLException{
-        List<Software> list=new ArrayList<>();
+    public Integer pendingReviewApp() throws SQLException {
+        String sql = "SELECT COUNT(*) as count FROM Software WHERE status = 'PENDING_REVIEW';";
+
+        try (Connection c = Db.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("count");
+                }
+            }
+        }
+        return 0;
+    }
+
+    // Đếm số app đã được review (completed)
+    public Integer completeReviewApp() throws SQLException {
+        String sql = """
+                    SELECT COUNT(DISTINCT software_id) AS count
+                    FROM Software_Review_Process
+                """;
+
+        try (Connection c = Db.getConnection(); PreparedStatement ps = c.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+
+            if (rs.next()) {
+                return rs.getInt("count");
+            }
+        }
+        return 0;
+    }
+
+    // Đếm số app được review hôm nay
+    public Integer reviewedToday() throws SQLException {
+        String sql = """
+                    SELECT COUNT(DISTINCT software_id) AS count
+                    FROM Software_Review_Process
+                    WHERE CONVERT_TZ(reviewed_at, '+00:00', '+07:00') >= CURDATE()
+                      AND CONVERT_TZ(reviewed_at, '+00:00', '+07:00') < CURDATE() + INTERVAL 1 DAY
+                """;
+
+        try (Connection c = Db.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            if (rs.next()) {
+                return rs.getInt("count");
+            }
+        }
+        return 0;
+    }
+
+    // Tính Quality Score trung bình (%)
+    public Integer getQualityScore() throws SQLException {
+        String sql = """
+                    SELECT ROUND(AVG(quality_score)) AS score
+                    FROM Software_Review_Process
+                    WHERE quality_score > 0
+                """;
+
+        try (Connection c = Db.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            if (rs.next()) {
+                return rs.getInt("score");
+            }
+        }
+        return 0;
+    }
+
+
+    /**
+     *
+     * @author MinhPD
+     */
+    public List<Software> Top3RevenueByVendor(Integer vendorId) throws SQLException {
+        List<Software> list = new ArrayList<>();
         String sql = "SELECT s.name AS app_name,SUM(od.price) AS revenue,s.avg_rating  AS rating,s.status,download_count,vendor_id FROM Software s\n"
                 + "JOIN Order_Detail od ON s.software_id = od.software_id\n"
                 + "JOIN Orders o ON od.order_id = o.order_id\n"
@@ -43,7 +117,8 @@ public class SoftwareDao {
                     list.add(sw);
                 }
             }
-            }
+        }
         return list;
     }
 }
+

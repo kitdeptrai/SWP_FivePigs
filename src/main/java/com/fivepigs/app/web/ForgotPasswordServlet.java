@@ -51,9 +51,10 @@ public class ForgotPasswordServlet extends HttpServlet {
                 String otp = OtpUtil.generateOtp();
 
                 session.setAttribute("reset_email", email);
-                session.setAttribute("reset_otp", otp);
+                session.setAttribute("reset_otp_hash", OtpUtil.hashOtp(otp));
                 session.setAttribute("reset_otp_expire", System.currentTimeMillis() + 5 * 60 * 1000); // 5 minutes
                 session.setAttribute("reset_otp_last_sent", System.currentTimeMillis());
+                session.setAttribute("reset_otp_attempts", 0);
 
                 String emailBody = "<div style='font-family: Arial, sans-serif; line-height: 1.6;'>"
                         + "<h2>Yêu cầu đặt lại mật khẩu</h2>"

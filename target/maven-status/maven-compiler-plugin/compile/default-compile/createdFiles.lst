@@ -1,7 +1,6 @@
 com\fivepigs\app\web\VerifyResetOtpServlet.class
 com\fivepigs\app\web\test.class
 com\fivepigs\app\model\Role.class
-com\fivepigs\app\web\ReviewerDashboardServlet.class
 com\fivepigs\app\dao\SoftwareDao.class
 com\fivepigs\app\dao\UserDao.class
 com\fivepigs\app\web\LoginServlet.class
@@ -15,7 +14,6 @@ com\fivepigs\app\web\UserDashboardServlet.class
 com\fivepigs\app\dao\ApprovalDao.class
 com\fivepigs\app\web\VerifyRegisterOtpServlet.class
 com\fivepigs\app\web\AdminDashboardServlet.class
-com\fivepigs\app\config\DbApproval.class
 com\fivepigs\app\util\EmailService$1.class
 com\fivepigs\app\model\Order.class
 com\fivepigs\app\model\SoftwareImage.class
