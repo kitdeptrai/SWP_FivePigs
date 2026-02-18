@@ -136,3 +136,117 @@ a:hover { text-decoration: underline; }
   .row { grid-template-columns: 1fr; }
   .card { padding: 20px; }
 }
+
+/* DASHBOARD */
+
+.layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  min-height: 100vh;
+}
+
+.sidebar {
+  background: rgba(0,0,0,0.25);
+  border-right: 1px solid var(--border);
+  padding: 24px 16px;
+  backdrop-filter: blur(12px);
+}
+
+.menu-item {
+  padding: 12px;
+  border-radius: 12px;
+  margin-bottom: 8px;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.menu-item:hover,
+.menu-item.active {
+  background: rgba(124, 58, 237, 0.2);
+  color: var(--text);
+}
+
+.main {
+  padding: 32px;
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.kpi-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.kpi-title {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.kpi-value {
+  font-size: 22px;
+  font-weight: 600;
+  margin-top: 6px;
+}
+
+/* BAR CHART */
+
+.bar-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 20px;
+  height: 200px;
+  margin-top: 20px;
+}
+
+.bar-item {
+  text-align: center;
+}
+
+.bar {
+  width: 40px;
+  background: linear-gradient(var(--primary), #2563eb);
+  border-radius: 8px 8px 0 0;
+  transition: 0.3s;
+}
+
+.bar:hover {
+  filter: brightness(1.1);
+}
+
+.bar-item span {
+  display: block;
+  margin-top: 8px;
+  font-size: 12px;
+}
+
+/* PROGRESS */
+
+.progress-group {
+  margin-bottom: 16px;
+}
+
+.progress-title {
+  font-size: 13px;
+  margin-bottom: 6px;
+  color: var(--muted);
+}
+
+.progress {
+  height: 10px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg,var(--primary),var(--primary-2));
+  border-radius: 10px;
+}
