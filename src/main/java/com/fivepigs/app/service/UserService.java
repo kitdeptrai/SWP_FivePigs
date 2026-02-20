@@ -19,8 +19,9 @@ public class UserService {
     }
 
     public User registerUser(String fullName, String email, String password) throws SQLException {
-        // Hash password (SHA-256 để test)
-        String passwordHash = PasswordUtil.sha256(password);
+        // Hash password (SHA-256 - TẠM THỜI COMMENT ĐỂ TEST PLAIN TEXT)
+        // String passwordHash = PasswordUtil.sha256(password);
+        String passwordHash = password; // Sử dụng mật khẩu gốc
 
         // BCrypt (khuyến nghị) - bật khi bạn đã thêm dependency jBCrypt
         // String passwordHash = PasswordUtil.bcryptHash(password);
@@ -66,9 +67,14 @@ public class UserService {
             return null; // Tài khoản bị khóa
         }
         
-        // Kiểm tra password (SHA-256 để test)
-        String passwordHash = PasswordUtil.sha256(password);
-        if (!passwordHash.equals(user.getPassword())) {
+        // Kiểm tra password (SHA-256 - TẠM THỜI COMMENT ĐỂ TEST PLAIN TEXT)
+        // String passwordHash = PasswordUtil.sha256(password);
+        // if (!passwordHash.equals(user.getPassword())) {
+        //     return null; // Password sai
+        // }
+
+        // So sánh mật khẩu gốc (plain text)
+        if (!password.equals(user.getPassword())) {
             return null; // Password sai
         }
 
@@ -85,8 +91,9 @@ public class UserService {
     }
 
     public void resetPassword(String email, String newPassword) throws SQLException {
-        // Hash password (SHA-256 để test)
-        String passwordHash = PasswordUtil.sha256(newPassword);
+        // Hash password (SHA-256 - TẠM THỜI COMMENT ĐỂ TEST PLAIN TEXT)
+        // String passwordHash = PasswordUtil.sha256(newPassword);
+        String passwordHash = newPassword;
 
         // BCrypt (khuyến nghị) - bật khi bạn đã thêm dependency jBCrypt
         // String passwordHash = PasswordUtil.bcryptHash(newPassword);

@@ -214,6 +214,7 @@ a:hover { text-decoration: underline; }
   background: linear-gradient(var(--primary), #2563eb);
   border-radius: 8px 8px 0 0;
   transition: 0.3s;
+  height: var(--h, 0px);
 }
 
 .bar:hover {
@@ -249,4 +250,5 @@ a:hover { text-decoration: underline; }
   height: 100%;
   background: linear-gradient(90deg,var(--primary),var(--primary-2));
   border-radius: 10px;
+  width: var(--w, 0%);
 }

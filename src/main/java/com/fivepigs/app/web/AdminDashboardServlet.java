@@ -1,38 +1,55 @@
 package com.fivepigs.app.web;
 
+import com.fivepigs.app.dao.AdminDao;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @WebServlet(name = "AdminDashboardServlet", urlPatterns = {"/admin_dashboard"})
 public class AdminDashboardServlet extends DashboardServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        // ====== Demo data (sau này thay bằng DAO) ======
-        int totalProducts = 1240;
-        int totalDownloads = 32540;
-        int totalEmployees = 18;
-        double totalRevenue = 125000000;
+        AdminDao adminDao = new AdminDao();
 
-        List<Integer> revenueByMonth = Arrays.asList(
-                10000000, 15000000, 12000000,
-                20000000, 18000000, 25000000
-        );
+        // ====== Lấy dữ liệu thật từ Database ======
+        int totalProducts = adminDao.getTotalProducts();
+        int totalDownloads = adminDao.getTotalDownloads();
+        int totalEmployees = adminDao.getTotalStaff();
+        double totalRevenue = adminDao.getTotalRevenue();
 
-        List<String> months = Arrays.asList(
-                "Jan", "Feb", "Mar", "Apr", "May", "Jun"
-        );
+        // ====== Dữ liệu thật cho biểu đồ ======
+        Map<String, Double> revenueByMonthMap = adminDao.getRevenueByMonth();
+        List<Integer> revenueByMonth = new ArrayList<>();
+        List<String> months = new ArrayList<>();
+        for (Map.Entry<String, Double> e : revenueByMonthMap.entrySet()) {
+            months.add(e.getKey());
+            revenueByMonth.add((int) Math.round(e.getValue()));
+        }
 
-        List<Integer> topDownloads = Arrays.asList(5200, 4300, 3900, 3100, 2800);
-        List<String> topApps = Arrays.asList(
-                "App A", "App B", "App C", "App D", "App E"
-        );
+        // ====== Top apps theo downloads (Option B: hiển thị số downloads, progress theo tỷ lệ so với top 1) ======
+        List<Map<String, Object>> topAppsRaw = adminDao.getTopAppsByDownloads();
+        List<String> topApps = new ArrayList<>();
+        List<Integer> topDownloads = new ArrayList<>();
+        int maxDownloads = 0;
+        for (Map<String, Object> row : topAppsRaw) {
+            int dl = ((Number) row.get("downloads")).intValue();
+            if (dl > maxDownloads) maxDownloads = dl;
+        }
+        for (Map<String, Object> row : topAppsRaw) {
+            topApps.add(String.valueOf(row.get("name")));
+            int dl = ((Number) row.get("downloads")).intValue();
+            int pct = (maxDownloads <= 0) ? 0 : (int) Math.round(dl * 100.0 / maxDownloads);
+            topDownloads.add(pct);
+        }
+
+        req.setAttribute("topAppsDownloads", topAppsRaw);
 
         // ====== set attribute ======
         req.setAttribute("totalProducts", totalProducts);
