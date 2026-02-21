@@ -155,27 +155,97 @@
         <p class="subtitle">Quản lý danh sách nhân viên hệ thống.</p>
 
         <div class="card" style="max-width: 100%;">
-            <div class="alert">Đang chờ dữ liệu thực từ DAO.</div>
+            <div style="display:flex; justify-content: space-between; align-items:center; gap: 16px;">
+                <div>
+                    <h2 style="margin:0; font-size: 18px; color: var(--dark-blue);">Danh sách nhân viên</h2>
+                    <p style="margin:6px 0 0; color:#64748b; font-size: 13px;">Role: reviewer / aproval</p>
+                </div>
+                <a href="#add-employee" style="padding: 10px 14px; border-radius: 10px; background: var(--accent); color: #fff; text-decoration:none; font-weight: 600;">+ Add Employee</a>
+            </div>
+
+            <c:if test="${param.success == '1'}">
+                <div class="alert success">Tạo nhân viên thành công. Mật khẩu mặc định đã được gửi qua email.</div>
+            </c:if>
+            <c:if test="${param.error == 'email_exists'}">
+                <div class="alert danger">Email đã tồn tại trong hệ thống.</div>
+            </c:if>
+            <c:if test="${param.error == 'missing_fields'}">
+                <div class="alert danger">Vui lòng nhập đầy đủ Họ tên, Email và Role.</div>
+            </c:if>
+            <c:if test="${param.error == 'db_error'}">
+                <div class="alert danger">Không thể tạo nhân viên (lỗi database).</div>
+            </c:if>
+
             <table>
                 <thead>
                     <tr>
                         <th>ID</th>
                         <th>Full Name</th>
                         <th>Email</th>
+                        <th>Phone</th>
                         <th>Role</th>
                         <th>Status</th>
+                        <th>Created At</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>#1</td>
-                        <td>Admin Demo</td>
-                        <td>admin@fivepigs.com</td>
-                        <td>Admin</td>
-                        <td style="color: #22c55e; font-weight: 600;">ACTIVE</td>
-                    </tr>
+                    <c:forEach var="e" items="${employees}">
+                        <tr>
+                            <td>#<c:out value="${e.userId}"/></td>
+                            <td><c:out value="${e.fullName}"/></td>
+                            <td><c:out value="${e.email}"/></td>
+                            <td><c:out value="${e.phone}"/></td>
+                            <td><c:out value="${e.roleName}"/></td>
+                            <td><c:out value="${e.status}"/></td>
+                            <td><c:out value="${e.createdAt}"/></td>
+                        </tr>
+                    </c:forEach>
+                    <c:if test="${empty employees}">
+                        <tr>
+                            <td colspan="7" style="text-align:center; color:#94a3b8; padding: 16px;">Chưa có nhân viên.</td>
+                        </tr>
+                    </c:if>
                 </tbody>
             </table>
+        </div>
+
+        <!-- Modal Add Employee (CSS-only :target) -->
+        <div id="add-employee" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Add Employee</h2>
+                    <a class="close-modal" href="${pageContext.request.contextPath}/admin/employees">×</a>
+                </div>
+
+                <form method="post" action="${pageContext.request.contextPath}/admin/employees/create">
+                    <div class="field">
+                        <label>Full name</label>
+                        <input name="fullName" type="text" required maxlength="100" />
+                    </div>
+                    <div class="field">
+                        <label>Email</label>
+                        <input name="email" type="email" required maxlength="100" />
+                    </div>
+                    <div class="field">
+                        <label>Phone (optional)</label>
+                        <input name="phone" type="text" maxlength="20" />
+                    </div>
+                    <div class="field">
+                        <label>Role</label>
+                        <select name="roleName" required style="width:100%; padding:12px; border-radius:12px; border:1px solid var(--border); background: rgba(0,0,0,0.22); color: var(--text);">
+                            <option value="reviewer">reviewer</option>
+                            <option value="aproval">aproval</option>
+                        </select>
+                    </div>
+
+                    <div class="alert" style="margin-top: 14px;">Mật khẩu mặc định: <b>123456</b> (sẽ gửi qua email)</div>
+
+                    <div class="actions">
+                        <button type="submit">Create</button>
+                        <a class="small" href="${pageContext.request.contextPath}/admin/employees">Cancel</a>
+                    </div>
+                </form>
+            </div>
         </div>
     </main>
 </div>
