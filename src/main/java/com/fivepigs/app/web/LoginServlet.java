@@ -81,7 +81,31 @@ public class LoginServlet extends HttpServlet {
             }
             
             // Redirect đến dashboard theo role
-            String dashboardPath = "/" + roleName.toLowerCase() + "_dashboard";
+            String roleNameLower = (roleName != null) ? roleName.toLowerCase() : "";
+            
+            String dashboardPath;
+            switch (roleNameLower) {
+                case "admin":
+                    dashboardPath = "/admin/dashboard";
+                    break;
+                case "aproval":
+                case "approval":
+                    dashboardPath = "/approval_dashboard";
+                    break;
+                case "reviewer":
+                    dashboardPath = "/reviewer_dashboard";
+                    break;
+                case "vendor":
+                    dashboardPath = "/vendor_dashboard";
+                    break;
+                case "customer":
+                case "user":
+                    dashboardPath = "/user_dashboard";
+                    break;
+                default:
+                    dashboardPath = "/user_dashboard";
+                    break;
+            }
             resp.sendRedirect(req.getContextPath() + dashboardPath);
         } catch (SQLException e) {
             throw new ServletException("Lỗi lấy thông tin role", e);
