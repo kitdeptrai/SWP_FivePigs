@@ -29,6 +29,8 @@ public class License {
     private LocalDateTime purchaseDate;
     private LocalDateTime expireDate;
     private String status;
+    private User user;
+    private Software software;
 
     public License() {
     }
@@ -97,6 +99,22 @@ public class License {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Software getSoftware() {
+        return software;
+    }
+
+    public void setSoftware(Software software) {
+        this.software = software;
     }
 
     

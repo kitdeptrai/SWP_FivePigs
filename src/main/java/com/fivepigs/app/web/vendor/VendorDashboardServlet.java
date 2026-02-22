@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
-package com.fivepigs.app.web;
+package com.fivepigs.app.web.vendor;
 
 import com.fivepigs.app.dao.*;
 import com.fivepigs.app.model.*;
@@ -24,7 +24,7 @@ import java.util.Map;
  * @author MinhPD
  */
 @WebServlet(name = "VendorDashboard", urlPatterns = {"/vendor_dashboard"})
-public class VendorDashboard extends HttpServlet {
+public class VendorDashboardServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -41,11 +41,11 @@ public class VendorDashboard extends HttpServlet {
             }
             List<Software> top3revenue = swdao.Top3RevenueByVendor(user.getUserId());
             Map<Integer, Double> revenueMap = vddao.revenueMap(user.getUserId());
-            Map<Integer,Double> downloadMap=vddao.downloadByWeek(user.getUserId());
-            Integer sumApprovedApps = vddao.sumApprovedApps(user.getUserId());
-            Integer sumDownloadApps = vddao.downloadCount(user.getUserId());
+            Map<Integer,Double> downloadMap=swdao.downloadByWeek(user.getUserId());
+            Integer sumApprovedApps = swdao.totalAppByStatusAndVendor(user.getUserId(),"APPROVED");
+            Integer sumDownloadApps = swdao.totalDownloadByVendor(user.getUserId());
             Double sumRevenue = vddao.sumRevenue(user.getUserId());
-            Double avgRating = vddao.avgRating(user.getUserId());
+            Double avgRating = swdao.avgRatingByVendorId(user.getUserId());
             
             request.setAttribute("downloadByWeek",downloadMap);
             request.setAttribute("revenueByWeek", revenueMap);

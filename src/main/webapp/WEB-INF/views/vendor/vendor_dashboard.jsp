@@ -6,44 +6,18 @@
     <head>
         <meta charset="UTF-8">
         <title>Vendor Dashboard</title>
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/dashboard.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/vendor.css">
     </head>
     <body>
 
         <div class="layout">
 
             <!-- SIDEBAR -->
-            <aside class="sidebar">
-                <div class="logo">
-
-                    <img src="assets/images/pig.png" alt="Pig Logo">
-                    <div>
-                        <h2>FivePigs</h2>
-                        <span>Software Market</span>
-                    </div>
-                </div>
-
-                <ul class="menu">
-                    <li class="active">Dashboard</li>
-                    <li>Pending Reviews</li>
-                    <li>My Reviews</li>
-                    <li>Review History</li>
-                    <li>Performance</li>
-                </ul>
-
-                <div class="user-box">
-                    <div class="avatar">AJ</div>
-                    <div>
-                        <p class="name">${user.fullName}</p>
-                        <p class="role">Reviewer</p>
-                    </div>
-                </div>
-
-                <a class="logout" href="${pageContext.request.contextPath}/logout">Logout</a>
-            </aside>
+            <jsp:include page="./layout/side_bar.jsp"/>
 
             <!-- MAIN CONTENT -->
-            <main class="main">
+            <div class="main">
                 <h1>Vendor Dashboard</h1>
                 <p class="subtitle">Welcome back, here’s what’s happening with your apps today.</p>
 
@@ -109,7 +83,7 @@
                     <div class="panel">
                         <div class="box">
                             <h3>Revenue Performance (Last 4 Weeks)</h3>
-                            <canvas id="revenueChart" height="120"></canvas>
+                            <canvas id="revenueChart" height="140"></canvas>
                         </div>
                     </div>
 
@@ -117,7 +91,7 @@
                     <div class="panel">
                         <div class="box">
                             <h3>Download Performance (Last 4 Weeks)</h3>
-                            <canvas id="downloadChart" height="120"></canvas>
+                            <canvas id="downloadChart" height="140"></canvas>
                         </div>
                     </div>
 
@@ -151,7 +125,7 @@
                                     </td>
                                     <td>
                                         <a 
-                                            href="#" 
+                                            href="product_detail?softwareId=${item.softwareId}" 
                                             class="btn-action">
                                             View detail
                                         </a>
@@ -162,61 +136,64 @@
 
                     </table>
                 </div>
-                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-                <script>
-                    const revenueLabels = [];
-                    const revenueData = [];
+            </div>
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+            const revenueLabels = [];
+            const revenueData = [];
 
-                    <c:forEach var="e" items="${revenueByWeek}">
-                    revenueLabels.push("Week ${e.key}");
-                    revenueData.push(${e.value});
-                    </c:forEach>
+            <c:forEach var="e" items="${revenueByWeek}">
+            revenueLabels.push("Week ${e.key}");
+            revenueData.push(${e.value});
+            </c:forEach>
 
-                    new Chart(document.getElementById('revenueChart'), {
-                        type: 'line',
-                        data: {
-                            labels: revenueLabels,
-                            datasets: [{
-                                    label: 'Revenue ($)',
-                                    data: revenueData,
-                                    borderWidth: 1
-                                }]
-                        },
-                        options: {
-                            scales: {
-                                y: {beginAtZero: true}
-                            }
-                        }
-                    });
-                </script>
+            new Chart(document.getElementById('revenueChart'), {
+                type: 'line',
+                data: {
+                    labels: revenueLabels,
+                    datasets: [{
+                            label: 'Revenue ($)',
+                            data: revenueData,
+                            borderWidth: 1,
+                            tension: 0.4,
+                        }]
+                },
+                options: {
+                    scales: {
+                        y: {beginAtZero: true}
+                    }
+                }
+            });
+        </script>
 
-                <script>
-                    const downloadLabels = [];
-                    const downloadData = [];
+        <script>
+            const downloadLabels = [];
+            const downloadData = [];
 
-                    <c:forEach var="e" items="${downloadByWeek}">
-                    downloadLabels.push("Week ${e.key+1}");
-                    downloadData.push(${e.value});
-                    </c:forEach>
+            <c:forEach var="e" items="${downloadByWeek}">
+            downloadLabels.push("Week ${e.key+1}");
+            downloadData.push(${e.value});
+            </c:forEach>
 
-                    new Chart(document.getElementById('downloadChart'), {
-                        type: 'bar',
-                        data: {
-                            labels: downloadLabels,
-                            datasets: [{
-                                    label: 'Downloads',
-                                    data: downloadData,
-                                    borderWidth: 2,
-                                    tension: 0.3
-                                }]
-                        },
-                        options: {
-                            scales: {
-                                y: {beginAtZero: true}
-                            }
-                        }
-                    });
-                </script>
+            new Chart(document.getElementById('downloadChart'), {
+                type: 'bar',
+                data: {
+                    labels: downloadLabels,
+                    datasets: [{
+                            label: 'Downloads',
+                            data: downloadData,
+                            borderWidth: 2,
+                            tension: 0.3,
+                        }]
+                },
+                options: {
+                    scales: {
+                        y: {beginAtZero: true}
+                    }
+                }
+            });
+        </script>
 
-                </body>
-                </html>
+    </body>
+</html>

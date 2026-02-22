@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
  * @author MinhPD
  */
 public class Software {
-//        software_id INT IDENTITY(1,1) PRIMARY KEY,
+//    software_id INT IDENTITY(1,1) PRIMARY KEY,
 //    name NVARCHAR(150) NOT NULL,
 //    short_description NVARCHAR(255),
 //    vendor_id INT NOT NULL,
@@ -26,7 +26,7 @@ public class Software {
 //    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     private Integer softwareId;
     private String name;
-    private String short_description;
+    private String shortDescription;
     private Integer vendorId;
     private Integer categoryId;
     private Double price;
@@ -36,22 +36,18 @@ public class Software {
     private Double avgRating;
     private LocalDateTime createdAt;
     private Double revenue;
+    private SoftwareImage softwareImage;
+    private Category category; 
+    private SoftwareVersion softwareVersion;
+    private SoftwareDetail softwareDetail;
+    
     public Software() {
     }
 
-    public Software(Integer vendorId,String name, String status, Integer downloadCount,Double avg_rating, Double revenue) {
-        this.vendorId=vendorId;
-        this.name = name;
-        this.status = status;
-        this.downloadCount = downloadCount;
-        this.avgRating = avgRating;
-        this.revenue = revenue;
-    }
-
-    public Software(Integer softwareId, String name, String short_description, Integer vendorId, Integer categoryId, Double price, Integer isFree, String status, Integer downloadCount, Double avgRating, LocalDateTime createdAt) {
+    public Software(Integer softwareId, String name, String shortDescription, Integer vendorId, Integer categoryId, Double price, Integer isFree, String status, Integer downloadCount, Double avgRating, LocalDateTime createdAt, Double revenue, SoftwareImage softwareImage, Category category, SoftwareVersion softwareVersion) {
         this.softwareId = softwareId;
         this.name = name;
-        this.short_description = short_description;
+        this.shortDescription = shortDescription;
         this.vendorId = vendorId;
         this.categoryId = categoryId;
         this.price = price;
@@ -60,9 +56,14 @@ public class Software {
         this.downloadCount = downloadCount;
         this.avgRating = avgRating;
         this.createdAt = createdAt;
-        
+        this.revenue = revenue;
+        this.softwareImage = softwareImage;
+        this.category = category;
+        this.softwareVersion = softwareVersion;
     }
 
+    
+    
     public Integer getSoftwareId() {
         return softwareId;
     }
@@ -79,12 +80,12 @@ public class Software {
         this.name = name;
     }
 
-    public String getShort_description() {
-        return short_description;
+    public String getShortDescription() {
+        return shortDescription;
     }
 
-    public void setShort_description(String short_description) {
-        this.short_description = short_description;
+    public void setShortDescription(String short_description) {
+        this.shortDescription = short_description;
     }
 
     public Integer getVendorId() {
@@ -159,6 +160,38 @@ public class Software {
         this.revenue = revenue;
     }
 
+    public SoftwareImage getSoftwareImage() {
+        return softwareImage;
+    }
+
+    public void setSoftwareImage(SoftwareImage softwareImage) {
+        this.softwareImage = softwareImage;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
+    public SoftwareVersion getSoftwareVersion() {
+        return softwareVersion;
+    }
+
+    public void setSoftwareVersion(SoftwareVersion softwareVersion) {
+        this.softwareVersion = softwareVersion;
+    }
+
+    public SoftwareDetail getSoftwareDetail() {
+        return softwareDetail;
+    }
+
+    public void setSoftwareDetail(SoftwareDetail softwareDetail) {
+        this.softwareDetail = softwareDetail;
+    }
+     
     
     
     

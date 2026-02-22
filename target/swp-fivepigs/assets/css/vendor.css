@@ -10,20 +10,21 @@ body {
     color: #e5e7eb;
 }
 
+
+
 /* LAYOUT */
 .layout {
     display: flex;
     height: 100vh;
-
 }
 
 /* SIDEBAR */
 .sidebar {
-    width: 260px;
+    width: 265px;
     background: #020617;
-    padding: 20px;
     display: flex;
     flex-direction: column;
+    border-right:2px solid #1e293b;
 }
 
 .logo h2 {
@@ -35,29 +36,69 @@ body {
     color: #94a3b8;
 }
 
+.logo {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    cursor: pointer;
+    padding: 20px;
+    margin-bottom: 5px;
+    border-bottom: 1px solid #1e293b;
+}
+
+.logo:hover {
+    opacity: 0.9;
+}
+
+.logo img {
+    width: 55px;
+    height: 55px;
+    object-fit: cover;
+    border-radius: 10px;
+    background: #ffffff;
+    padding: 4px;
+}
 .menu {
     list-style: none;
-    margin-top: 30px;
+    margin-top: 10px;
+    padding: 10px 20px;
+}
+
+.menu li a i{
+    width: 25px;
+    height: 25px;
+    padding:4px;
 }
 
 .menu li {
-    padding: 12px;
     margin-bottom: 8px;
-    border-radius: 8px;
-    cursor: pointer;
-    color: #cbd5f5;
 }
 
-.menu li.active,
-.menu li:hover {
-    background: #1e293b;
+.menu li a {
+    display: block;
+    padding: 12px;
+    border-radius: 8px;
+    color: #cbd5f5;
+    text-decoration: none;
+    transition: 0.2s;
 }
+
+.menu li a:hover,
+.menu li.active a {
+    background: #1e293b;
+    color: #fff;
+}
+
 
 .user-box {
     margin-top: auto;
     display: flex;
     gap: 10px;
     align-items: center;
+    border-top: 1px solid #1e293b;
+    padding: 20px;
 }
 
 .avatar {
@@ -74,12 +115,15 @@ body {
     margin-top: 15px;
     color: #94a3b8;
     text-decoration: none;
+    padding:0 0 20px 20px;
 }
 
-/* MAIN (FIX QUAN TRỌNG Ở ĐÂY) */
+
+
+/* Dashboard */
 .main {
     flex: 1;
-    padding: 30px;
+    padding: 25px;
     overflow-y: auto; /* 🔥 FIX: CHO PHÉP SCROLL */
 }
 
@@ -89,22 +133,16 @@ body {
 }
 
 /* CARDS */
-.cards {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
-}
+
 
 .card {
     background: #020617;
     padding: 20px;
+    border:1px solid #1e293b;
     border-radius: 16px;
 }
 
-.card-title {
-    color: #94a3b8;
-    margin-bottom: 10px;
-}
+
 
 .card h2 {
     font-size: 28px;
@@ -124,6 +162,10 @@ body {
     color: #a855f7;
 }
 
+.danger {
+    color: #ef4444;
+}
+
 /* GRID 2 COLUMNS */
 .grid-2 {
     display: grid;
@@ -135,9 +177,10 @@ body {
 
 /* PANEL */
 .panel {
-    background: #020617;
+    background: #1e293b;
     padding: 20px;
     border-radius: 16px;
+    border:1px solid #1e293b;
 }
 
 .panel-header {
@@ -148,37 +191,6 @@ body {
 
 .target {
     color: #c7d2fe;
-}
-
-/* PROGRESS BAR */
-.progress-bar {
-    background: #1e293b;
-    height: 8px;
-    border-radius: 8px;
-    margin: 8px 0 16px;
-    overflow: hidden;
-}
-
-.progress-fill {
-    background: linear-gradient(90deg, #4f6ef7, #6366f1);
-    height: 100%;
-    border-radius: 8px;
-}
-
-/* STATS */
-.stats {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
-}
-
-.stats h2 {
-    font-size: 22px;
-}
-
-.stats p {
-    color: #94a3b8;
-    font-size: 13px;
 }
 
 .green {
@@ -194,92 +206,6 @@ body {
     justify-content: space-between;
     margin-top: 10px;
     font-size: 14px;
-}
-
-/* FULL WIDTH */
-.full-width {
-    grid-column: 1 / -1;
-    margin-top: 30px;
-}
-
-/* REVIEW ITEM */
-.review-item {
-    display: flex;
-    align-items: center;
-    background: #020617;
-    padding: 14px;
-    border-radius: 14px;
-    margin-top: 16px;
-}
-
-.review-img {
-    width: 52px;
-    height: 52px;
-    border-radius: 10px;
-    object-fit: cover;
-    margin-right: 14px;
-}
-
-.review-info {
-    flex: 1;
-}
-
-.review-info p {
-    font-size: 13px;
-    color: #94a3b8;
-}
-
-/* TAGS */
-.review-tags {
-    display: flex;
-    gap: 8px;
-    margin-right: 16px;
-}
-
-.tag {
-    padding: 4px 8px;
-    font-size: 12px;
-    border-radius: 6px;
-}
-
-.tag.success {
-    background: #052e16;
-    color: #22c55e;
-}
-
-/* STATUS */
-.review-status {
-    font-size: 20px;
-}
-
-.review-status.pending {
-    color: #facc15;
-}
-
-.review-status.done {
-    color: #22c55e;
-}
-/* LOGO REVIEWER */
-.logo {
-    text-decoration: none;
-    color: inherit;
-    display: flex;
-    gap: 12px;
-    align-items: center;
-    cursor: pointer;
-}
-
-.logo:hover {
-    opacity: 0.9;
-}
-
-.logo img {
-    width: 55px;
-    height: 55px;
-    object-fit: cover;
-    border-radius: 10px;
-    background: #ffffff;
-    padding: 4px;
 }
 
 /* ICON IN CARD */
@@ -318,11 +244,16 @@ body {
     color: #a855f7;
 }
 
+.card-icon.danger {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+}
+
 /* ===== CARDS LAYOUT ===== */
 .cards {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 24px;
+    gap: 28px;
     margin-top: 24px;
 }
 
@@ -334,34 +265,6 @@ body {
     box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04);
 }
 
-/* ===== ICON ===== */
-.card-icon {
-    width: 42px;
-    height: 42px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 14px;
-}
-
-.card-icon.warning {
-    background: rgba(250, 204, 21, 0.15);
-    color: #facc15;
-}
-.card-icon.success {
-    background: rgba(34, 197, 94, 0.15);
-    color: #22c55e;
-}
-.card-icon.info {
-    background: rgba(59, 130, 246, 0.15);
-    color: #3b82f6;
-}
-.card-icon.purple {
-    background: rgba(168, 85, 247, 0.15);
-    color: #a855f7;
-}
-
 /* ===== TEXT ===== */
 .card-title {
     font-size: 15px;
@@ -370,8 +273,8 @@ body {
 }
 
 .card h2 {
-    font-size: 32px;
-    margin: 0;
+    font-size: 34px;
+    margin-top: 8px;
 }
 
 .warning-text {
@@ -387,12 +290,6 @@ body {
     color: #a855f7;
 }
 
-/* ===== CARD STYLE GIỐNG HÌNH MẪU ===== */
-
-.cards {
-    grid-template-columns: repeat(4, 1fr);
-    gap: 28px;
-}
 
 .card {
     height: 220px;
@@ -405,27 +302,6 @@ body {
     box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04);
 }
 
-/* ICON */
-.card-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 14px;
-}
-
-/* SỐ */
-.card h2 {
-    font-size: 34px;
-    margin-top: 8px;
-}
-
-/* TITLE */
-.card-title {
-    font-size: 15px;
-    color: #9ca3af;
-    margin-top: 6px;
-}
-
-/* SUBTEXT */
 .warning-text,
 .success-text,
 .info-text,
@@ -448,92 +324,10 @@ body {
     color: #a855f7;
 }
 
-
-/* ===== RECENT REVIEW – STYLE GIỐNG HÌNH MẪU ===== */
-
-.recent-panel {
-    background: linear-gradient(180deg, #1f2937, #0b1220);
-    border-radius: 22px;
-    padding: 26px;
-}
-
-/* override review-item cũ */
-.recent-item {
-    background: #111827;
-    border-radius: 18px;
-    padding: 18px 20px;
-    margin-top: 18px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-}
-
-/* ảnh thumbnail */
-.recent-thumb {
-    width: 56px;
-    height: 56px;
-    border-radius: 14px;
-    object-fit: cover;
-}
-
-/* info */
-.recent-item .review-info strong {
-    font-size: 15px;
-}
-
-.recent-item .review-info p {
-    font-size: 13px;
-    color: #94a3b8;
-    margin-top: 4px;
-}
-
-/* status icon */
-.recent-item .review-status {
-    font-size: 22px;
-    margin-left: auto;
-}
-
-.recent-item .review-status.pending {
-    color: #facc15;
-}
-
-.recent-item .review-status.done {
-    color: #22c55e;
-}
-
-.recent-review {
-    background: linear-gradient(180deg, #0b1020, #111827);
-    padding: 24px;
-    border-radius: 16px;
-    color: #fff;
-}
-
-.recent-review h2 {
-    margin-bottom: 20px;
-    font-size: 20px;
-}
-
-.review-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #1f2937;
-    padding: 16px;
-    border-radius: 12px;
-    margin-bottom: 14px;
-}
-
 .left {
     display: flex;
     align-items: center;
     gap: 14px;
-}
-
-.logo {
-    width: 48px;
-    height: 48px;
-    border-radius: 8px;
-    object-fit: cover;
 }
 
 .info .name {
@@ -579,10 +373,12 @@ body {
     background: #111827;
 }
 .table-card {
-    background: linear-gradient(180deg, #0f172a, #020617);
+    background: linear-gradient(180deg, #1f2937, #111827);
     border-radius: 14px;
     padding: 20px;
     margin-top: 25px;
+    border:1px solid #1e293b;
+
 }
 
 .table-header {
@@ -591,6 +387,7 @@ body {
     align-items: center;
     margin-bottom: 15px;
 }
+
 
 .table-header h3 {
     font-size: 18px;
@@ -603,22 +400,54 @@ body {
 }
 .dashboard-table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;   /* đổi từ collapse */
+    border-spacing: 0 10px;      /* tạo khoảng cách giữa các row */
 }
 
 .dashboard-table th,
 .dashboard-table td {
-    padding: 12px;
+    padding: 14px 16px;
     text-align: left;
 }
 
 .dashboard-table th {
-    color: white;
+    color: #94a3b8;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+}
+
+.dashboard-table tbody tr {
+    background: #1e293b;                /* nền row */
+    border-radius: 12px;
+    transition: 0.3s ease;
+}
+
+.dashboard-table tbody tr:hover {
+    background: #263449;
+    transform: translateY(-2px);
 }
 
 .dashboard-table td {
     color: #e5e7eb;
+    border-top: 1px solid #2d3a4f;
+    border-bottom: 1px solid #2d3a4f;
 }
+
+/* Bo góc cho từng row */
+.dashboard-table tbody tr td:first-child {
+    border-left: 1px solid #2d3a4f;
+    border-top-left-radius: 12px;
+    border-bottom-left-radius: 12px;
+}
+
+.dashboard-table tbody tr td:last-child {
+    border-right: 1px solid #2d3a4f;
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
+}
+
 .product-name {
     font-weight: 600;
 }
@@ -648,3 +477,4 @@ body {
     text-decoration: none;
     transition: all 0.2s ease;
 }
+

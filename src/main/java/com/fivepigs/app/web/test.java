@@ -4,9 +4,12 @@
  */
 package com.fivepigs.app.web;
 
+import com.fivepigs.app.dao.SoftwareDao;
 import com.fivepigs.app.dao.VendorDao;
+import com.fivepigs.app.model.Software;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -14,19 +17,24 @@ import java.util.Map;
  * @author MinhPD
  */
 public class test {
-    
+
     public static void main(String[] args) {
-        try {
-            VendorDao vddao = new VendorDao();
-            Integer sumApprovedApps = vddao.sumApprovedApps(2);
-            Map<Integer, Double> revenueMap = vddao.revenueMap(2);
-            for(int i=1;i<=4;i++){
-                System.out.println(revenueMap.get(i));
-            }
-            System.out.println("Approved apps = " + sumApprovedApps);
-        } catch (SQLException e) {
-            e.printStackTrace();
+        try{
+        SoftwareDao swdao = new SoftwareDao();
+        
+        List<Software> sw = swdao.getSoftwareCardListByVendorID(2);
+        for (Software s : sw) {
+            System.out.println("ID: " + s.getSoftwareId());
+            System.out.println("Name: " + s.getName());
+            System.out.println("Short Description: " + s.getShortDescription());
+            System.out.println("Status: " + s.getStatus());
+            System.out.println("Download: " + s.getDownloadCount());
+            System.out.println("Rating: " + s.getAvgRating());
+            System.out.println(s.getSoftwareImage().getImageUrl());
+            System.out.println("-----------------------------");
+        }
+        }catch(SQLException e){
+            System.out.println("loi");
         }
     }
 }
-
