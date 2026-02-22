@@ -237,6 +237,66 @@ public class AdminDao {
         return rows;
     }
 
+    // ===== CRUD =====
+
+    public UserRow findUserById(int userId) {
+        String sql = "SELECT u.user_id, u.full_name, u.email, u.phone, u.status, u.created_at, r.role_name " +
+                "FROM users u JOIN role r ON u.role_id = r.role_id " +
+                "WHERE u.user_id = ?";
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new UserRow(
+                            rs.getInt("user_id"),
+                            rs.getString("full_name"),
+                            rs.getString("email"),
+                            rs.getString("phone"),
+                            rs.getString("role_name"),
+                            rs.getString("status"),
+                            rs.getTimestamp("created_at")
+                    );
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public void setUserStatus(int userId, String status) throws SQLException {
+        String sql = "UPDATE users SET status = ? WHERE user_id = ?";
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, status);
+            ps.setInt(2, userId);
+            ps.executeUpdate();
+        }
+    }
+
+    public void updateUser(int userId, String fullName, String phone, String status, String roleName) throws SQLException {
+        String normalizedRoleName = normalizeRoleName(roleName);
+        Integer roleId = getRoleIdByName(normalizedRoleName);
+        if (roleId == null) {
+            roleId = getRoleIdByName(roleName);
+        }
+        if (roleId == null) {
+            throw new SQLException("Role không tồn tại: " + roleName);
+        }
+
+        String sql = "UPDATE users SET full_name = ?, phone = ?, status = ?, role_id = ? WHERE user_id = ?";
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, fullName);
+            ps.setString(2, phone);
+            ps.setString(3, status);
+            ps.setInt(4, roleId);
+            ps.setInt(5, userId);
+            ps.executeUpdate();
+        }
+    }
+
     // ===== Helper data rows =====
 
     public static class RevenueByMonthRow {

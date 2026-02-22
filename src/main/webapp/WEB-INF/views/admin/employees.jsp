@@ -186,6 +186,7 @@
                         <th>Role</th>
                         <th>Status</th>
                         <th>Created At</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -196,8 +197,98 @@
                             <td><c:out value="${e.email}"/></td>
                             <td><c:out value="${e.phone}"/></td>
                             <td><c:out value="${e.roleName}"/></td>
-                            <td><c:out value="${e.status}"/></td>
-                            <td><c:out value="${e.createdAt}"/></td>
+                            <td>
+                                <span class="badge ${e.status == 'ACTIVE' ? 'success' : 'danger'}" style="padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 600; background: ${e.status == 'ACTIVE' ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)'}; color: ${e.status == 'ACTIVE' ? '#22c55e' : '#ef4444'};">
+                                    <c:out value="${e.status}"/>
+                                </span>
+                            </td>
+                            <td><fmt:formatDate value="${e.createdAt}" pattern="dd/MM/yyyy HH:mm"/></td>
+                            <td>
+                                <div style="display: flex; gap: 8px;">
+                                    <a href="#edit-emp-${e.userId}" style="color: var(--accent); text-decoration: none; font-size: 13px; font-weight: 600;">Edit</a>
+                                    <c:if test="${e.status == 'ACTIVE'}">
+                                        <a href="#disable-emp-${e.userId}" style="color: var(--danger); text-decoration: none; font-size: 13px; font-weight: 600;">Disable</a>
+                                    </c:if>
+                                    <c:if test="${e.status == 'INACTIVE'}">
+                                        <a href="#enable-emp-${e.userId}" style="color: #22c55e; text-decoration: none; font-size: 13px; font-weight: 600;">Enable</a>
+                                    </c:if>
+                                </div>
+
+                                <!-- Modal Edit Employee -->
+                                <div id="edit-emp-${e.userId}" class="modal">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h2>Edit Employee #<c:out value="${e.userId}"/></h2>
+                                            <a class="close-modal" href="${pageContext.request.contextPath}/admin/employees">×</a>
+                                        </div>
+                                        <form method="post" action="${pageContext.request.contextPath}/admin/employees/update">
+                                            <input type="hidden" name="userId" value="${e.userId}" />
+                                            <div class="field">
+                                                <label>Full name</label>
+                                                <input name="fullName" type="text" value="<c:out value='${e.fullName}'/>" required maxlength="100" />
+                                            </div>
+                                            <div class="field">
+                                                <label>Phone</label>
+                                                <input name="phone" type="text" value="<c:out value='${e.phone}'/>" maxlength="20" />
+                                            </div>
+                                            <div class="field">
+                                                <label>Role</label>
+                                                <select name="roleName" required style="width:100%; padding:12px; border-radius:12px; border:1px solid var(--border); background: rgba(0,0,0,0.22); color: var(--text);">
+                                                    <option value="reviewer" ${e.roleName == 'reviewer' ? 'selected' : ''}>reviewer</option>
+                                                    <option value="Approval" ${e.roleName == 'Approval' ? 'selected' : ''}>Approval</option>
+                                                </select>
+                                            </div>
+                                            <div class="field">
+                                                <label>Status</label>
+                                                <select name="status" required style="width:100%; padding:12px; border-radius:12px; border:1px solid var(--border); background: rgba(0,0,0,0.22); color: var(--text);">
+                                                    <option value="ACTIVE" ${e.status == 'ACTIVE' ? 'selected' : ''}>ACTIVE</option>
+                                                    <option value="INACTIVE" ${e.status == 'INACTIVE' ? 'selected' : ''}>INACTIVE</option>
+                                                </select>
+                                            </div>
+                                            <div class="actions">
+                                                <button type="submit">Update</button>
+                                                <a class="small" href="${pageContext.request.contextPath}/admin/employees">Cancel</a>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+
+                                <!-- Modal Confirm Disable -->
+                                <div id="disable-emp-${e.userId}" class="modal">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h2>Khóa tài khoản</h2>
+                                            <a class="close-modal" href="${pageContext.request.contextPath}/admin/employees">×</a>
+                                        </div>
+                                        <p>Bạn có chắc chắn muốn khóa tài khoản của <strong><c:out value="${e.fullName}"/></strong>?</p>
+                                        <form method="post" action="${pageContext.request.contextPath}/admin/employees/disable">
+                                            <input type="hidden" name="userId" value="${e.userId}" />
+                                            <div class="actions">
+                                                <button type="submit" style="background: var(--danger);">Xác nhận khóa</button>
+                                                <a class="small" href="${pageContext.request.contextPath}/admin/employees">Hủy</a>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+
+                                <!-- Modal Confirm Enable -->
+                                <div id="enable-emp-${e.userId}" class="modal">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h2>Mở khóa tài khoản</h2>
+                                            <a class="close-modal" href="${pageContext.request.contextPath}/admin/employees">×</a>
+                                        </div>
+                                        <p>Bạn có chắc chắn muốn mở khóa tài khoản của <strong><c:out value="${e.fullName}"/></strong>?</p>
+                                        <form method="post" action="${pageContext.request.contextPath}/admin/employees/enable">
+                                            <input type="hidden" name="userId" value="${e.userId}" />
+                                            <div class="actions">
+                                                <button type="submit" style="background: #22c55e;">Xác nhận mở khóa</button>
+                                                <a class="small" href="${pageContext.request.contextPath}/admin/employees">Hủy</a>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </td>
                         </tr>
                     </c:forEach>
                     <c:if test="${empty employees}">
