@@ -124,7 +124,8 @@ public class AdminDao {
     }
 
     public Integer getRoleIdByName(String roleName) {
-        String sql = "SELECT role_id FROM role WHERE role_name = ?";
+        // match role_name không phân biệt hoa thường
+        String sql = "SELECT role_id FROM Role WHERE LOWER(role_name) = LOWER(?)";
         try (Connection conn = Db.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, roleName);
@@ -140,8 +141,22 @@ public class AdminDao {
         }
     }
 
+    private static String normalizeRoleName(String roleName) {
+        if (roleName == null) return null;
+        String r = roleName.trim();
+        // fix typo phổ biến
+        if (r.equalsIgnoreCase("aproval")) return "Approval";
+        return r;
+    }
+
     public int createUser(String fullName, String email, String phone, String roleName) throws SQLException {
-        Integer roleId = getRoleIdByName(roleName);
+        String normalizedRoleName = normalizeRoleName(roleName);
+        Integer roleId = getRoleIdByName(normalizedRoleName);
+        if (roleId == null) {
+            // Fallback thử tìm chính xác roleName nếu normalize không ra
+            roleId = getRoleIdByName(roleName);
+        }
+        
         if (roleId == null) {
             throw new SQLException("Role không tồn tại: " + roleName);
         }
@@ -172,7 +187,7 @@ public class AdminDao {
         // Employees: reviewer + aproval
         String sql = "SELECT u.user_id, u.full_name, u.email, u.phone, u.status, u.created_at, r.role_name " +
                      "FROM users u JOIN role r ON u.role_id = r.role_id " +
-                     "WHERE r.role_name IN ('reviewer', 'aproval') " +
+                     "WHERE LOWER(r.role_name) IN ('reviewer', 'approval', 'aproval') " +
                      "ORDER BY u.created_at DESC";
         List<UserRow> rows = new ArrayList<>();
         try (Connection conn = Db.getConnection();

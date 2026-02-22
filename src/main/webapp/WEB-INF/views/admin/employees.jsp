@@ -234,7 +234,7 @@
                         <label>Role</label>
                         <select name="roleName" required style="width:100%; padding:12px; border-radius:12px; border:1px solid var(--border); background: rgba(0,0,0,0.22); color: var(--text);">
                             <option value="reviewer">reviewer</option>
-                            <option value="aproval">aproval</option>
+                            <option value="Approval">Approval</option>
                         </select>
                     </div>
 
