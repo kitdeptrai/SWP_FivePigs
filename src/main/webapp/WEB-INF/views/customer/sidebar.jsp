@@ -1,0 +1,38 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%
+    // SỬA DÒNG NÀY: Dùng getAttribute và ép kiểu về String
+    String activePage = (String) request.getAttribute("activePage");
+    
+    // Kiểm tra null để tránh lỗi
+    if (activePage == null) activePage = "";
+%>
+
+<div class="sidebar">
+    <div class="logo">
+        <img src="${pageContext.request.contextPath}/assets/images/logo.png" alt="Logo">
+        <span class="logo-text">FIVEPIGS</span>
+    </div>
+
+    <a href="${pageContext.request.contextPath}/home" class="menu-item <%= activePage.equals("home") ? "active" : "" %>">
+        <i class="fa-solid fa-house"></i> Home
+    </a>
+
+    <a href="${pageContext.request.contextPath}/game" class="menu-item <%= activePage.equals("games") ? "active" : "" %>">
+        <i class="fa-solid fa-gamepad"></i> Games
+    </a>
+
+    <a href="${pageContext.request.contextPath}/app" class="menu-item <%= activePage.equals("apps") ? "active" : "" %>">
+        <i class="fa-solid fa-cubes"></i> Apps
+    </a>
+
+    <a href="${pageContext.request.contextPath}/library" class="menu-item <%= activePage.equals("library") ? "active" : "" %>">
+        <i class="fa-solid fa-book-open"></i> Library
+    </a>
+
+    <div class="sidebar-footer">
+        <a href="${pageContext.request.contextPath}/news" class="menu-item <%= activePage.equals("news") ? "active" : "" %>">
+        <i class="fa-solid fa-book-open"></i> News
+    </a>
+        <div class="menu-item"><i class="fa-solid fa-circle-info"></i> About</div>
+    </div>
+</div>
