@@ -16,20 +16,62 @@
     <aside class="sidebar">
         <div class="logo">
      
-    <img src="assets/images/pig.png" alt="Pig Logo">
+    <img src="${pageContext.request.contextPath}/assets/images/pig.png" alt="Pig Logo">
     <div>
         <h2>FivePigs</h2>
         <span>Software Market</span>
     </div>
 </div>
+<ul class="menu">
 
-        <ul class="menu">
-            <li class="active">Dashboard</li>
-            <li>Pending Reviews</li>
-            <li>My Reviews</li>
-            <li>Review History</li>
-            <li>Performance</li>
-        </ul>
+    <li>
+        <a href="${pageContext.request.contextPath}/reviewer_dashboard"
+           class="menu-link active">
+            <span class="icon">▦</span>
+            <span>Dashboard</span>
+        </a>
+    </li>
+
+    <li>
+        <a href="${pageContext.request.contextPath}/reviewer_pending"
+           class="menu-link">
+            <span class="icon">🕒</span>
+            <span>Pending Reviews</span>
+        </a>
+    </li>
+
+               <li>
+                    <a href="${pageContext.request.contextPath}/reviewer_my_reviews"
+                      class="menu-link ">
+                         <span class="icon">📄</span> My Reviews
+                         </a>
+                </li>
+
+               <li>
+                    <a href="${pageContext.request.contextPath}/reviewer_history"
+                        class="menu-link ">
+                        <span class="icon">⏱</span> Review History
+                    </a>
+                </li>
+
+   <!-- Review Guidelines -->
+<li>
+    <a href="${pageContext.request.contextPath}/reviewer_guidelines"
+       class="menu-link">
+        <span class="icon">📖</span>
+        <span>Review Guidelines</span>
+    </a>
+</li>
+
+<!-- Notifications -->
+<li>
+    <a href="${pageContext.request.contextPath}/reviewer_notifications"
+       class="menu-link">
+        <span class="icon">🔔</span>
+        <span>Notifications</span>
+    </a>
+</li>
+</ul>
 
         <div class="user-box">
             <div class="avatar">AJ</div>

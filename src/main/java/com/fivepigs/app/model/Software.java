@@ -5,12 +5,13 @@
 package com.fivepigs.app.model;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  *
-<<<<<<< HEAD
  * @author thanh
  */
 public class Software {
@@ -41,6 +42,55 @@ public class Software {
     private String appName;
     private Date reviewDate;
     private String recommendation;
+    private String categoryName;
+    private String version;
+    private String language;
+    
+    private String imageUrl;
+     private Double qualityScore;
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public Double getQualityScore() {
+        return qualityScore;
+    }
+
+    public void setQualityScore(Double qualityScore) {
+        this.qualityScore = qualityScore;
+    }
+    
+    
+    
+    public String getVersion() {
+    return version;
+}
+
+public void setVersion(String version) {
+    this.version = version;
+}
+
+public String getLanguage() {
+    return language;
+}
+
+public void setLanguage(String language) {
+    this.language = language;
+}
+   
+public String getCategoryName() {
+    return categoryName;
+}
+
+public void setCategoryName(String categoryName) {
+    this.categoryName = categoryName;
+}
+
 
     public Software() {
     }
@@ -185,6 +235,12 @@ public class Software {
         this.recommendation = recommendation;
     }
 
-
+   
+public String getFormattedCreatedAt() {
+    if (createdAt == null) return "";
+    DateTimeFormatter formatter =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    return createdAt.format(formatter);
+}
 
 }
