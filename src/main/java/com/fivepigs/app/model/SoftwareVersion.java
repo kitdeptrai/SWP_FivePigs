@@ -6,24 +6,9 @@ package com.fivepigs.app.model;
 
 import java.time.LocalDateTime;
 
-/**
- *
- * @author MinhPD
- */
+
 public class SoftwareVersion {
-//    CREATE TABLE Software_Version (
-//    version_id INT AUTO_INCREMENT PRIMARY KEY,
-//    software_id INT NOT NULL,
-//    version_name VARCHAR(50),      -- ví dụ 1.0.0
-//    file_url VARCHAR(255),         -- link file zip/app
-//    release_note LONGTEXT,
-//    file_size BIGINT,
-//    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-//    is_active TINYINT(1) DEFAULT 1,
-//    FOREIGN KEY (software_id) REFERENCES Software(software_id)
-//        ON DELETE CASCADE
-//);
-    
+
     private Integer versionId;
     private Integer softwareId;
     private String versionName;
@@ -110,7 +95,5 @@ public class SoftwareVersion {
     public void setIsActive(Integer isActive) {
         this.isActive = isActive;
     }
-    
-    
     
 }

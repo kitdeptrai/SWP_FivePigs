@@ -2,13 +2,12 @@ package com.fivepigs.app.service;
 
 import com.fivepigs.app.dao.UserDao;
 import com.fivepigs.app.model.User;
-import com.fivepigs.app.util.PasswordUtil;
 
 import java.sql.SQLException;
 
 public class UserService {
     private final UserDao userDao;
-    private static final String DEFAULT_ROLE = "User"; // Role mặc định khi đăng ký
+    private static final String DEFAULT_ROLE = "Customer"; // Role mặc định khi đăng ký
 
     public UserService() {
         this.userDao = new UserDao();
@@ -19,9 +18,12 @@ public class UserService {
     }
 
     public User registerUser(String fullName, String email, String password) throws SQLException {
-        // Hash password (TẠM THỜI VÔ HIỆU HÓA)
+        // Hash password (SHA-256 - TẠM THỜI COMMENT ĐỂ TEST PLAIN TEXT)
         // String passwordHash = PasswordUtil.sha256(password);
-        String passwordHash = password; // Sử dụng mật khẩu gốc
+       String passwordHash = password; // Sử dụng mật khẩu gốc
+
+        // BCrypt (khuyến nghị) - bật khi bạn đã thêm dependency jBCrypt
+        // String passwordHash = PasswordUtil.bcryptHash(password);
         
         // Lấy role_id của CUSTOMER (role mặc định)
         Integer roleId = userDao.getRoleIdByName(DEFAULT_ROLE);
@@ -64,7 +66,7 @@ public class UserService {
             return null; // Tài khoản bị khóa
         }
         
-        // Kiểm tra password (TẠM THỜI VÔ HIỆU HÓA MÃ HÓA)
+        // Kiểm tra password (SHA-256 - TẠM THỜI COMMENT ĐỂ TEST PLAIN TEXT)
         // String passwordHash = PasswordUtil.sha256(password);
         // if (!passwordHash.equals(user.getPassword())) {
         //     return null; // Password sai
@@ -74,6 +76,11 @@ public class UserService {
         if (!password.equals(user.getPassword())) {
             return null; // Password sai
         }
+
+        // BCrypt (khuyến nghị) - bật khi bạn đã thêm dependency jBCrypt
+        // if (!PasswordUtil.bcryptCheck(password, user.getPassword())) {
+        //     return null;
+        // }
         
         return user;
     }
@@ -83,9 +90,13 @@ public class UserService {
     }
 
     public void resetPassword(String email, String newPassword) throws SQLException {
-        // Tạm thời vô hiệu hóa mã hóa, chỉ lưu mật khẩu gốc
+        // Hash password (SHA-256 - TẠM THỜI COMMENT ĐỂ TEST PLAIN TEXT)
         // String passwordHash = PasswordUtil.sha256(newPassword);
         String passwordHash = newPassword;
+
+        // BCrypt (khuyến nghị) - bật khi bạn đã thêm dependency jBCrypt
+        // String passwordHash = PasswordUtil.bcryptHash(newPassword);
+
         userDao.updatePassword(email, passwordHash);
     }
 }

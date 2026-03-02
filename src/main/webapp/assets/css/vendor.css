@@ -16,6 +16,10 @@ body {
 .layout {
     display: flex;
     height: 100vh;
+<<<<<<<< HEAD:src/main/webapp/assets/css/vendor.css
+========
+    
+>>>>>>>> 48f4f6f3f0b2addd77b09b5899d232f46696e787:target/swp-fivepigs/assets/reviewer/reviewer.css
 }
 
 /* SIDEBAR */
@@ -149,18 +153,10 @@ body {
     margin-bottom: 5px;
 }
 
-.warning {
-    color: #facc15;
-}
-.success {
-    color: #22c55e;
-}
-.info {
-    color: #3b82f6;
-}
-.purple {
-    color: #a855f7;
-}
+.warning { color: #facc15; }
+.success { color: #22c55e; }
+.info { color: #3b82f6; }
+.purple { color: #a855f7; }
 
 .danger {
     color: #ef4444;
@@ -193,12 +189,48 @@ body {
     color: #c7d2fe;
 }
 
+<<<<<<<< HEAD:src/main/webapp/assets/css/vendor.css
 .green {
     color: #22c55e;
 }
 .blue {
     color: #3b82f6;
 }
+========
+/* PROGRESS BAR */
+.progress-bar {
+    background: #1e293b;
+    height: 8px;
+    border-radius: 8px;
+    margin: 8px 0 16px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    background: linear-gradient(90deg, #4f6ef7, #6366f1);
+    height: 100%;
+    border-radius: 8px;
+}
+
+/* STATS */
+.stats {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.stats h2 {
+    font-size: 22px;
+}
+
+.stats p {
+    color: #94a3b8;
+    font-size: 13px;
+}
+
+.green { color: #22c55e; }
+.blue { color: #3b82f6; }
+>>>>>>>> 48f4f6f3f0b2addd77b09b5899d232f46696e787:target/swp-fivepigs/assets/reviewer/reviewer.css
 
 /* QUALITY */
 .quality {
@@ -208,6 +240,88 @@ body {
     font-size: 14px;
 }
 
+<<<<<<<< HEAD:src/main/webapp/assets/css/vendor.css
+========
+/* FULL WIDTH */
+.full-width {
+    grid-column: 1 / -1;
+    margin-top: 30px;
+}
+
+/* REVIEW ITEM */
+.review-item {
+    display: flex;
+    align-items: center;
+    background: #020617;
+    padding: 14px;
+    border-radius: 14px;
+    margin-top: 16px;
+}
+
+.review-img {
+    width: 52px;
+    height: 52px;
+    border-radius: 10px;
+    object-fit: cover;
+    margin-right: 14px;
+}
+
+.review-info {
+    flex: 1;
+}
+
+.review-info p {
+    font-size: 13px;
+    color: #94a3b8;
+}
+
+/* TAGS */
+.review-tags {
+    display: flex;
+    gap: 8px;
+    margin-right: 16px;
+}
+
+.tag {
+    padding: 4px 8px;
+    font-size: 12px;
+    border-radius: 6px;
+}
+
+.tag.success {
+    background: #052e16;
+    color: #22c55e;
+}
+
+/* STATUS */
+.review-status {
+    font-size: 20px;
+}
+
+.review-status.pending {
+    color: #facc15;
+}
+
+.review-status.done {
+    color: #22c55e;
+}
+/* LOGO REVIEWER */
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo img {
+    width: 55px;
+    height: 55px;
+    object-fit: cover;
+    border-radius: 10px;
+    background: #ffffff;
+    padding: 4px;
+}
+
+>>>>>>>> 48f4f6f3f0b2addd77b09b5899d232f46696e787:target/swp-fivepigs/assets/reviewer/reviewer.css
 /* ICON IN CARD */
 .card {
     position: relative;
@@ -277,18 +391,10 @@ body {
     margin-top: 8px;
 }
 
-.warning-text {
-    color: #facc15;
-}
-.success-text {
-    color: #22c55e;
-}
-.info-text    {
-    color: #3b82f6;
-}
-.purple-text  {
-    color: #a855f7;
-}
+.warning-text { color: #facc15; }
+.success-text { color: #22c55e; }
+.info-text    { color: #3b82f6; }
+.purple-text  { color: #a855f7; }
 
 
 .card {
@@ -310,67 +416,148 @@ body {
 }
 
 /* màu giống hình */
-.warning-text {
-    color: #facc15;
-}
-.success-text {
-    color: #22c55e;
-}
-.info-text    {
-    color: #3b82f6;
-}
-.purple-text  {
-    color: #a855f7;
+.warning-text { color: #facc15; }
+.success-text { color: #22c55e; }
+.info-text    { color: #3b82f6; }
+.purple-text  { color: #a855f7; }
+
+<<<<<<<< HEAD:src/main/webapp/assets/css/vendor.css
+========
+
+/* ===== RECENT REVIEW – STYLE GIỐNG HÌNH MẪU ===== */
+
+.recent-panel {
+    background: linear-gradient(180deg, #1f2937, #0b1220);
+    border-radius: 22px;
+    padding: 26px;
 }
 
-.left {
+/* override review-item cũ */
+.recent-item {
+    background: #111827;
+    border-radius: 18px;
+    padding: 18px 20px;
+    margin-top: 18px;
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 16px;
 }
 
+/* ảnh thumbnail */
+.recent-thumb {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    object-fit: cover;
+}
+
+/* info */
+.recent-item .review-info strong {
+    font-size: 15px;
+}
+
+.recent-item .review-info p {
+    font-size: 13px;
+    color: #94a3b8;
+    margin-top: 4px;
+}
+
+/* status icon */
+.recent-item .review-status {
+    font-size: 22px;
+    margin-left: auto;
+}
+
+.recent-item .review-status.pending {
+    color: #facc15;
+}
+
+.recent-item .review-status.done {
+    color: #22c55e;
+}
+
+.recent-review {
+  background: linear-gradient(180deg, #0b1020, #111827);
+  padding: 24px;
+  border-radius: 16px;
+  color: #fff;
+}
+
+.recent-review h2 {
+  margin-bottom: 20px;
+  font-size: 20px;
+}
+
+.review-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #1f2937;
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 14px;
+}
+
+>>>>>>>> 48f4f6f3f0b2addd77b09b5899d232f46696e787:target/swp-fivepigs/assets/reviewer/reviewer.css
+.left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+<<<<<<<< HEAD:src/main/webapp/assets/css/vendor.css
+========
+.logo {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+>>>>>>>> 48f4f6f3f0b2addd77b09b5899d232f46696e787:target/swp-fivepigs/assets/reviewer/reviewer.css
 .info .name {
-    font-size: 16px;
-    font-weight: 600;
+  font-size: 16px;
+  font-weight: 600;
 }
 
 .info .meta {
-    font-size: 13px;
-    color: #9ca3af;
+  font-size: 13px;
+  color: #9ca3af;
 }
 
 .right {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .badge {
-    padding: 4px 10px;
-    border-radius: 999px;
-    font-size: 12px;
-    font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
 }
 
 .badge.green {
-    background: rgba(34,197,94,0.15);
-    color: #22c55e;
+  background: rgba(34,197,94,0.15);
+  color: #22c55e;
 }
 
 .pending svg {
-    filter: drop-shadow(0 0 6px rgba(250,204,21,0.6));
+  filter: drop-shadow(0 0 6px rgba(250,204,21,0.6));
 }
 
 .done svg {
-    filter: drop-shadow(0 0 6px rgba(34,197,94,0.6));
+  filter: drop-shadow(0 0 6px rgba(34,197,94,0.6));
 }
 .review-logo {
-    width: 48px;
-    height: 48px;
-    border-radius: 10px;
-    object-fit: cover;
-    background: #111827;
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  object-fit: cover;
+  background: #111827;
 }
+<<<<<<<< HEAD:src/main/webapp/assets/css/vendor.css
 .table-card {
     background: linear-gradient(180deg, #1f2937, #111827);
     border-radius: 14px;
@@ -381,9 +568,39 @@ body {
 }
 
 .table-header {
+========
+/* ===== SIDEBAR ===== */
+
+.sidebar {
+    width: 260px;
+    background: #0b1220;
+    padding: 20px;
+>>>>>>>> 48f4f6f3f0b2addd77b09b5899d232f46696e787:target/swp-fivepigs/assets/reviewer/reviewer.css
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+}
+
+/* remove underline cleanly */
+.sidebar a {
+    text-decoration: none;
+}
+
+/* menu list */
+.menu {
+    list-style: none;
+    margin-top: 30px;
+    padding: 0;
+}
+
+.menu li {
+    margin-bottom: 12px;
+}
+
+/* menu link */
+.menu-link {
+    display: flex;
     align-items: center;
+<<<<<<<< HEAD:src/main/webapp/assets/css/vendor.css
     margin-bottom: 15px;
 }
 
@@ -469,11 +686,49 @@ body {
     padding: 6px 14px;
     border-radius: 999px;
     font-size: 12px;
+========
+    gap: 14px;
+    padding: 14px 18px;
+    border-radius: 16px;
+>>>>>>>> 48f4f6f3f0b2addd77b09b5899d232f46696e787:target/swp-fivepigs/assets/reviewer/reviewer.css
     font-weight: 500;
-    color: #93c5fd;
-    border: 1px solid rgba(147, 197, 253, 0.3);
-    background: transparent;
+    font-size: 15px;
+    color: #9ca3af;
+    transition: all 0.25s ease;
+}
+
+/* icon */
+.menu-link .icon {
+    font-size: 18px;
+    width: 22px;
+    text-align: center;
+}
+
+/* hover */
+.menu-link:hover {
+    background: #1e293b;
+    color: #ffffff;
+}
+
+/* active */
+.menu-link.active {
+    background: linear-gradient(90deg, #4f6ef7, #6366f1);
+    color: #ffffff;
+}
+.menu-link,
+.menu-link:link,
+.menu-link:visited,
+.menu-link:hover,
+.menu-link:active {
+    text-decoration: none !important;
+}
+.sidebar a {
     text-decoration: none;
+<<<<<<<< HEAD:src/main/webapp/assets/css/vendor.css
     transition: all 0.2s ease;
 }
 
+========
+    color: #cbd5e1;
+}
+>>>>>>>> 48f4f6f3f0b2addd77b09b5899d232f46696e787:target/swp-fivepigs/assets/reviewer/reviewer.css

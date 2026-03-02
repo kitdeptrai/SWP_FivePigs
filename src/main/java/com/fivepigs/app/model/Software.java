@@ -5,11 +5,14 @@
 package com.fivepigs.app.model;
 
 import java.sql.Date;
+import java.sql.Timestamp;
+
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  *
- * @author MinhPD
+ * @author thanh
  */
 public class Software {
 //    software_id INT IDENTITY(1,1) PRIMARY KEY,
@@ -36,15 +39,73 @@ public class Software {
     private Double avgRating;
     private LocalDateTime createdAt;
     private Double revenue;
+    private String appName;
+    private User user;
+    private Category category;
     private SoftwareImage softwareImage;
-    private Category category; 
+    private ApprovalProcess approvalProcess;
+    private ReviewerProcess reviewerProcess;
     private SoftwareVersion softwareVersion;
     private SoftwareDetail softwareDetail;
+
+    private Date reviewDate;
+    private String recommendation;
+    private String categoryName;
+    private String version;
+    private String language;
     
+    private String imageUrl;
+     private Double qualityScore;
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public Double getQualityScore() {
+        return qualityScore;
+    }
+
+    public void setQualityScore(Double qualityScore) {
+        this.qualityScore = qualityScore;
+    }
+    
+    
+    
+    public String getVersion() {
+    return version;
+}
+
+public void setVersion(String version) {
+    this.version = version;
+}
+
+public String getLanguage() {
+    return language;
+}
+
+public void setLanguage(String language) {
+    this.language = language;
+}
+   
+public String getCategoryName() {
+    return categoryName;
+}
+
+public void setCategoryName(String categoryName) {
+    this.categoryName = categoryName;
+}
+
+
+
+  
     public Software() {
     }
 
-    public Software(Integer softwareId, String name, String shortDescription, Integer vendorId, Integer categoryId, Double price, Integer isFree, String status, Integer downloadCount, Double avgRating, LocalDateTime createdAt, Double revenue, SoftwareImage softwareImage, Category category, SoftwareVersion softwareVersion) {
+    public Software(Integer softwareId, String name, String short_description, Integer vendorId, Integer categoryId, Double price, Integer isFree, String status, Integer downloadCount, Double avgRating, LocalDateTime createdAt, Double revenue, String appName, ApprovalProcess ap, ReviewerProcess rp) {
         this.softwareId = softwareId;
         this.name = name;
         this.shortDescription = shortDescription;
@@ -57,13 +118,75 @@ public class Software {
         this.avgRating = avgRating;
         this.createdAt = createdAt;
         this.revenue = revenue;
-        this.softwareImage = softwareImage;
-        this.category = category;
+        this.appName = appName;
+        this.approvalProcess = ap;
+        this.reviewerProcess = rp;
+    }
+
+    public SoftwareDetail getSoftwareDetail() {
+        return softwareDetail;
+    }
+
+    public void setSoftwareDetail(SoftwareDetail softwareDetail) {
+        this.softwareDetail = softwareDetail;
+    }
+
+    public SoftwareVersion getSoftwareVersion() {
+        return softwareVersion;
+    }
+
+    public void setSoftwareVersion(SoftwareVersion softwareVersion) {
         this.softwareVersion = softwareVersion;
+    }
+
+
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+    
+    
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+    
+    
+
+    public SoftwareImage getSoftwareImage() {
+        return softwareImage;
+    }
+
+    public void setSoftwareImage(SoftwareImage softwareImage) {
+        this.softwareImage = softwareImage;
     }
 
     
     
+    public ApprovalProcess getApprovalProcess() {
+        return approvalProcess;
+    }
+
+    public void setApprovalProcess(ApprovalProcess ap) {
+        this.approvalProcess = ap;
+    }
+
+    public ReviewerProcess getReviewerProcess() {
+        return reviewerProcess;
+    }
+
+    public void setReviewerProcess(ReviewerProcess rp) {
+        this.reviewerProcess = rp;
+    }
+
     public Integer getSoftwareId() {
         return softwareId;
     }
@@ -160,39 +283,23 @@ public class Software {
         this.revenue = revenue;
     }
 
-    public SoftwareImage getSoftwareImage() {
-        return softwareImage;
+
+    public String getAppName() {
+        return appName;
     }
 
-    public void setSoftwareImage(SoftwareImage softwareImage) {
-        this.softwareImage = softwareImage;
+    public void setAppName(String appName) {
+        this.appName = appName;
     }
 
-    public Category getCategory() {
-        return category;
-    }
 
-    public void setCategory(Category category) {
-        this.category = category;
-    }
+   
+public String getFormattedCreatedAt() {
+    if (createdAt == null) return "";
+    DateTimeFormatter formatter =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    return createdAt.format(formatter);
+}
 
-    public SoftwareVersion getSoftwareVersion() {
-        return softwareVersion;
-    }
 
-    public void setSoftwareVersion(SoftwareVersion softwareVersion) {
-        this.softwareVersion = softwareVersion;
-    }
-
-    public SoftwareDetail getSoftwareDetail() {
-        return softwareDetail;
-    }
-
-    public void setSoftwareDetail(SoftwareDetail softwareDetail) {
-        this.softwareDetail = softwareDetail;
-    }
-     
-    
-    
-    
 }
