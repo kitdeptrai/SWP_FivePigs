@@ -5,11 +5,11 @@
 package com.fivepigs.app.model;
 
 import java.sql.Date;
+
 import java.time.LocalDateTime;
 
 /**
  *
-<<<<<<< HEAD
  * @author thanh
  */
 public class Software {
@@ -81,8 +81,8 @@ public class Software {
     public void setSoftwareVersion(SoftwareVersion softwareVersion) {
         this.softwareVersion = softwareVersion;
     }
-    
-    
+
+
 
     public User getUser() {
         return user;
@@ -233,5 +233,6 @@ public class Software {
     public void setAppName(String appName) {
         this.appName = appName;
     }
-    
+
+
 }

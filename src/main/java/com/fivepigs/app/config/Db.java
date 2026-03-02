@@ -18,11 +18,12 @@ public final class Db {
         } catch (ClassNotFoundException e) {
             throw new RuntimeException("Failed to load MySQL JDBC Driver", e);
         }
-    }
+    }   
 
     private Db() {}
 
     public static Connection getConnection() throws SQLException {
         return DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASS);
     }
+    
 }

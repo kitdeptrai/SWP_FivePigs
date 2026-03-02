@@ -5,34 +5,82 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Xác thực OTP</title>
+  <title>Xác thực OTP - Đăng ký</title>
   <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css" />
   <style>
     .otp-inputs {
       display: flex;
       justify-content: center;
-      gap: 10px;
-      margin: 20px 0;
+      gap: 12px;
+      margin: 30px 0;
     }
     .otp-input {
-      width: 40px;
-      height: 40px;
+      width: 45px;
+      height: 50px;
       text-align: center;
-      font-size: 1.2em;
-      border-radius: 8px;
+      font-size: 1.5em;
+      font-weight: 600;
+      border-radius: 12px;
+      border: 2px solid var(--border);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text);
+      transition: all 0.2s ease;
+    }
+    .otp-input:focus {
+      border-color: var(--primary);
+      background: rgba(124, 58, 237, 0.1);
+      outline: none;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(124, 58, 237, 0.2);
+    }
+    .otp-input.filled {
+      border-color: var(--primary-2);
+    }
+    .resend-container {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 25px;
+        padding-top: 20px;
+        border-top: 1px solid var(--border);
     }
     .resend-link {
-        display: block;
-        text-align: center;
-        margin-top: 15px;
+        color: var(--primary);
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        transition: color 0.2s;
+    }
+    .resend-link:hover {
+        color: #a78bfa;
+        text-decoration: underline;
+    }
+    .error-msg {
+        display: none;
+        margin-bottom: 15px;
+    }
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+    }
+    .shake {
+        animation: shake 0.2s ease-in-out 0s 2;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="card">
-      <h1>Nhập mã OTP</h1>
-      <p class="subtitle">Một mã OTP đã được gửi đến email <strong><c:out value="${sessionScope.reg_email}"/></strong>. Vui lòng nhập mã vào ô dưới đây.</p>
+      <div style="text-align: center; margin-bottom: 20px;">
+          <div style="background: rgba(124, 58, 237, 0.1); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
+              <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><polyline points="17 11 19 13 23 9"></polyline></svg>
+          </div>
+          <h1>Xác thực đăng ký</h1>
+          <p class="subtitle">Mã OTP đã được gửi đến email:<br><strong style="color: var(--text)"><c:out value="${sessionScope.reg_email}"/></strong></p>
+      </div>
+
+      <div id="js-error" class="alert danger error-msg"></div>
 
       <c:if test="${not empty error}">
         <div class="alert danger">${error}</div>
@@ -44,65 +92,103 @@
 
       <form method="post" action="${pageContext.request.contextPath}/verify-register-otp" autocomplete="off">
         <div class="otp-inputs" id="otp-container">
-            <input class="otp-input" type="text" inputmode="numeric" maxlength="1" />
-            <input class="otp-input" type="text" inputmode="numeric" maxlength="1" />
-            <input class="otp-input" type="text" inputmode="numeric" maxlength="1" />
-            <input class="otp-input" type="text" inputmode="numeric" maxlength="1" />
-            <input class="otp-input" type="text" inputmode="numeric" maxlength="1" />
-            <input class="otp-input" type="text" inputmode="numeric" maxlength="1" />
+            <input class="otp-input" type="text" inputmode="numeric" maxlength="1" pattern="\d*" />
+            <input class="otp-input" type="text" inputmode="numeric" maxlength="1" pattern="\d*" />
+            <input class="otp-input" type="text" inputmode="numeric" maxlength="1" pattern="\d*" />
+            <input class="otp-input" type="text" inputmode="numeric" maxlength="1" pattern="\d*" />
+            <input class="otp-input" type="text" inputmode="numeric" maxlength="1" pattern="\d*" />
+            <input class="otp-input" type="text" inputmode="numeric" maxlength="1" pattern="\d*" />
         </div>
         <input type="hidden" name="otp" id="otp-hidden-input" />
 
         <div class="actions">
-          <button type="submit">Xác thực</button>
+          <button type="submit" id="btn-submit" style="height: 48px; font-size: 16px;">Hoàn tất đăng ký</button>
         </div>
       </form>
 
-      <a href="${pageContext.request.contextPath}/resend-otp" class="resend-link">Gửi lại mã OTP</a>
+      <div class="resend-container">
+          <a class="resend-link" href="${pageContext.request.contextPath}/register">Quay lại đăng ký</a>
+          <span style="color: var(--border)">|</span>
+          <a class="resend-link" href="${pageContext.request.contextPath}/resend-otp">Gửi lại mã OTP</a>
+      </div>
     </div>
   </div>
 
   <script>
     const otpContainer = document.getElementById('otp-container');
     const hiddenInput = document.getElementById('otp-hidden-input');
+    const jsError = document.getElementById('js-error');
     const form = document.querySelector('form');
+    const inputs = otpContainer.querySelectorAll('.otp-input');
 
-    otpContainer.addEventListener('input', (e) => {
-        const target = e.target;
-        const value = target.value;
-        if (isNaN(value)) {
-            target.value = '';
-            return;
-        }
-        if (value !== '') {
-            const next = target.nextElementSibling;
-            if (next) {
-                next.focus();
-            }
-        }
-        updateHiddenInput();
-    });
+    // Focus ô đầu tiên khi load trang
+    window.onload = () => inputs[0].focus();
 
-    otpContainer.addEventListener('keydown', (e) => {
-        const target = e.target;
-        if (e.key === 'Backspace' && target.value === '') {
-            const prev = target.previousElementSibling;
-            if (prev) {
-                prev.focus();
+    inputs.forEach((input, index) => {
+        // Xử lý nhập số
+        input.addEventListener('input', (e) => {
+            const value = e.target.value;
+
+            if (!/^\d$/.test(value)) {
+                e.target.value = '';
+                return;
             }
-        }
-        updateHiddenInput();
+
+            input.classList.add('filled');
+
+            if (value !== '' && index < inputs.length - 1) {
+                inputs[index + 1].focus();
+            }
+            updateHiddenInput();
+        });
+
+        // Xử lý xóa (Backspace)
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Backspace') {
+                if (input.value === '' && index > 0) {
+                    inputs[index - 1].focus();
+                    inputs[index - 1].value = '';
+                    inputs[index - 1].classList.remove('filled');
+                } else {
+                    input.classList.remove('filled');
+                }
+            }
+        });
+
+        // Xử lý Paste mã OTP
+        input.addEventListener('paste', (e) => {
+            e.preventDefault();
+            const data = e.clipboardData.getData('text').trim();
+            if (!/^\d{6}$/.test(data)) return;
+
+            data.split('').forEach((char, i) => {
+                if (inputs[i]) {
+                    inputs[i].value = char;
+                    inputs[i].classList.add('filled');
+                }
+            });
+            updateHiddenInput();
+            inputs[5].focus();
+        });
     });
 
     function updateHiddenInput() {
         let otp = '';
-        for (const input of otpContainer.children) {
-            otp += input.value;
-        }
+        inputs.forEach(input => { otp += input.value; });
         hiddenInput.value = otp;
+        if (otp.length === 6) jsError.style.display = 'none';
     }
 
-    form.addEventListener('submit', updateHiddenInput);
+    form.addEventListener('submit', (e) => {
+        updateHiddenInput();
+        if (hiddenInput.value.length !== 6) {
+            e.preventDefault();
+            jsError.textContent = "Vui lòng nhập đủ 6 chữ số của mã xác thực.";
+            jsError.style.display = 'block';
+            otpContainer.classList.add('shake');
+            setTimeout(() => otpContainer.classList.remove('shake'), 400);
+        }
+    });
   </script>
 </body>
 </html>

@@ -67,9 +67,10 @@ public class ResetPasswordServlet extends HttpServlet {
             userService.resetPassword(email, newPassword);
 
             // Invalidate OTP after success to prevent reuse
-            session.removeAttribute("reset_otp");
+            session.removeAttribute("reset_otp_hash");
             session.removeAttribute("reset_otp_expire");
             session.removeAttribute("reset_otp_last_sent");
+            session.removeAttribute("reset_otp_attempts");
             session.removeAttribute("reset_email");
 
             session.invalidate();

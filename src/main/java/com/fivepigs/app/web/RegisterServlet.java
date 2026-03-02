@@ -66,9 +66,10 @@ public class RegisterServlet extends HttpServlet {
             session.setAttribute("reg_fullName", fullName);
             session.setAttribute("reg_email", email);
             session.setAttribute("reg_password", password);
-            session.setAttribute("reg_otp", otp);
+            session.setAttribute("reg_otp", com.fivepigs.app.util.OtpUtil.hashOtp(otp));
             session.setAttribute("reg_otp_expire",
                     System.currentTimeMillis() + 5 * 60 * 1000);
+            session.setAttribute("reg_otp_attempts", 0);
 
             // Chuẩn bị nội dung email HTML
             String emailBody = "<div style='font-family: Arial, sans-serif; line-height: 1.6;'>"
