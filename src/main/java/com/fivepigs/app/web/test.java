@@ -22,16 +22,9 @@ public class test {
         try{
         SoftwareDao swdao = new SoftwareDao();
         
-        List<Software> sw = swdao.getSoftwareCardListByVendorID(2);
+        List<Software> sw = swdao.Top3RevenueByVendor(2);
         for (Software s : sw) {
-            System.out.println("ID: " + s.getSoftwareId());
-            System.out.println("Name: " + s.getName());
-            System.out.println("Short Description: " + s.getShortDescription());
-            System.out.println("Status: " + s.getStatus());
-            System.out.println("Download: " + s.getDownloadCount());
-            System.out.println("Rating: " + s.getAvgRating());
-            System.out.println(s.getSoftwareImage().getImageUrl());
-            System.out.println("-----------------------------");
+            System.out.println(s.getSoftwareId());
         }
         }catch(SQLException e){
             System.out.println("loi");

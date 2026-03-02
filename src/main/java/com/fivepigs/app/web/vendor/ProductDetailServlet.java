@@ -6,8 +6,10 @@ package com.fivepigs.app.web.vendor;
 
 import com.fivepigs.app.dao.ReviewDao;
 import com.fivepigs.app.dao.SoftwareDao;
+import com.fivepigs.app.dao.SoftwareImageDao;
 import com.fivepigs.app.model.Review;
 import com.fivepigs.app.model.Software;
+import com.fivepigs.app.model.SoftwareImage;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -32,15 +34,17 @@ public class ProductDetailServlet extends HttpServlet {
         try {
             Integer softwareId = Integer.parseInt(request.getParameter("softwareId"));
             SoftwareDao swdao = new SoftwareDao();
-            ReviewDao rwdao=new ReviewDao();
+            SoftwareImageDao idao = new SoftwareImageDao();
+            ReviewDao rwdao = new ReviewDao();
             Integer downloadCount = swdao.getDownloadBySoftwareId(softwareId);
             Double revenue = swdao.getRevenueBySoftwareId(softwareId);
             Double avgRating = swdao.getRatingBySoftwareId(softwareId);
             Integer totalLicense = swdao.getTotalLicenseBySoftwareId(softwareId);
             Software infoSoftware = swdao.getSoftwareDetailBySoftwareId(softwareId);
-            List<Review> listReview=rwdao.getReviewListBySoftwareId(softwareId);
-
-            request.setAttribute("listReview",listReview);
+            List<SoftwareImage> listImage = idao.getImagesBySoftwareId(softwareId);
+            List<Review> listReview = rwdao.getReviewListBySoftwareId(softwareId);
+            request.setAttribute("listImage", listImage);
+            request.setAttribute("listReview", listReview);
             request.setAttribute("infoSoftware", infoSoftware);
             request.setAttribute("downloadCount", downloadCount == null ? 0 : downloadCount);
             request.setAttribute("revenue", revenue == null ? 0 : revenue);

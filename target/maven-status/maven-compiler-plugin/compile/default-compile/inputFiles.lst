@@ -1,5 +1,6 @@
 D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\ReviewerDashboardServlet.java
 D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\dao\UserDao.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\vendor\PayoutServlet.java
 D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\RegisterServlet.java
 D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\test.java
 D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\dao\SoftwareDao.java
@@ -24,6 +25,7 @@ D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fi
 D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\model\Role.java
 D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\ApprovalDashboardServlet.java
 D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\model\Review.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\dao\LicenseDao.java
 D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\util\PasswordUtil.java
 D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\AdminDashboardServlet.java
 D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\util\OtpUtil.java

@@ -14,6 +14,7 @@ CREATE TABLE Users (
     full_name NVARCHAR(100),
     email VARCHAR(100) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
+    avatar VARCHAR(255),
     role_id INT NOT NULL,
     phone VARCHAR(20),
     status VARCHAR(20) DEFAULT 'ACTIVE',
@@ -55,7 +56,6 @@ CREATE TABLE Software_Detail (
     detail_id INT AUTO_INCREMENT PRIMARY KEY,
     software_id INT UNIQUE,
     description LONGTEXT,
-    version VARCHAR(50),
     system_requirement LONGTEXT,
     release_note LONGTEXT,
     FOREIGN KEY (software_id) REFERENCES Software(software_id) ON DELETE CASCADE
@@ -71,7 +71,21 @@ CREATE TABLE Software_Image (
     FOREIGN KEY (software_id) REFERENCES Software(software_id) ON DELETE CASCADE
 );
 
--- 8. Cart
+-- 8. Software Version
+CREATE TABLE Software_Version (
+    version_id INT AUTO_INCREMENT PRIMARY KEY,
+    software_id INT NOT NULL,
+    version_name VARCHAR(50),      -- ví dụ 1.0.0
+    file_url VARCHAR(255),         -- link file zip/app
+    release_note LONGTEXT,
+    file_size BIGINT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    is_active TINYINT(1) DEFAULT 1,
+    FOREIGN KEY (software_id) REFERENCES Software(software_id)
+        ON DELETE CASCADE
+);
+
+-- 9. Cart
 CREATE TABLE Cart (
     cart_id INT AUTO_INCREMENT PRIMARY KEY,
     customer_id INT,
@@ -79,7 +93,7 @@ CREATE TABLE Cart (
     FOREIGN KEY (customer_id) REFERENCES Users(user_id)
 );
 
--- 9. Cart Detail
+-- 10. Cart Detail
 CREATE TABLE Cart_Detail (
     cart_detail_id INT AUTO_INCREMENT PRIMARY KEY,
     cart_id INT,
@@ -88,7 +102,7 @@ CREATE TABLE Cart_Detail (
     FOREIGN KEY (software_id) REFERENCES Software(software_id)
 );
 
--- 10. Orders
+-- 11. Orders
 CREATE TABLE Orders (
     order_id INT AUTO_INCREMENT PRIMARY KEY,
     customer_id INT,
@@ -99,7 +113,7 @@ CREATE TABLE Orders (
     FOREIGN KEY (payment_status_id) REFERENCES Payment_Status(payment_status_id)
 );
 
--- 11. Order Detail
+-- 12. Order Detail
 CREATE TABLE Order_Detail (
     order_detail_id INT AUTO_INCREMENT PRIMARY KEY,
     order_id INT,
@@ -109,7 +123,7 @@ CREATE TABLE Order_Detail (
     FOREIGN KEY (software_id) REFERENCES Software(software_id)
 );
 
--- 12. License
+-- 13. License
 CREATE TABLE License (
     license_id INT AUTO_INCREMENT PRIMARY KEY,
     license_key VARCHAR(100) UNIQUE,
@@ -122,7 +136,7 @@ CREATE TABLE License (
     FOREIGN KEY (customer_id) REFERENCES Users(user_id)
 );
 
--- 13. Software Review Process
+-- 14. Software Review Process
 CREATE TABLE Software_Review_Process (
     review_process_id INT AUTO_INCREMENT PRIMARY KEY,
     software_id INT,
@@ -133,7 +147,7 @@ CREATE TABLE Software_Review_Process (
     FOREIGN KEY (reviewer_id) REFERENCES Users(user_id)
 );
 
--- 14. Software Approval
+-- 15. Software Approval
 CREATE TABLE Software_Approval (
     approval_id INT AUTO_INCREMENT PRIMARY KEY,
     software_id INT UNIQUE NOT NULL,
@@ -145,7 +159,7 @@ CREATE TABLE Software_Approval (
     FOREIGN KEY (approver_id) REFERENCES Users(user_id)
 );
 
--- 15. Review
+-- 16. Review
 CREATE TABLE Review (
     review_id INT AUTO_INCREMENT PRIMARY KEY,
     software_id INT,
@@ -157,7 +171,7 @@ CREATE TABLE Review (
     FOREIGN KEY (customer_id) REFERENCES Users(user_id)
 );
 
--- 16. Report
+-- 17. Report
 CREATE TABLE Report (
     report_id INT AUTO_INCREMENT PRIMARY KEY,
     software_id INT,
@@ -169,7 +183,7 @@ CREATE TABLE Report (
     FOREIGN KEY (reporter_id) REFERENCES Users(user_id)
 );
 
--- 17. Notification
+-- 18. Notification
 CREATE TABLE Notification (
     notification_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT,
@@ -180,7 +194,7 @@ CREATE TABLE Notification (
     FOREIGN KEY (user_id) REFERENCES Users(user_id)
 );
 
--- 18. Vendor Payout
+-- 19. Vendor Payout
 CREATE TABLE Vendor_Payout (
     payout_id INT AUTO_INCREMENT PRIMARY KEY,
     vendor_id INT,
@@ -192,7 +206,7 @@ CREATE TABLE Vendor_Payout (
     FOREIGN KEY (vendor_id) REFERENCES Users(user_id)
 );
 
--- 19. Vendor Payout Detail
+-- 20. Vendor Payout Detail
 CREATE TABLE Vendor_Payout_Detail (
     payout_detail_id INT AUTO_INCREMENT PRIMARY KEY,
     payout_id INT,
@@ -202,7 +216,7 @@ CREATE TABLE Vendor_Payout_Detail (
     FOREIGN KEY (order_detail_id) REFERENCES Order_Detail(order_detail_id)
 );
 
--- 20. Wallet
+-- 21. Wallet
 CREATE TABLE Wallet (
     wallet_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT UNIQUE,
@@ -212,7 +226,7 @@ CREATE TABLE Wallet (
     FOREIGN KEY (user_id) REFERENCES Users(user_id)
 );
 
--- 21. Wallet Transaction
+-- 22. Wallet Transaction
 CREATE TABLE Wallet_Transaction (
     transaction_id INT AUTO_INCREMENT PRIMARY KEY,
     wallet_id INT,
@@ -223,7 +237,7 @@ CREATE TABLE Wallet_Transaction (
     FOREIGN KEY (wallet_id) REFERENCES Wallet(wallet_id)
 );
 
--- 22. Support Ticket
+-- 23. Support Ticket
 CREATE TABLE Support_Ticket (
     ticket_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
@@ -238,7 +252,7 @@ CREATE TABLE Support_Ticket (
     FOREIGN KEY (assigned_admin_id) REFERENCES Users(user_id)
 );
 
--- 23. Support Ticket Message
+-- 24. Support Ticket Message
 CREATE TABLE Support_Ticket_Message (
     message_id INT AUTO_INCREMENT PRIMARY KEY,
     ticket_id INT NOT NULL,
@@ -248,4 +262,62 @@ CREATE TABLE Support_Ticket_Message (
     FOREIGN KEY (ticket_id) REFERENCES Support_Ticket(ticket_id) ON DELETE CASCADE,
     FOREIGN KEY (sender_id) REFERENCES Users(user_id)
 );
+
+-- 25. pending review
+CREATE TABLE Review_Score (
+    review_score_id INT AUTO_INCREMENT PRIMARY KEY,
+    software_id INT NOT NULL,
+    reviewer_id INT NOT NULL,
+    
+    no_malware TINYINT(1) DEFAULT 0,
+    no_copyright_violation TINYINT(1) DEFAULT 0,
+    no_spam_content TINYINT(1) DEFAULT 0,
+
+    ui_ux_score INT,
+    technical_score INT,
+    performance_score INT,
+    documentation_score INT,
+
+    total_score DECIMAL(4,2),
+
+    decision VARCHAR(20), -- APPROVED / REJECTED
+    review_note LONGTEXT,
+
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (software_id) REFERENCES Software(software_id),
+    FOREIGN KEY (reviewer_id) REFERENCES Users(user_id)
+);
+
+-- 26.my reviews
+
+
+-- ===== Review Guidelines =====
+CREATE TABLE Review_Guideline (
+    guideline_id INT AUTO_INCREMENT PRIMARY KEY,
+    category VARCHAR(50) NOT NULL,              -- Security/Legal/Technical/Performance/Functionality
+    priority VARCHAR(20) NOT NULL,              -- Critical/High/Medium/Low
+    title NVARCHAR(150) NOT NULL,
+    description LONGTEXT,
+    icon VARCHAR(50),                           -- Shield / Code / Bolt ...
+    color VARCHAR(30),                          -- Red / Blue / Purple ...
+    created_by INT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (created_by) REFERENCES Users(user_id)
+);
+
+CREATE TABLE Review_Guideline_Item (
+    item_id INT AUTO_INCREMENT PRIMARY KEY,
+    guideline_id INT NOT NULL,
+    item_text NVARCHAR(255) NOT NULL,
+    sort_order INT DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (guideline_id) REFERENCES Review_Guideline(guideline_id) ON DELETE CASCADE
+);
+
+-- Index để search/filter nhanh
+CREATE INDEX idx_guideline_category ON Review_Guideline(category);
+CREATE INDEX idx_guideline_title ON Review_Guideline(title);
+CREATE INDEX idx_item_guideline ON Review_Guideline_Item(guideline_id);
 

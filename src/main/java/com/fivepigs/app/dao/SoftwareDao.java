@@ -271,23 +271,25 @@ public class SoftwareDao {
         return null;
     }
 
-    public Software getSoftwareDetailBySoftwareId(int softwareId) throws SQLException{
-        String sql = "SELECT s.name,sv.version_name AS version,c.category_name,s.created_at,s.price,sd.description,sd.system_requirement\n"
-                + "FROM Software s\n"
-                + "LEFT JOIN Software_Version sv ON s.software_id = sv.software_id AND sv.is_active = 1\n"
-                + "LEFT JOIN Software_Detail sd ON s.software_id = sd.software_id\n"
-                + "LEFT JOIN Category c ON s.category_id = c.category_id\n"
-                + "WHERE s.software_id = ?;";
-        
+    public Software getSoftwareDetailBySoftwareId(int softwareId) throws SQLException {
+        String sql = "SELECT s.name,sv.version_name AS version,c.category_name,s.created_at,s.price,sd.description,sd.system_requirement,si.image_url AS thumbnail\n"
+                + "                FROM Software s\n"
+                + "                LEFT JOIN Software_Version sv ON s.software_id = sv.software_id AND sv.is_active = 1\n"
+                + "                LEFT JOIN Software_Detail sd ON s.software_id = sd.software_id\n"
+                + "                LEFT JOIN Category c ON s.category_id = c.category_id\n"
+                + "                LEFT JOIN Software_Image si ON s.software_id = si.software_id AND si.is_thumbnail = 1\n"
+                + "                WHERE s.software_id = ?;";
+
         try (Connection c = Db.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, softwareId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    Software sw=new Software();
-                    SoftwareDetail swDetail=new SoftwareDetail();
-                    SoftwareVersion swVersion=new SoftwareVersion();
-                    Category cat=new Category();
-                    
+                    Software sw = new Software();
+                    SoftwareDetail swDetail = new SoftwareDetail();
+                    SoftwareVersion swVersion = new SoftwareVersion();
+                    SoftwareImage simg=new SoftwareImage();
+                    Category cat = new Category();
+
                     sw.setName(rs.getString("name"));
                     swVersion.setVersionName(rs.getString("version"));
                     cat.setCategoryName(rs.getString("category_name"));
@@ -295,6 +297,8 @@ public class SoftwareDao {
                     sw.setPrice(rs.getDouble("price"));
                     swDetail.setDescription(rs.getString("description"));
                     swDetail.setSysRequirement("system_requirement");
+                    simg.setImageUrl(rs.getString("thumbnail"));
+                    sw.setSoftwareImage(simg);
                     sw.setSoftwareVersion(swVersion);
                     sw.setSoftwareDetail(swDetail);
                     sw.setCategory(cat);
@@ -304,6 +308,5 @@ public class SoftwareDao {
         }
         return null;
     }
-    
-    
+
 }

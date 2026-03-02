@@ -206,7 +206,7 @@
 
     <body>
         <div class="layout">
-            <jsp:include page="./layout/side_bar.jsp"/>
+            <jsp:include page="layout/side_bar.jsp"/>
             <div class="main">
                 <h1>License Management</h1>
                 <p class="subtitle">Monitor and manage all license keys for your products</p>

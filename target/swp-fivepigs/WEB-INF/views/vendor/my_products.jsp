@@ -185,7 +185,7 @@
     <body>
         <div class="layout">
             <!-- SIDEBAR -->
-            <jsp:include page="./layout/side_bar.jsp"/>
+            <jsp:include page="layout/side_bar.jsp"/>
 
             <!-- MAIN -->
             <div class="main">
@@ -195,7 +195,7 @@
                         <h1>My Products</h1>
                         <p class="subtitle">Manage your software products and uploads</p>
                     </div>                   
-                    <a href="#" class="btn-primary">+ Upload New Product</a>
+                    <a href="upload_product" class="btn-primary">+ Upload New Product</a>
                 </div>
 
                 <!-- Stats -->
@@ -260,7 +260,7 @@
                 <div class="products">
                     <c:forEach var="item" items="${softwareCardList}">
                         <div class="product-card">
-                            <img src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97" />
+                            <img src="${software.softwareImage.imageUrl}" />
                             <div class="product-info">
                                 <div class="product-header">
                                     <div class="product-title">${item.name}</div>

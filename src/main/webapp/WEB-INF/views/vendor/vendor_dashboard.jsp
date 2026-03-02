@@ -14,7 +14,7 @@
         <div class="layout">
 
             <!-- SIDEBAR -->
-            <jsp:include page="./layout/side_bar.jsp"/>
+            <jsp:include page="layout/side_bar.jsp"/>
 
             <!-- MAIN CONTENT -->
             <div class="main">

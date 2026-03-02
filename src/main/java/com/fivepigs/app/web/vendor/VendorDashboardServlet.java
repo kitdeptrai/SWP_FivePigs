@@ -41,13 +41,12 @@ public class VendorDashboardServlet extends HttpServlet {
             }
             List<Software> top3revenue = swdao.Top3RevenueByVendor(user.getUserId());
             Map<Integer, Double> revenueMap = vddao.revenueMap(user.getUserId());
-            Map<Integer,Double> downloadMap=swdao.downloadByWeek(user.getUserId());
-            Integer sumApprovedApps = swdao.totalAppByStatusAndVendor(user.getUserId(),"APPROVED");
+            Map<Integer, Double> downloadMap = swdao.downloadByWeek(user.getUserId());
+            Integer sumApprovedApps = swdao.totalAppByStatusAndVendor(user.getUserId(), "APPROVED");
             Integer sumDownloadApps = swdao.totalDownloadByVendor(user.getUserId());
             Double sumRevenue = vddao.sumRevenue(user.getUserId());
             Double avgRating = swdao.avgRatingByVendorId(user.getUserId());
-            
-            request.setAttribute("downloadByWeek",downloadMap);
+            request.setAttribute("downloadByWeek", downloadMap);
             request.setAttribute("revenueByWeek", revenueMap);
             request.setAttribute("top3revenue", top3revenue);
             request.setAttribute("sumApprovedApps", sumApprovedApps == null ? 0 : sumApprovedApps);

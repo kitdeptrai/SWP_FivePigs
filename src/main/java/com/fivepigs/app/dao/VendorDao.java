@@ -40,7 +40,6 @@ public class VendorDao {
         return null;
     }
 
-
     public Map<Integer, Double> revenueMap(int vendorId) throws SQLException {
 
         Map<Integer, Double> revenueMap = new HashMap<>();
@@ -51,17 +50,17 @@ public class VendorDao {
         }
 
         String sql = """
-        SELECT 
-            CEIL(DATEDIFF(CURDATE(), o.order_date) / 7) AS week_index,
-            SUM(od.price) AS revenue
-        FROM Orders o
-        JOIN Order_Detail od ON o.order_id = od.order_id
-        JOIN Software s ON od.software_id = s.software_id
-        JOIN Payment_Status ps ON o.payment_status_id = ps.payment_status_id
-        WHERE ps.status_name = 'PAID'
-          AND s.vendor_id = ?
-          AND o.order_date >= DATE_SUB(CURDATE(), INTERVAL 28 DAY)
-        GROUP BY week_index
+                SELECT 
+                    CEIL((DATEDIFF(CURDATE(), o.order_date) + 1) / 7)AS week_index,
+                    SUM(od.price) AS revenue
+                FROM Orders o
+                JOIN Order_Detail od ON o.order_id = od.order_id
+                JOIN Software s ON od.software_id = s.software_id
+                JOIN Payment_Status ps ON o.payment_status_id = ps.payment_status_id
+                WHERE ps.status_name = 'PAID'
+                  AND s.vendor_id = ?
+                  AND o.order_date >= DATE_SUB(CURDATE(), INTERVAL 28 DAY)
+                GROUP BY week_index
     """;
 
         try (Connection c = Db.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {

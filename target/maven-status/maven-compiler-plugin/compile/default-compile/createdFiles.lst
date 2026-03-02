@@ -1,3 +1,4 @@
+com\fivepigs\app\web\vendor\PayoutServlet.class
 com\fivepigs\app\web\VerifyResetOtpServlet.class
 com\fivepigs\app\web\ApprovalDashboardServlet.class
 com\fivepigs\app\web\test.class
@@ -37,3 +38,4 @@ com\fivepigs\app\web\LogoutServlet.class
 com\fivepigs\app\util\EmailService.class
 com\fivepigs\app\web\ResendOtpServlet.class
 com\fivepigs\app\model\SoftwareVersion.class
+com\fivepigs\app\dao\LicenseDao.class

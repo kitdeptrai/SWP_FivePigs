@@ -303,13 +303,13 @@
     <body>
         <div class="layout">
 
-            <jsp:include page="./layout/side_bar.jsp"/>
+            <jsp:include page="layout/side_bar.jsp"/>
 
             <div class="main">
 
                 <!-- HEADER -->
                 <div class="product-header">
-                    <img src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97">
+                    <img src="${infoSoftware.softwareImage.imageUrl}">
                     <div class="product-info">
                         <div class="product-title">${infoSoftware.name}</div>
                         <div class="product-meta">v${infoSoftware.softwareVersion.versionName} ? ${infoSoftware.category.categoryName} 
@@ -429,10 +429,11 @@
                         <h3>Product Images</h3>
 
                         <div class="image-grid">
-                            <img src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97">
-                            <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085">
-                            <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c">
-                            <img src="https://images.unsplash.com/photo-1537432376769-00a5c8b1f4b0">
+                            <c:forEach var="item" items="${listImage}">
+                                <img src="${item}">
+                            </c:forEach>
+                            
+                            
                         </div>
 
                     </div>
