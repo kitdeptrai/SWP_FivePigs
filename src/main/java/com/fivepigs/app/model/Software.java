@@ -15,7 +15,7 @@ import java.time.format.DateTimeFormatter;
  * @author thanh
  */
 public class Software {
-//        software_id INT IDENTITY(1,1) PRIMARY KEY,
+//    software_id INT IDENTITY(1,1) PRIMARY KEY,
 //    name NVARCHAR(150) NOT NULL,
 //    short_description NVARCHAR(255),
 //    vendor_id INT NOT NULL,
@@ -29,7 +29,7 @@ public class Software {
 //    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     private Integer softwareId;
     private String name;
-    private String short_description;
+    private String shortDescription;
     private Integer vendorId;
     private Integer categoryId;
     private Double price;
@@ -108,7 +108,7 @@ public void setCategoryName(String categoryName) {
     public Software(Integer softwareId, String name, String short_description, Integer vendorId, Integer categoryId, Double price, Integer isFree, String status, Integer downloadCount, Double avgRating, LocalDateTime createdAt, Double revenue, String appName, ApprovalProcess ap, ReviewerProcess rp) {
         this.softwareId = softwareId;
         this.name = name;
-        this.short_description = short_description;
+        this.shortDescription = shortDescription;
         this.vendorId = vendorId;
         this.categoryId = categoryId;
         this.price = price;
@@ -186,7 +186,7 @@ public void setCategoryName(String categoryName) {
     public void setReviewerProcess(ReviewerProcess rp) {
         this.reviewerProcess = rp;
     }
-    
+
     public Integer getSoftwareId() {
         return softwareId;
     }
@@ -203,12 +203,12 @@ public void setCategoryName(String categoryName) {
         this.name = name;
     }
 
-    public String getShort_description() {
-        return short_description;
+    public String getShortDescription() {
+        return shortDescription;
     }
 
-    public void setShort_description(String short_description) {
-        this.short_description = short_description;
+    public void setShortDescription(String short_description) {
+        this.shortDescription = short_description;
     }
 
     public Integer getVendorId() {
@@ -282,6 +282,7 @@ public void setCategoryName(String categoryName) {
     public void setRevenue(Double revenue) {
         this.revenue = revenue;
     }
+
 
     public String getAppName() {
         return appName;

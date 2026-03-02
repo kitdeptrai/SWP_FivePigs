@@ -1,113 +1,89 @@
-<<<<<<< HEAD
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\dao\NotificationDao.java
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\util\PasswordUtil.java
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\model\ReviewHistoryDTO.java
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\model\ApprovalSoftware.java
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\model\ReviewGuidelineItem.java
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\dao\SoftwareDao.java
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\dao\ReviewScoreDao.java
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\model\License.java
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\model\Role.java
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\web\LogoutServlet.java
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\web\ReviewerNotificationsServlet.java
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\web\PendingReviewServlet.java
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\web\ResendOtpServlet.java
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\web\ReviewerGuidelinesServlet.java
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\web\ApprovalDashboard.java
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\web\VerifyRegisterOtpServlet.java
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\model\ReviewGuideline.java
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\web\ReviewerGuidelineDeleteServlet.java
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\dao\ReviewHistoryDao.java
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\model\ReviewScore.java
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\web\ReviewerNotificationDeleteAllServlet.java
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\web\ResetPasswordServlet.java
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\model\OrderDetail.java
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\util\EmailService.java
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\web\ReviewerGuidelineCreateServlet.java
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\web\ReviewerNotificationDeleteServlet.java
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\web\AdminDashboardServlet.java
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\web\VerifyResetOtpServlet.java
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\model\SoftwareDetail.java
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\dao\ApprovalDao.java
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\web\ReviewerNotificationToggleServlet.java
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\web\UserDashboardServlet.java
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\web\ReviewerHistoryServlet.java
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\web\RegisterServlet.java
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\model\Notification.java
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\model\Order.java
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\model\User.java
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\web\VendorDashboard.java
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\service\UserService.java
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\dao\UserDao.java
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\dao\ReviewGuidelineDao.java
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\web\ReviewerNotificationMarkAllReadServlet.java
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\model\Software.java
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\web\LoginServlet.java
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\web\DashboardServlet.java
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\web\ReviewerDashboard.java
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\web\ReviewerMyReviewsServlet.java
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\util\OtpUtil.java
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\web\ForgotPasswordServlet.java
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\web\ReviewSoftwareServlet.java
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\web\ReviewerGuidelineItemsServlet.java
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\model\SoftwareImage.java
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\config\Db.java
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\dao\ReviewerDao.java
-D:\SPRING2026\SWP391\Báº£n gá»‘c\SWP_FivePigs\SWP_FivePigs\src\main\java\com\fivepigs\app\dao\VendorDao.java
-=======
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\DashboardServlet.java
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\ReviewerDashboard.java
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\dao\ReviewerDao.java
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\model\ApprovalSoftware.java
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\model\Category.java
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\model\SoftwareImage.java
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\dao\AdminDao.java
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\admin\AdminNotificationsServlet.java
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\LogoutServlet.java
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\util\OtpUtil.java
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\admin\UpdateUserServlet.java
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\dao\UserDao.java
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\admin\AdminEmployeesServlet.java
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\dao\SoftwareDao.java
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\admin\DisableEmployeeServlet.java
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\model\Order.java
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\model\License.java
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\VerifyRegisterOtpServlet.java
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\model\ReviewerProcess.java
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\ForgotPasswordServlet.java
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\dao\ApprovalDao.java
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\admin\AddUserServlet.java
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\admin\EnableEmployeeServlet.java
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\util\EmailService.java
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\admin\AdminDashboardServlet.java
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\ApprovalPendingDetail.java
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\model\SoftwareVersion.java
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\ApprovalHistoryDetail.java
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\model\ApprovalProcess.java
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\model\User.java
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\dao\VendorDao.java
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\admin\AddEmployeeServlet.java
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\service\UserService.java
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\LoginServlet.java
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\model\OrderDetail.java
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\ApprovalDashboard.java
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\ResendOtpServlet.java
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\VendorDashboard.java
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\config\Db.java
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\ApprovalHistory.java
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\admin\EnableUserServlet.java
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\VerifyResetOtpServlet.java
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\model\Role.java
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\admin\AdminReportsServlet.java
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\ResetPasswordServlet.java
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\RegisterServlet.java
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\ApprovalPendingServlet.java
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\admin\AdminUsersServlet.java
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\model\SoftwareDetail.java
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\model\Software.java
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\UserDashboardServlet.java
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\admin\UpdateEmployeeServlet.java
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\test.java
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\admin\DisableUserServlet.java
-C:\Users\thanh\Máy tính\SP26\SWP391\Code\duanSWP\SWP_FivePigs\src\main\java\com\fivepigs\app\util\PasswordUtil.java
->>>>>>> 82efb24b997b8f26f3f060f52509f04347dd9f3b
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\ReviewerGuidelineCreateServlet.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\dao\ReviewHistoryDao.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\vendor\PayoutServlet.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\ApprovalHistoryDetail.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\admin\AdminUsersServlet.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\dao\SoftwareDao.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\admin\UpdateEmployeeServlet.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\admin\AddUserServlet.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\model\Notification.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\model\Software.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\ReviewerDashboard.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\ReviewerNotificationMarkAllReadServlet.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\model\VendorPayout.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\ApprovalPendingServlet.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\VerifyResetOtpServlet.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\ResendOtpServlet.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\model\SoftwareDetail.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\ApprovalPendingDetail.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\ReviewerGuidelineItemsServlet.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\dao\ReviewDao.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\service\UserService.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\model\ReviewScore.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\admin\DisableUserServlet.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\model\VendorPayoutDetail.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\vendor\UploadProductServlet.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\admin\UpdateUserServlet.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\dao\ReviewerDao.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\dao\AdminDao.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\model\ApprovalSoftware.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\admin\AdminNotificationsServlet.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\util\PasswordUtil.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\dao\NotificationDao.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\util\OtpUtil.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\ApprovalHistory.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\ReviewerGuidelinesServlet.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\ResetPasswordServlet.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\model\OrderDetail.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\dao\VendorDao.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\model\ReviewGuideline.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\model\ReviewerProcess.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\ReviewerMyReviewsServlet.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\ReviewerNotificationToggleServlet.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\admin\DisableEmployeeServlet.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\vendor\ProductDetailServlet.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\dao\PayoutDao.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\PendingReviewServlet.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\dao\UserDao.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\admin\EnableUserServlet.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\RegisterServlet.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\test.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\admin\AdminReportsServlet.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\model\User.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\dao\SoftwareImageDao.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\model\ApprovalProcess.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\vendor\MyProductsServlet.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\vendor\VendorDashboardServlet.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\dao\ReviewGuidelineDao.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\model\Order.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\model\SoftwareVersion.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\config\Db.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\dao\ApprovalDao.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\ApprovalDashboard.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\ReviewerGuidelineDeleteServlet.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\ReviewerNotificationDeleteServlet.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\LogoutServlet.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\DashboardServlet.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\ReviewerNotificationsServlet.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\dao\ReviewScoreDao.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\ReviewSoftwareServlet.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\model\License.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\model\ReviewGuidelineItem.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\admin\AdminEmployeesServlet.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\ForgotPasswordServlet.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\UserDashboardServlet.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\model\Category.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\model\Role.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\admin\EnableEmployeeServlet.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\model\ReviewHistoryDTO.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\model\Review.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\dao\LicenseDao.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\admin\AddEmployeeServlet.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\ReviewerNotificationDeleteAllServlet.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\VerifyRegisterOtpServlet.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\ReviewerHistoryServlet.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\model\SoftwareImage.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\admin\AdminDashboardServlet.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\vendor\LicenseManagementServlet.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\util\EmailService.java
+D:\MINH\Tai lieu hoc tap\Ki 5 Chuyen Nganh\SWP\SWP_FivePigs\src\main\java\com\fivepigs\app\web\LoginServlet.java

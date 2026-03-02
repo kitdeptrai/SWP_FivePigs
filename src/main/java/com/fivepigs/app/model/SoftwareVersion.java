@@ -6,11 +6,9 @@ package com.fivepigs.app.model;
 
 import java.time.LocalDateTime;
 
-/**
- *
- * @author thanh
- */
+
 public class SoftwareVersion {
+
     private Integer versionId;
     private Integer softwareId;
     private String versionName;
@@ -97,6 +95,5 @@ public class SoftwareVersion {
     public void setIsActive(Integer isActive) {
         this.isActive = isActive;
     }
-    
     
 }

@@ -138,7 +138,7 @@
         </div>
 
         <p class="card-title">Quality Score</p>
-<h2>${qualityScore}%</h2>
+<h2>20%</h2>
 <span class="info-text">Above average</span>
 
     </div>
