@@ -1,4 +1,4 @@
-package com.fivepigs.app.controller.reviewer;
+package com.fivepigs.app.web;
 
 import com.fivepigs.app.dao.NotificationDao;
 import jakarta.servlet.annotation.WebServlet;

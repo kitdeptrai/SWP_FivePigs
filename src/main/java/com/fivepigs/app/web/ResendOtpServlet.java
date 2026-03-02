@@ -31,8 +31,9 @@ public class ResendOtpServlet extends HttpServlet {
         String otp = OtpUtil.generateOtp();
 
         // Update OTP and expiration time in session (5 minutes)
-        session.setAttribute("reg_otp", otp);
+        session.setAttribute("reg_otp", OtpUtil.hashOtp(otp));
         session.setAttribute("reg_otp_expire", System.currentTimeMillis() + 5 * 60 * 1000);
+        session.setAttribute("reg_otp_attempts", 0);
 
         // Prepare HTML email body
         String emailBody = "<div style='font-family: Arial, sans-serif; line-height: 1.6;'>"

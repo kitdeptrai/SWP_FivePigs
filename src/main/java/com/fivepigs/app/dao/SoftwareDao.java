@@ -277,5 +277,67 @@ public List<Software> getMyReviews(Integer reviewerId) throws SQLException {
         }
         return list;
     }
+    
+     public Software getSoftwareById(int softwareId) throws SQLException {
+        String sql = """
+            SELECT
+                s.software_id,
+                s.name AS app_name,
+                s.short_description,
+                s.status,
+                c.category_name,
+                u.full_name AS reviewer_name,
+                rp.reviewed_at,
+                (
+                    SELECT si.image_url
+                    FROM Software_Image si
+                    WHERE si.software_id = s.software_id
+                    ORDER BY si.is_thumbnail DESC, si.created_at ASC
+                    LIMIT 1
+                ) AS thumbnail_url
+            FROM Software s
+            JOIN Software_Review_Process rp ON rp.software_id = s.software_id
+            JOIN Users u ON u.user_id = rp.reviewer_id
+            LEFT JOIN Category c ON c.category_id = s.category_id
+            WHERE s.software_id = ?
+        """;
+
+        try (Connection con = Db.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, softwareId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Software s = new Software();
+                    Category c = new Category();
+                    s.setSoftwareId(rs.getInt("software_id"));
+                    s.setAppName(rs.getString("app_name"));
+                    s.setShort_description(rs.getString("short_description"));
+                    s.setStatus(rs.getString("status"));
+                    
+                    // Thiết lập category
+                    c.setCategoryName(rs.getString("category_name"));
+                    
+                    // Thiết lập reviewer
+                    s.setName(rs.getString("reviewer_name"));
+
+                    // Thiết lập thumbnail image
+                    SoftwareImage si = new SoftwareImage();
+                    si.setImageUrl(rs.getString("thumbnail_url"));
+                    s.setSoftwareImage(si);
+
+                    // Thiết lập thời gian review
+                    Timestamp ts = rs.getTimestamp("reviewed_at");
+                    ReviewerProcess rp = new ReviewerProcess();
+                    rp.setReviewed_at(ts != null ? ts.toLocalDateTime() : null);
+                    s.setReviewerProcess(rp);
+
+                    return s; // Trả về đối tượng phần mềm
+                }
+            }
+        }
+
+        return null; // Nếu không có phần mềm với ID này
+    }
 }
 
