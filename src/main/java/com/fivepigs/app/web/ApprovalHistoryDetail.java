@@ -5,6 +5,8 @@
 
 package com.fivepigs.app.web;
 
+import com.fivepigs.app.dao.ApprovalDao;
+import com.fivepigs.app.model.Software;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -12,18 +14,15 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import com.fivepigs.app.dao.ApprovalDao;
-import com.fivepigs.app.model.Software;
 import java.sql.SQLException;
-import java.util.List;
-import java.util.Map;
+
 /**
  *
  * @author thanh
  */
-@WebServlet(name="ApprovalDashboard", urlPatterns={"/approval_dashboard"})
-public class ApprovalDashboard extends HttpServlet {
-
+@WebServlet(name="ApprovalHistoryDetail", urlPatterns={"/approval_history_detail"})
+public class ApprovalHistoryDetail extends HttpServlet {
+   
     /** 
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
      * @param request servlet request
@@ -39,10 +38,10 @@ public class ApprovalDashboard extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet ApprovalDashboard</title>");  
+            out.println("<title>Servlet ApprovalHistoryDetail</title>");  
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet ApprovalDashboard at " + request.getContextPath () + "</h1>");
+            out.println("<h1>Servlet ApprovalHistoryDetail at " + request.getContextPath () + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -59,19 +58,17 @@ public class ApprovalDashboard extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
+
         try{
         ApprovalDao adao = new ApprovalDao();
-        Map<String, Integer> counts = adao.getDashboardCounts();
-        List<Software> approvedApp = adao.getApprovalApp(1);
-        List<Software> getPendingApp = adao.getPendingApp(1);
-        request.setAttribute("counts", counts);
-        request.setAttribute("approvedApp",approvedApp);
-        request.setAttribute("pendingApp", getPendingApp);
-        request.getRequestDispatcher("/WEB-INF/views/Approval/approval_dashboard.jsp").forward(request, response);
+        Integer softwareId = Integer.parseInt(request.getParameter("softwareId"));
+        Software s = adao.getPendingDetail(softwareId);
+        request.setAttribute("historyDetail", s);
+        
+        request.getRequestDispatcher("/WEB-INF/views/Approval/approval_history_detail.jsp").forward(request, response);
         }catch(SQLException e){
             System.out.println(e.getMessage());
         }
-        
     } 
 
     /** 
@@ -84,7 +81,7 @@ public class ApprovalDashboard extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-        doGet(request,response);
+        processRequest(request, response);
     }
 
     /** 

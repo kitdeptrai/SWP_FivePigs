@@ -4,9 +4,12 @@
  */
 package com.fivepigs.app.web;
 
+import com.fivepigs.app.dao.ApprovalDao;
 import com.fivepigs.app.dao.VendorDao;
+import com.fivepigs.app.model.Software;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -17,15 +20,13 @@ public class test {
     
     public static void main(String[] args) {
         try {
-            VendorDao vddao = new VendorDao();
-            Integer sumApprovedApps = vddao.sumApprovedApps(2);
-            Map<Integer, Double> revenueMap = vddao.revenueMap(2);
-            for(int i=1;i<=4;i++){
-                System.out.println(revenueMap.get(i));
-            }
-            System.out.println("Approved apps = " + sumApprovedApps);
+              ApprovalDao adao = new ApprovalDao();
+              List<Software> list = adao.getPendingApprovals();
+              for(Software item: list){
+                  System.out.println(item.getName());
+              }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println(e);
         }
     }
 }
