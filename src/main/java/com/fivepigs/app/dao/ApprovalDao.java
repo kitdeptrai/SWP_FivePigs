@@ -140,7 +140,6 @@ public class ApprovalDao {
 
         try (Connection c = Db.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
 
-//            ps.setInt(1, approval_id);
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -347,15 +346,15 @@ public class ApprovalDao {
         }
         return null;
     }
-    
-public void submitDecision(int softwareId, int approverId, String decision, String note) throws SQLException {
 
-    Connection c = Db.getConnection();
-    try {
-        c.setAutoCommit(false);
+    public void submitDecision(int softwareId, int approverId, String decision, String note) throws SQLException {
 
-        // 1️⃣ Insert hoặc Update Software_Approval
-        String approvalSql = """
+        Connection c = Db.getConnection();
+        try {
+            c.setAutoCommit(false);
+
+            // 1️⃣ Insert hoặc Update Software_Approval
+            String approvalSql = """
             INSERT INTO Software_Approval (software_id, approver_id, decision, approval_note)
             VALUES (?, ?, ?, ?)
             ON DUPLICATE KEY UPDATE
@@ -364,35 +363,35 @@ public void submitDecision(int softwareId, int approverId, String decision, Stri
             approval_date = CURRENT_TIMESTAMP
         """;
 
-        try (PreparedStatement ps = c.prepareStatement(approvalSql)) {
-            ps.setInt(1, softwareId);
-            ps.setInt(2, approverId);
-            ps.setString(3, decision);
-            ps.setString(4, note);
-            ps.executeUpdate();
-        }
+            try (PreparedStatement ps = c.prepareStatement(approvalSql)) {
+                ps.setInt(1, softwareId);
+                ps.setInt(2, approverId);
+                ps.setString(3, decision);
+                ps.setString(4, note);
+                ps.executeUpdate();
+            }
 
-        // 2️⃣ Update Software.status
-        String statusSql = """
+            // 2️⃣ Update Software.status
+            String statusSql = """
             UPDATE Software
             SET status = ?
             WHERE software_id = ?
         """;
 
-        try (PreparedStatement ps = c.prepareStatement(statusSql)) {
-            ps.setString(1, decision); // APPROVED hoặc REJECTED
-            ps.setInt(2, softwareId);
-            ps.executeUpdate();
+            try (PreparedStatement ps = c.prepareStatement(statusSql)) {
+                ps.setString(1, decision); // APPROVED hoặc REJECTED
+                ps.setInt(2, softwareId);
+                ps.executeUpdate();
+            }
+
+            c.commit();
+
+        } catch (Exception e) {
+            c.rollback();
+            throw e;
+        } finally {
+            c.close();
         }
-
-        c.commit();
-
-    } catch (Exception e) {
-        c.rollback();
-        throw e;
-    } finally {
-        c.close();
     }
-}
 
 }
