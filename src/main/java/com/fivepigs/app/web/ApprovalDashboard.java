@@ -16,6 +16,7 @@ import com.fivepigs.app.dao.ApprovalDao;
 import com.fivepigs.app.model.Software;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 /**
  *
  * @author thanh
@@ -60,12 +61,16 @@ public class ApprovalDashboard extends HttpServlet {
     throws ServletException, IOException {
         try{
         ApprovalDao adao = new ApprovalDao();
-        List<Software> approvedApp = adao.approvedApp(1);
+        Map<String, Integer> counts = adao.getDashboardCounts();
+        List<Software> approvedApp = adao.getApprovalApp(1);
+        List<Software> getPendingApp = adao.getPendingApp(1);
+        request.setAttribute("counts", counts);
         request.setAttribute("approvedApp",approvedApp);
+        request.setAttribute("pendingApp", getPendingApp);
         request.getRequestDispatcher("/WEB-INF/views/Approval/approval_dashboard.jsp").forward(request, response);
         }catch(SQLException e){
             System.out.println(e.getMessage());
-        }  
+        }
         
     } 
 

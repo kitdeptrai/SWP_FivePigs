@@ -38,13 +38,17 @@ public class Software {
     private LocalDateTime createdAt;
     private Double revenue;
     private String appName;
-    private Date reviewDate;
-    private String recommendation;
-
+    private User user;
+    private Category category;
+    private SoftwareImage softwareImage;
+    private ApprovalProcess approvalProcess;
+    private ReviewerProcess reviewerProcess;
+    private SoftwareVersion softwareVersion;
+    private SoftwareDetail softwareDetail;
     public Software() {
     }
 
-    public Software(Integer softwareId, String name, String short_description, Integer vendorId, Integer categoryId, Double price, Integer isFree, String status, Integer downloadCount, Double avgRating, LocalDateTime createdAt, Double revenue, String appName, Date reviewDate, String recommendation) {
+    public Software(Integer softwareId, String name, String short_description, Integer vendorId, Integer categoryId, Double price, Integer isFree, String status, Integer downloadCount, Double avgRating, LocalDateTime createdAt, Double revenue, String appName, ApprovalProcess ap, ReviewerProcess rp) {
         this.softwareId = softwareId;
         this.name = name;
         this.short_description = short_description;
@@ -58,12 +62,74 @@ public class Software {
         this.createdAt = createdAt;
         this.revenue = revenue;
         this.appName = appName;
-        this.reviewDate = reviewDate;
-        this.recommendation = recommendation;
+        this.approvalProcess = ap;
+        this.reviewerProcess = rp;
+    }
+
+    public SoftwareDetail getSoftwareDetail() {
+        return softwareDetail;
+    }
+
+    public void setSoftwareDetail(SoftwareDetail softwareDetail) {
+        this.softwareDetail = softwareDetail;
+    }
+
+    public SoftwareVersion getSoftwareVersion() {
+        return softwareVersion;
+    }
+
+    public void setSoftwareVersion(SoftwareVersion softwareVersion) {
+        this.softwareVersion = softwareVersion;
     }
     
     
 
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+    
+    
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+    
+    
+
+    public SoftwareImage getSoftwareImage() {
+        return softwareImage;
+    }
+
+    public void setSoftwareImage(SoftwareImage softwareImage) {
+        this.softwareImage = softwareImage;
+    }
+
+    
+    
+    public ApprovalProcess getApprovalProcess() {
+        return approvalProcess;
+    }
+
+    public void setApprovalProcess(ApprovalProcess ap) {
+        this.approvalProcess = ap;
+    }
+
+    public ReviewerProcess getReviewerProcess() {
+        return reviewerProcess;
+    }
+
+    public void setReviewerProcess(ReviewerProcess rp) {
+        this.reviewerProcess = rp;
+    }
+    
     public Integer getSoftwareId() {
         return softwareId;
     }
@@ -167,23 +233,5 @@ public class Software {
     public void setAppName(String appName) {
         this.appName = appName;
     }
-
-    public Date getReviewDate() {
-        return reviewDate;
-    }
-
-    public void setReviewDate(Date reviewDate) {
-        this.reviewDate = reviewDate;
-    }
-
-    public String getRecommendation() {
-        return recommendation;
-    }
-
-    public void setRecommendation(String recommendation) {
-        this.recommendation = recommendation;
-    }
-    
-    
     
 }
