@@ -70,6 +70,7 @@ public class ReviewerHistoryServlet extends HttpServlet {
                 dao.getHistoryByReviewer(reviewerId, offset, PAGE_SIZE);
 
         // 7️⃣ Set attribute
+        request.setAttribute("user", user);
         request.setAttribute("historyList", historyList);
         request.setAttribute("currentPage", currentPage);
         request.setAttribute("totalPages", totalPages);
