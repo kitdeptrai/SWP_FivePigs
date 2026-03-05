@@ -1,0 +1,262 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : Feb 28, 2026, 9:39:53 PM
+    Author     : Admin
+*/
+
+/* notifications.css - UI giống ảnh 2 */
+
+.noti-head{
+    display:flex;
+    justify-content:space-between;
+    gap:16px;
+    align-items:flex-start;
+    margin-bottom: 12px;
+}
+.noti-head-left .page-title{ margin:0; }
+.noti-head-left .subtitle{ margin-top:8px; }
+
+.noti-head-right{
+    display:flex;
+    gap:10px;
+    margin-top: 4px;
+}
+
+.noti-btn{
+    border:1px solid rgba(255,255,255,.15);
+    background: rgba(255,255,255,.06);
+    color:#fff;
+    padding: 8px 12px;
+    border-radius: 10px;
+    cursor:pointer;
+    font-weight:700;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+}
+.noti-btn:hover{ background: rgba(255,255,255,.10); }
+.noti-btn.danger{
+    color:#ff5c5c;
+    border-color: rgba(255,92,92,.35);
+}
+.noti-btn.danger:hover{ background: rgba(255,92,92,.12); }
+
+.noti-stats{
+    display:flex;
+    gap:18px;
+    margin: 16px 0 18px;
+}
+.stat-card{
+    flex:1;
+    background: rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius: 18px;
+    padding: 22px;
+    min-height: 110px;
+}
+.stat-icon{
+    width:36px;
+    height:36px;
+    border-radius: 10px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background: rgba(43,92,255,.15);
+    margin-bottom: 14px;
+}
+.stat-icon.red{
+    background: rgba(255,59,59,.16);
+    color:#ff5c5c;
+}
+.stat-card h2{ margin:0; font-size: 26px; }
+.stat-card p{ margin:8px 0 0; opacity:.7; font-size:13px; }
+
+.noti-filters{
+    background: rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius: 14px;
+    padding: 12px;
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:10px;
+    margin-bottom: 14px;
+}
+.filter-label{
+    opacity:.75;
+    font-size:13px;
+    margin-right: 6px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+.filter-divider{
+    width:1px;
+    height:20px;
+    background: rgba(255,255,255,.12);
+    margin: 0 6px;
+}
+.chip{
+    border:none;
+    background: rgba(255,255,255,.08);
+    color:#fff;
+    padding: 7px 12px;
+    border-radius: 999px;
+    cursor:pointer;
+    font-size: 12px;
+    font-weight: 700;
+}
+.chip.active{ background: #2b5cff; }
+.chip:hover{ background: rgba(255,255,255,.12); }
+
+/* List card giống ảnh 2 */
+.noti-card{
+    background: rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius: 14px;
+    padding: 16px;
+    display:flex;
+    gap: 14px;
+    margin-bottom: 12px;
+}
+.noti-left{
+    width:36px;
+    height:36px;
+    border-radius: 10px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background: rgba(43,92,255,.15);
+    flex: 0 0 auto;
+    margin-top: 2px;
+}
+.noti-body{ flex:1; min-width:0; }
+.noti-top{ display:flex; justify-content:space-between; gap: 12px; }
+.noti-title{ font-weight: 900; }
+.noti-time{ opacity:.65; font-size:12px; white-space:nowrap; }
+.noti-desc{ margin-top:6px; opacity:.8; font-size:13px; line-height:1.35; }
+.noti-actions{ margin-top: 10px; display:flex; gap: 18px; align-items:center; }
+
+.link-action{
+    background:none;
+    border:none;
+    color:#6ea3ff;
+    cursor:pointer;
+    padding:0;
+    font-weight:800;
+    font-size:12px;
+    display:inline-flex;
+    gap:8px;
+    align-items:center;
+}
+.link-action:hover{ text-decoration:underline; }
+.link-action.danger{ color:#ff5c5c; }
+
+/* Badges */
+.badge{
+    display:inline-flex;
+    align-items:center;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 900;
+    margin-left: 8px;
+    border:1px solid rgba(255,255,255,.12);
+}
+.b-high{ background: rgba(255,59,59,.18); color:#ff7a7a; border-color: rgba(255,59,59,.28); }
+.b-med{ background: rgba(255,193,7,.18); color:#ffd45a; border-color: rgba(255,193,7,.28); }
+.b-low{ background: rgba(130,138,150,.18); color:#c8d0df; border-color: rgba(130,138,150,.28); }
+.b-unread{ background: rgba(43,92,255,.18); color:#9bb7ff; border-color: rgba(43,92,255,.28); }
+
+/* Modal */
+.modal{
+    position:fixed;
+    inset:0;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    background: rgba(0,0,0,.55);
+    z-index: 9999;
+    padding: 20px;
+}
+.modal.open{ display:flex; }
+.modal-box{
+    width: min(680px, 96vw);
+    background: #fff;
+    border-radius: 16px;
+    padding: 18px;
+    position:relative;
+    color:#111;
+}
+.modal-close{
+    position:absolute;
+    right:14px;
+    top:12px;
+    border:none;
+    background: transparent;
+    font-size: 20px;
+    cursor:pointer;
+}
+.modal-header{ display:flex; gap:12px; align-items:flex-start; }
+.modal-icon{
+    width:44px;
+    height:44px;
+    border-radius: 12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background: #eef2ff;
+    color: #2b5cff;
+}
+.modal-title{ font-weight:900; font-size:18px; margin: 2px 0 0; }
+.modal-badges{ margin-top: 8px; display:flex; gap:8px; flex-wrap:wrap; }
+.modal-content{
+    margin-top: 14px;
+    border:1px solid #e6e8ee;
+    border-radius: 12px;
+    padding: 14px;
+    color:#333;
+    line-height:1.5;
+    font-size: 14px;
+    white-space: pre-wrap;
+}
+.modal-grid{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 12px;
+}
+.mini-card{
+    border:1px solid #e6e8ee;
+    border-radius: 12px;
+    padding: 12px;
+    font-size: 13px;
+}
+.mini-label{
+    color:#667085;
+    font-weight:900;
+    font-size:12px;
+    display:flex;
+    gap:8px;
+    align-items:center;
+}
+.mini-value{ margin-top: 8px; font-weight: 900; }
+.modal-footer{ margin-top: 14px; display:flex; gap: 10px; }
+.btn-dark{
+    flex: 1;
+    background: #0b1020;
+    border:none;
+    color:#fff;
+    padding: 12px 14px;
+    border-radius: 12px;
+    cursor:pointer;
+    font-weight: 900;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+}
+.btn-dark:hover{ opacity:.92; }
