@@ -321,6 +321,7 @@ CREATE INDEX idx_guideline_category ON Review_Guideline(category);
 CREATE INDEX idx_guideline_title ON Review_Guideline(title);
 CREATE INDEX idx_item_guideline ON Review_Guideline_Item(guideline_id);
 
+<<<<<<< HEAD
 -- ====     27.   Tảo bảng assignment cho phần My reviews======
 
 USE fivepigs;
@@ -344,3 +345,5 @@ CREATE TABLE Reviewer_Assignment (
 CREATE INDEX idx_assignment_reviewer ON Reviewer_Assignment(reviewer_id, status, assigned_at);
 CREATE INDEX idx_assignment_software ON Reviewer_Assignment(software_id, status);
 
+=======
+>>>>>>> 9bffd4b37bed06535e41f64f16d53329b89f62b7

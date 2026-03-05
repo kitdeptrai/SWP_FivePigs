@@ -46,7 +46,7 @@
 
                                         <!-- Hiển thị mô tả ngắn -->
                                         <div class="app-desc">
-                                            <c:out value="${it.short_description}"/>
+                                            <c:out value="${it.shortDescription}"/>
                                         </div>
 
                                         <!-- Hiển thị tên danh mục -->

@@ -229,7 +229,7 @@ public class ApprovalDao {
 
                 s.setSoftwareId(rs.getInt("software_id"));
                 s.setAppName(rs.getString("app_name"));
-                s.setShort_description(rs.getString("short_description"));
+                s.setShortDescription(rs.getString("short_description"));
 
                 c.setCategoryName(rs.getString("category_name"));
                 u.setFullName(rs.getString("reviewer_name"));
