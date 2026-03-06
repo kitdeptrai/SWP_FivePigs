@@ -29,4 +29,4 @@
     </div>
 </div>
 
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/script.js"></script>
+<script src="${pageContext.request.contextPath}/assets/js/script.js"></script>

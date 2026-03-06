@@ -1,9 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
-    // SỬA DÒNG NÀY: Dùng getAttribute và ép kiểu về String
     String activePage = (String) request.getAttribute("activePage");
-    
-    // Kiểm tra null để tránh lỗi
+
     if (activePage == null) activePage = "";
 %>
 
@@ -33,6 +31,8 @@
         <a href="${pageContext.request.contextPath}/news" class="menu-item <%= activePage.equals("news") ? "active" : "" %>">
         <i class="fa-solid fa-book-open"></i> News
     </a>
-        <div class="menu-item"><i class="fa-solid fa-circle-info"></i> About</div>
+       <a href="${pageContext.request.contextPath}/aboutus" class="menu-item <%= activePage.equals("about") ? "active" : "" %>">
+               <i class="fa-solid fa-circle-info"></i> About
+           </a>
     </div>
 </div>

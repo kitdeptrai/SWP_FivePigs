@@ -56,6 +56,15 @@ public class Software {
     
     private String imageUrl;
      private Double qualityScore;
+    private String iconUrl;
+
+    public String getIconUrl() {
+        return iconUrl;
+    }
+
+    public void setIconUrl(String iconUrl) {
+        this.iconUrl = iconUrl;
+    }
 
     public String getImageUrl() {
         return imageUrl;
