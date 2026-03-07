@@ -123,103 +123,13 @@ public class SoftwareDao {
 
     return list;
 }
-    // update status trong pending reviews
-    public boolean updateStatus(int softwareId, String status) throws SQLException {
-
-    String sql = "UPDATE Software SET status = ? WHERE software_id = ?";
-
-    try (Connection conn = Db.getConnection();
-         PreparedStatement ps = conn.prepareStatement(sql)) {
-
-        ps.setString(1, status);
-        ps.setInt(2, softwareId);
-
-        return ps.executeUpdate() > 0;
-    }
-}
 
 
-    public List<Software> searchPendingSoftware(String keyword) throws SQLException {
 
-    List<Software> list = new ArrayList<>();
 
-    String sql = "SELECT * FROM software " +
-                 "WHERE status = 'pending' " +
-                 "AND name LIKE ?";
-
-    try (Connection conn = Db.getConnection();
-         PreparedStatement ps = conn.prepareStatement(sql)) {
-
-        ps.setString(1, "%" + keyword + "%");
-
-        ResultSet rs = ps.executeQuery();
-
-        while (rs.next()) {
-            Software s = new Software();
-            s.setSoftwareId(rs.getInt("software_id"));
-            s.setName(rs.getString("name"));
-            s.setPrice(rs.getDouble("price"));
-            list.add(s);
-        }
-    }
-
-    return list;
-}
     
     // My Reviews (apps được assign cho reviewer)
-public List<Software> getMyReviews(Integer reviewerId) throws SQLException {
 
-    List<Software> list = new ArrayList<>();
-
-    String sql = """
-        SELECT s.software_id,
-               s.name,
-               s.short_description,
-               s.price,
-               s.status,
-               s.created_at,
-               s.version,
-               s.language,
-               c.category_name,
-               si.image_url,
-               rp.quality_score
-        FROM Software_Review_Process rp
-        JOIN Software s 
-             ON rp.software_id = s.software_id
-        LEFT JOIN Category c
-             ON s.category_id = c.category_id
-        LEFT JOIN Software_Image si
-             ON s.software_id = si.software_id
-             AND si.is_thumbnail = 1
-        WHERE rp.reviewer_id = ?
-
-        ORDER BY s.created_at DESC
-    """;
-
-        try (Connection conn = Db.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
-
-            while (rs.next()) {
-                Software s = new Software();
-                s.setSoftwareId(rs.getInt("software_id"));
-                s.setName(rs.getString("name"));
-                s.setShortDescription(rs.getString("short_description"));
-                s.setPrice(rs.getDouble("price"));
-                s.setStatus(rs.getString("status"));
-
-                Timestamp ts = rs.getTimestamp("created_at");
-                if (ts != null) {
-                    s.setCreatedAt(ts.toLocalDateTime());
-                }
-
-                s.setVersion(rs.getString("version"));
-                s.setCategoryName(rs.getString("category_name"));
-                s.setLanguage(null); // schema mới không có
-
-                list.add(s);
-            }
-        }
-        return list;
-    }
 
     // update status trong pending reviews
     public boolean updateStatus(int softwareId, String status) throws SQLException {
