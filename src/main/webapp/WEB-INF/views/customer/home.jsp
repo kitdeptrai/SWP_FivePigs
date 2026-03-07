@@ -48,7 +48,7 @@
                                 </div>
                             </div>
                             <div class="sub-card"
-                                 style="background-image: url('https://play-lh.googleusercontent.com/y1vZtN3Vz7Q_T5XqjXqXqXqXqXqXqXqXqXqXqXqXqXqXqXqXqXqXqXqXqXqXqXqX'); background-color:#fce4ec;">
+                                 style="background-image: url('https://play-lh.googleusercontent.com/y1vZtN3Vz7Q_T5XqjXqXqXqXqXqXqXqXqXqXqXqXqXqXqXqXqXqXqXqXqXqXqX'); background-color:#fce4ec;">
                                 <div class="sub-card-content"
                                      style="background: linear-gradient(transparent, rgba(194, 24, 91, 0.8));">
                                     <h3>Cooking</h3>

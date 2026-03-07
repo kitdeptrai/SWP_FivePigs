@@ -2,7 +2,7 @@ package com.fivepigs.app.dao;
 import com.fivepigs.app.model.Category;
 import com.fivepigs.app.model.Software;
 import com.fivepigs.app.dao.SoftwareDao;
-import config.Db;
+import com.fivepigs.app.config.Db;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -37,3 +37,4 @@ public class CategoryDao {
         System.out.println(softwares);
     }
 }
+

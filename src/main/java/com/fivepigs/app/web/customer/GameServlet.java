@@ -1,6 +1,5 @@
 package com.fivepigs.app.web.customer;
 
-import com.fivepigs.app.dao.CategoryDao;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -12,6 +11,7 @@ import com.fivepigs.app.dao.SoftwareDao;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,23 +56,34 @@ public class GameServlet extends HttpServlet {
             throws ServletException, IOException {
         request.setAttribute("activePage", "games");
         SoftwareDao sdao = new SoftwareDao();
-        CategoryDao cdao = new CategoryDao();
+
         try {
             List<Software> softwareList = sdao.getSoftwareByCategoryWithIcon("3");
             Map<String, List<Software>> sections = new LinkedHashMap<>();
 
-            List<String> genres = sdao.getGenresByCategory(3); // category 3 = games
-            for (String genre : genres) {
-                List<Software> list = sdao.getSoftwareByCategoryAndGenre(3, genre);
-                sections.put(genre, list);
+            try {
+                List<String> genres = sdao.getGenresByCategory(3); // category 3 = games
+                for (String genre : genres) {
+                    List<Software> list = sdao.getSoftwareByCategoryAndGenre(3, genre);
+                    sections.put(genre, list);
+                }
+            } catch (SQLException ignored) {
+                sections.put("All Games", softwareList);
+                request.setAttribute("gameWarning", "Thieu bang genre/software_genre, dang hien thi danh sach game mac dinh.");
+            }
+
+            if (sections.isEmpty()) {
+                sections.put("All Games", softwareList != null ? softwareList : new ArrayList<>());
             }
 
             request.setAttribute("sections", sections);
-
             request.setAttribute("softwareToShow", softwareList);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            request.setAttribute("sections", new LinkedHashMap<String, List<Software>>());
+            request.setAttribute("softwareToShow", new ArrayList<>());
+            request.setAttribute("gameWarning", "Khong tai duoc du lieu game tu database.");
         }
+
         request.getRequestDispatcher("/WEB-INF/views/customer/game.jsp").forward(request, response);
     }
 

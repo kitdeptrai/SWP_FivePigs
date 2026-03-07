@@ -14,10 +14,35 @@
         <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap"
               rel="stylesheet">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/customer.css">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/single-product.css">
 
     </head>
-
     <body>
+        <c:if test="${param.msg == 'added' || param.msg == 'exists'}">
+            <div id="cartModalOverlay" class="cart-modal-overlay">
+                <div class="cart-modal">
+                    <button type="button" class="cart-modal-close" onclick="closeCartModal()">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                    <h3>
+                        <c:choose>
+                            <c:when test="${param.msg == 'added'}">ADDED TO CART</c:when>
+                            <c:otherwise>ALREADY IN CART</c:otherwise>
+                        </c:choose>
+                    </h3>
+                    <p>
+                        <c:choose>
+                            <c:when test="${param.msg == 'added'}">${detail.name} was added to cart.</c:when>
+                            <c:otherwise>${detail.name} is already in cart or owned in library.</c:otherwise>
+                        </c:choose>
+                    </p>
+                    <div class="cart-modal-actions">
+                        <button type="button" class="cart-modal-btn ghost" onclick="closeCartModal()">Continue Shopping</button>
+                        <a href="${pageContext.request.contextPath}/cart" class="cart-modal-btn primary">Open Cart</a>
+                    </div>
+                </div>
+            </div>
+        </c:if>
 
                 <jsp:include page="/WEB-INF/views/customer/sidebar.jsp">
                     <jsp:param name="activePage" value="home" />
@@ -48,33 +73,19 @@
                             <span><i class="fa-solid fa-check-circle"></i> Editors' Choice</span>
                         </div>
 
-                        <!-- INSTALL -->
-                        <form action="${pageContext.request.contextPath}/install" method="POST" style="display:inline;">
-                            <input type="hidden" name="appId" value="${detail.softwareId}">
+                        <!-- ADD TO CART -->
+                        <form action="${pageContext.request.contextPath}/cart" method="POST" style="display:inline;">
+                            <input type="hidden" name="action" value="add">
+                            <input type="hidden" name="softwareId" value="${detail.softwareId}">
+                            <input type="hidden" name="redirect" value="${pageContext.request.contextPath}/product?pid=${detail.softwareId}">
                             <button type="submit" class="install-btn">
-                                Install
+                                Add To Cart
                             </button>
                         </form>
 
-
-                        <!-- WISHLIST (HEART) -->
-                        <form action="${pageContext.request.contextPath}/wishlist" method="POST" style="display:inline;">
-                            <input type="hidden" name="appId" value="${detail.softwareId}">
-                            <button type="submit" class="install-btn"
-                                    style="background:#f1f2f6;color:#333;box-shadow:none;margin-left:10px;padding:12px 15px;">
-                                <i class="fa-regular fa-heart"></i>
-                            </button>
-                        </form>
-
-
-                        <!-- SHARE -->
-                        <form action="${pageContext.request.contextPath}/share" method="POST" style="display:inline;">
-                            <input type="hidden" name="appId" value="${detail.softwareId}">
-                            <button type="submit" class="install-btn"
-                                    style="background:#f1f2f6;color:#333;box-shadow:none;margin-left:10px;padding:12px 15px;">
-                                <i class="fa-solid fa-share-nodes"></i>
-                            </button>
-                        </form>
+                        <a href="${pageContext.request.contextPath}/cart" class="install-btn" style="text-decoration:none;background:#f1f2f6;color:#333;box-shadow:none;margin-left:10px;padding:12px 15px;display:inline-flex;align-items:center;gap:8px;">
+                            <i class="fa-solid fa-cart-shopping"></i> Go To Cart
+                        </a>
 
                     </div>
                 </div>
@@ -142,5 +153,18 @@
                             <span class="spec-value">English, Vietnamese</span>
                         </div>
                     </div>
-                </div> </div> </div> </body>
+                                </div> </div> </div>
+
+        <script>
+            function closeCartModal() {
+                var modal = document.getElementById("cartModalOverlay");
+                if (modal) modal.style.display = "none";
+            }
+        </script>
+    </body>
 </html>
+
+
+
+
+

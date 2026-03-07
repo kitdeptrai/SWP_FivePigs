@@ -1,32 +1,62 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page pageEncoding="UTF-8"%>
+<%@ page import="com.fivepigs.app.model.User" %>
+<%
+    User currentUser = (User) session.getAttribute("user");
+%>
 
 <div class="header">
-    <div class="search-group">
+    <form action="${pageContext.request.contextPath}/search" method="get" class="search-group">
         <i class="fa-solid fa-magnifying-glass" style="color: #b2bec3;"></i>
-        <input type="text" placeholder="Search apps, games...">
-    </div>
+        <input type="text" name="q" value="${param.q}" placeholder="Search apps, games...">
+        <c:if test="${not empty param.dept}">
+            <input type="hidden" name="dept" value="${param.dept}">
+        </c:if>
+    </form>
 
     <div class="user-actions">
         <div class="icon-btn"><i class="fa-regular fa-bell"></i></div>
 
-        <div class="user-profile-container" onclick="toggleUserDropdown()">
-            <div class="user-info">
-                <div class="avatar">
-                    <img src="https://ui-avatars.com/api/?name=Kiet&background=6c5ce7&color=fff" alt="User">
+        <% if (currentUser == null) { %>
+            <a href="${pageContext.request.contextPath}/login"
+               class="menu-item"
+               style="margin-bottom:0; background:#6b70ff; color:#fff; padding:10px 16px; border-radius:10px;">
+                <i class="fa-solid fa-right-to-bracket"></i> Login
+            </a>
+        <% } else { %>
+            <div class="user-profile-container" onclick="toggleUserDropdown()">
+                <div class="user-info">
+                    <div class="avatar">
+                        <img src="https://ui-avatars.com/api/?name=<%= currentUser.getFullName() %>&background=6c5ce7&color=fff" alt="User">
+                    </div>
+                    <span class="user-name"><%= currentUser.getFullName() %></span>
+                    <i class="fa-solid fa-caret-down" style="font-size: 12px; color: #636e72;"></i>
                 </div>
-                <i class="fa-solid fa-caret-down" style="font-size: 12px; color: #636e72;"></i>
-            </div>
 
-            <div id="userDropdown" class="dropdown-menu">
-                <a href="#" class="dropdown-item"><i class="fa-regular fa-user"></i> My Profile</a>
-                <a href="#" class="dropdown-item"><i class="fa-solid fa-gear"></i> Settings</a>
-                <div class="divider"></div>
-                <a href="${pageContext.request.contextPath}/logout" class="dropdown-item logout">
-                    <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
-                </a>
+                <div id="userDropdown" class="dropdown-menu ms-account-menu">
+                    <div class="ms-account-header">
+                        <div class="ms-account-row">
+                            <div class="avatar ms-account-avatar">
+                                <img src="https://ui-avatars.com/api/?name=<%= currentUser.getFullName() %>&background=6c5ce7&color=fff" alt="User">
+                            </div>
+                            <div class="ms-account-meta">
+                                <div class="ms-account-name"><%= currentUser.getFullName() %></div>
+                                <div class="ms-account-email"><%= currentUser.getEmail() %></div>
+                                <a href="${pageContext.request.contextPath}/logout" class="ms-account-signout">Sign out</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <a href="${pageContext.request.contextPath}/profile" class="dropdown-item"><i class="fa-regular fa-user"></i> My Profile</a>
+                    <a href="${pageContext.request.contextPath}/settings?tab=payment_methods" class="dropdown-item"><i class="fa-regular fa-credit-card"></i> Payment methods</a>
+                    <a href="${pageContext.request.contextPath}/settings?tab=redeem_code" class="dropdown-item"><i class="fa-solid fa-gift"></i> Redeem code or gift cards</a>
+                    <a href="${pageContext.request.contextPath}/settings?tab=payment_help" class="dropdown-item"><i class="fa-regular fa-circle-question"></i> Help with payment and refunds</a>
+                    <div class="divider"></div>
+                    <a href="${pageContext.request.contextPath}/settings?tab=devices" class="dropdown-item"><i class="fa-solid fa-laptop"></i> Manage account and devices</a>
+                    <a href="${pageContext.request.contextPath}/settings?tab=feedback" class="dropdown-item"><i class="fa-regular fa-message"></i> Send feedback</a>
+                    <a href="${pageContext.request.contextPath}/settings?tab=store_settings" class="dropdown-item"><i class="fa-solid fa-gear"></i> Store settings</a>
+                </div>
             </div>
-        </div>
+        <% } %>
     </div>
 </div>
-
-<script src="${pageContext.request.contextPath}/assets/js/script.js"></script>

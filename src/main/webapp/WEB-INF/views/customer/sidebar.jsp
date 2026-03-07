@@ -27,6 +27,10 @@
         <i class="fa-solid fa-book-open"></i> Library
     </a>
 
+    <a href="${pageContext.request.contextPath}/cart" class="menu-item <%= activePage.equals("cart") ? "active" : "" %>">
+        <i class="fa-solid fa-cart-shopping"></i> Cart
+    </a>
+
     <div class="sidebar-footer">
         <a href="${pageContext.request.contextPath}/news" class="menu-item <%= activePage.equals("news") ? "active" : "" %>">
         <i class="fa-solid fa-book-open"></i> News
@@ -36,3 +40,4 @@
            </a>
     </div>
 </div>
+
