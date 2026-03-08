@@ -96,7 +96,7 @@ public class LoginServlet extends HttpServlet {
                     dashboardPath = "/reviewer_dashboard";
                     break;
                 case "vendor":
-                    dashboardPath = "/vendor_dashboard";
+                    dashboardPath = "/vendor/dashboard";
                     break;
                 case "customer":
                 case "user":

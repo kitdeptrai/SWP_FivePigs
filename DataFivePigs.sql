@@ -306,6 +306,7 @@ VALUES
 (30,2,'Multiplayer and matchmaking system tested');
 
 
+<<<<<<< HEAD
 INSERT INTO Software_Image (software_id,image_url,is_thumbnail) VALUES
 (11,'images/RE9_icon.jpg',1),
 (11,'images/RE9_detail1.jpg',0),
@@ -351,6 +352,54 @@ INSERT INTO Software_Image (software_id,image_url,is_thumbnail) VALUES
 (2,'images/ins_detail2.webp',0),
 (2,'images/ins_detail3.webp',0),
 (2,'images/ins_detail4.webp',0);
+=======
+-- Resident Evil Requiem (ID = 11)
+INSERT INTO Software_Image (software_id,image_url,is_thumbnail) VALUES
+(11,'uploads/images/RE9_icon.jpg',1),
+(11,'uploads/images/RE9_detail1.jpg',0),
+(11,'uploads/images/RE9_detail2.jpg',0),
+(11,'uploads/images/RE9_detail3.jpg',0),
+(11,'uploads/images/RE9_detail4.jpg',0);
+
+-- Warzone (ID = 13)
+INSERT INTO Software_Image (software_id,image_url,is_thumbnail) VALUES
+(13,'uploads/images/Warzone_icon.png',1),
+(13,'uploads/images/Warzone_detail1.jpg',0),
+(13,'uploads/images/Warzone_detail2.jpg',0),
+(13,'uploads/images/Warzone_detail3.jpg',0),
+(13,'uploads/images/Warzone_detail4.jpg',0);
+
+-- PUBG (ID = 19)
+INSERT INTO Software_Image (software_id,image_url,is_thumbnail) VALUES
+(19,'uploads/images/pubg_icon.png',1),
+(19,'uploads/images/pubg_detail1.png',0),
+(19,'uploads/images/pubg_detail2.webp',0),
+(19,'uploads/images/pubg_detail3.jpg',0),
+(19,'uploads/images/pubg_detail4.jpg',0);
+
+-- Minecraft (ID = 16)
+INSERT INTO Software_Image (software_id,image_url,is_thumbnail) VALUES
+(16,'uploads/images/minecraft.webp',1),
+(16,'uploads/images/Minecraft_info1.jpg',0),
+(16,'uploads/images/Minecraft_info2.jpg',0),
+(16,'uploads/images/minecraft_info3.png',0),
+(16,'uploads/images/minecraft_info4.jpg',0);
+
+-- Facebook (ID = 1)
+INSERT INTO Software_Image (software_id,image_url,is_thumbnail) VALUES
+(1,'uploads/images/facebook_icon.png',1),
+(1,'uploads/images/facebook_detail1.png',0),
+(1,'uploads/images/facebook_detail2.webp',0),
+(1,'uploads/images/facebook_detail3.jpg',0);
+
+-- Instagram (ID = 2)
+INSERT INTO Software_Image (software_id,image_url,is_thumbnail) VALUES
+(2,'uploads/images/instagram_icon.jpg',1),
+(2,'uploads/images/ins_detail1.webp',0),
+(2,'uploads/images/ins_detail2.webp',0),
+(2,'uploads/images/ins_detail3.webp',0),
+(2,'uploads/images/ins_detail4.webp',0);
+>>>>>>> 5e4f8c2db8a6fed33530c9b498cdff4c8b7c02b5
 
 INSERT INTO Software_Review_Process (software_id, reviewer_id, test_result)
 VALUES

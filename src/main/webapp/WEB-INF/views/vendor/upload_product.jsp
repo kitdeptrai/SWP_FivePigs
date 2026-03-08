@@ -5,20 +5,16 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="UTF-8">
         <title>Upload Software</title>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/vendor.css">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/vendor/vendor.css">
         <style>
-            body{
-                font-family: Arial, sans-serif;
-                background:#0f172a;
-                color:#fff;
-                margin:0;
-            }
+            
 
             /* Container */
             .container{
@@ -85,6 +81,7 @@
             .card.active{
                 display:block;
             }
+            
             input, textarea, select{
                 width:100%;
                 padding:12px;
@@ -141,7 +138,34 @@
                 border-radius:8px;
                 margin-bottom:15px;
             }
+            .error-box{
+                background:rgba(239, 68, 68, 0.12);
+                border:1px solid rgba(239, 68, 68, 0.5);
+                color:rgba(255, 255, 255, 0.9);
+                padding:12px 16px;
+                border-radius:8px;
+                margin-bottom:20px;
+                display:flex;
+                align-items:center;
+                gap:10px;
+            }
 
+            .input-error{
+                border:1px solid #ef4444 !important;
+            }
+
+            .preview-img{
+                margin-top:10px;
+                max-width:120px;
+                border-radius:6px;
+                display:none;
+            }
+
+            .file-name{
+                margin-top:8px;
+                font-size:13px;
+                color:#94a3b8;
+            }
         </style>
     </head>
     <body>
@@ -167,75 +191,112 @@
                             <div class="step-title">Media & Files</div>
                         </div>
                     </div>
-
-                    <!-- STEP 1 -->
-                    <div class="card active" id="step1">
-                        <h3>Basic Information</h3>
-
-                        <input type="text" id="productName" placeholder="Product Name *">
-                        <input type="text" id="version" placeholder="Version *">
-
-                        <select id="category">
-                            <option value="">Select Category *</option>
-                            <option>Productivity</option>
-                            <option>Developer Tools</option>
-                            <option>Design</option>
-                        </select>
-
-                        <select id="language">
-                            <option value="">Programming Language *</option>
-                            <option>Java</option>
-                            <option>JavaScript</option>
-                            <option>Python</option>
-                        </select>
-
-                        <div class="btn-group">
-                            <button class="btn-next" onclick="nextStep(1)">Next</button>
+                    <c:if test="${not empty error}">
+                        <div class="error-box">
+                            <i class="fa-solid fa-circle-exclamation"></i>
+                            ${error}
                         </div>
-                    </div>
+                    </c:if>
+                    <form method="post"
+                          action="${pageContext.request.contextPath}/vendor/upload_product"
+                          enctype="multipart/form-data">
 
-                    <!-- STEP 2 -->
-                    <div class="card" id="step2">
-                        <h3>Product Details</h3>
+                        <!-- STEP 1 -->
+                        <div class="card active" id="step1">
+                            <h3>Basic Information</h3>
 
-                        <input type="number" id="price" placeholder="Price (USD) *">
+                            <label>Product Name *</label>
+                            <input type="text"
+                                   name="productName"
+                                   id="productName"
+                                   value="${param.productName}"
+                                   class="${errorField == 'productName' ? 'input-error' : ''}">
 
-                        <textarea id="description" rows="4" placeholder="Description *"></textarea>
+                            <label>Version *</label>
+                            <input type="text"
+                                   name="version"
+                                   id="version"
+                                   value="${param.version}"
+                                   placeholder="Example: 1.0">
 
-                        <textarea id="features" rows="3" placeholder="Key Features"></textarea>
+                            <label>Category *</label>
+                            <select name="category" id="category">
 
-                        <textarea id="requirements" rows="2" placeholder="System Requirements"></textarea>
+                                <option value="">Select Category</option>
 
-                        <div class="btn-group">
-                            <button class="btn-prev" onclick="prevStep(2)">Previous</button>
-                            <button class="btn-next" onclick="nextStep(2)">Next</button>
-                        </div>
-                    </div>
+                                <option value="1" ${param.category == '1' ? 'selected' : ''}>
+                                    APP
+                                </option>
 
-                    <!-- STEP 3 -->
-                    <div class="card" id="step3">
-                        <h3>Media & Files</h3>
+                                <option value="2" ${param.category == '2' ? 'selected' : ''}>
+                                    GAME
+                                </option>
 
-                        <div class="file-box">
-                            Product File *
-                            <input type="file" id="productFile">
-                        </div>
+                            </select>
 
-                        <div class="file-box">
-                            Thumbnail Image *
-                            <input type="file" id="thumbnail">
+                            <label>Price (USD) *</label>
+                            <input type="number"
+                                   name="price"
+                                   id="price"
+                                   value="${param.price}">
+
+                            <div class="btn-group">
+                                <button type="button" class="btn-next" onclick="nextStep(1)">Next</button>
+                            </div>
                         </div>
 
-                        <div class="file-box">
-                            Screenshots
-                            <input type="file" multiple>
+
+                        <!-- STEP 2 -->
+                        <div class="card" id="step2">
+                            <h3>Product Description</h3>
+
+                            <label>Short Description *</label>
+                            <textarea name="shortDescription" id="shortDescription" rows="2">${param.shortDescription}</textarea>
+
+                            <label>Full Description *</label>
+                            <textarea name="description" id="description" rows="4">${param.description}</textarea>
+
+                            <label>Release Note</label>
+                            <textarea name="releaseNote" id="releaseNote" rows="3">${param.releaseNote}</textarea>
+
+                            <label>System Requirement</label>
+                            <textarea name="systemRequire" id="systemRequire" rows="2">${param.systemRequire}</textarea>
+
+                            <div class="btn-group">
+                                <button type="button" class="btn-prev" onclick="prevStep(2)">Previous</button>
+                                <button type="button" class="btn-next" onclick="nextStep(2)">Next</button>
+                            </div>
                         </div>
 
-                        <div class="btn-group">
-                            <button class="btn-prev" onclick="prevStep(3)">Previous</button>
-                            <button class="btn-submit" onclick="submitForm()">Submit</button>
+
+                        <!-- STEP 3 -->
+                        <div class="card" id="step3">
+                            <h3>Media & Files</h3>
+
+                            <div class="file-box">
+                                <label>Software File *</label>
+                                <input type="file" name="softwareFile" id="softwareFile">
+                                <div id="softwareFileName" class="file-name"></div>
+                            </div>
+
+                            <div class="file-box">
+                                <label>Thumbnail Image *</label>
+                                <input type="file" name="thumbnail" id="thumbnail">
+                                <img id="thumbPreview" class="preview-img">
+                            </div>
+
+                            <div class="file-box">
+                                <label>Additional Images</label>
+                                <input type="file" name="additionalImages" multiple>
+                            </div>
+
+                            <div class="btn-group">
+                                <button type="button" class="btn-prev" onclick="prevStep(3)">Previous</button>
+                                <button type="submit" class="btn-submit">Upload Product</button>
+                            </div>
                         </div>
-                    </div>
+
+                    </form>
 
                 </div>
             </div>
@@ -245,20 +306,15 @@
             function nextStep(step) {
 
                 if (step === 1) {
-                    // validate step 1
-                    if (!document.getElementById("productName").value ||
-                            !document.getElementById("version").value ||
-                            !document.getElementById("category").value ||
-                            !document.getElementById("language").value) {
-                        alert("Please complete all required fields in Basic Info");
+                    if (!productName.value || !version.value || !category.value || !price.value) {
+                        alert("Please fill all required fields in Basic Information");
                         return;
                     }
                 }
 
                 if (step === 2) {
-                    if (!document.getElementById("price").value ||
-                            !document.getElementById("description").value) {
-                        alert("Please complete required fields in Details");
+                    if (!shortDescription.value || !description.value) {
+                        alert("Please complete product description");
                         return;
                     }
                 }
@@ -270,23 +326,72 @@
                 document.getElementById("step" + (step + 1) + "-indicator").classList.add("active");
             }
 
+
             function prevStep(step) {
+
                 document.getElementById("step" + step).classList.remove("active");
                 document.getElementById("step" + (step - 1)).classList.add("active");
 
                 document.getElementById("step" + step + "-indicator").classList.remove("active");
                 document.getElementById("step" + (step - 1) + "-indicator").classList.add("active");
+
             }
 
-            function submitForm() {
-                if (!document.getElementById("productFile").files.length ||
-                        !document.getElementById("thumbnail").files.length) {
-                    alert("Please upload required files");
-                    return;
+
+            // Preview thumbnail
+            document.getElementById("thumbnail").addEventListener("change", function () {
+
+                const file = this.files[0];
+                const preview = document.getElementById("thumbPreview");
+
+                if (file) {
+                    preview.src = URL.createObjectURL(file);
+                    preview.style.display = "block";
                 }
 
-                alert("Upload Successful!");
-            }
+            });
+
+
+            // Show software file name
+            document.getElementById("softwareFile").addEventListener("change", function () {
+
+                const file = this.files[0];
+                const label = document.getElementById("softwareFileName");
+
+                if (file) {
+                    label.innerHTML = "Selected: " + file.name;
+                }
+
+            });
+
+
+            // Disable submit button when uploading
+            document.querySelector("form").addEventListener("submit", function () {
+
+                const btn = document.querySelector(".btn-submit");
+
+                btn.innerHTML = "Uploading...";
+                btn.disabled = true;
+
+            });
+
+
+            // Auto open step when error
+            window.onload = function () {
+
+                let step = "${errorStep}";
+
+                if (step) {
+
+                    document.querySelectorAll(".card").forEach(c => c.classList.remove("active"));
+                    document.querySelectorAll(".step").forEach(s => s.classList.remove("active"));
+
+                    document.getElementById("step" + step).classList.add("active");
+                    document.getElementById("step" + step + "-indicator").classList.add("active");
+
+                }
+
+            };
 
         </script>
 

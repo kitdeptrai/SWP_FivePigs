@@ -23,7 +23,7 @@ import java.util.Map;
  *
  * @author MinhPD
  */
-@WebServlet(name = "VendorDashboard", urlPatterns = {"/vendor_dashboard"})
+@WebServlet(name = "VendorDashboard", urlPatterns = {"/vendor/dashboard"})
 public class VendorDashboardServlet extends HttpServlet {
 
     @Override
@@ -42,7 +42,7 @@ public class VendorDashboardServlet extends HttpServlet {
             List<Software> top3revenue = swdao.Top3RevenueByVendor(user.getUserId());
             Map<Integer, Double> revenueMap = vddao.revenueMap(user.getUserId());
             Map<Integer, Double> downloadMap = swdao.downloadByWeek(user.getUserId());
-            Integer sumApprovedApps = swdao.totalAppByStatusAndVendor(user.getUserId(), "APPROVED");
+            Integer sumApprovedApps = swdao.totalAppByStatusAndVendor(user.getUserId(), "ACTIVE");
             Integer sumDownloadApps = swdao.totalDownloadByVendor(user.getUserId());
             Double sumRevenue = vddao.sumRevenue(user.getUserId());
             Double avgRating = swdao.avgRatingByVendorId(user.getUserId());

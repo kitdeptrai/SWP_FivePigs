@@ -17,25 +17,24 @@ import jakarta.servlet.http.HttpServletResponse;
  *
  * @author MinhPD
  */
-@WebServlet(name="PayoutServlet", urlPatterns={"/payout"})
-public class PayoutServlet extends HttpServlet {
+@WebServlet(name="VendorNotificationServlet", urlPatterns={"/vendor/notification"})
+public class VendorNotificationServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-        request.getRequestDispatcher("/WEB-INF/views/vendor/payout.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/views/vendor/notification.jsp").forward(request, response);
     } 
+
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-  
+       
     }
 
-    /** 
-     * Returns a short description of the servlet.
-     * @return a String containing servlet description
-     */
+    
+  
     @Override
     public String getServletInfo() {
         return "Short description";
