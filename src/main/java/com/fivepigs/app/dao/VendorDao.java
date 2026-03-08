@@ -10,6 +10,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -44,23 +45,22 @@ public class VendorDao {
 
         Map<Integer, Double> revenueMap = new HashMap<>();
 
-        // luôn đảm bảo đủ 4 tuần
         for (int i = 1; i <= 4; i++) {
             revenueMap.put(i, 0.0);
         }
 
         String sql = """
-                SELECT 
-                    CEIL((DATEDIFF(CURDATE(), o.order_date) + 1) / 7)AS week_index,
-                    SUM(od.price) AS revenue
-                FROM Orders o
-                JOIN Order_Detail od ON o.order_id = od.order_id
-                JOIN Software s ON od.software_id = s.software_id
-                JOIN Payment_Status ps ON o.payment_status_id = ps.payment_status_id
-                WHERE ps.status_name = 'PAID'
-                  AND s.vendor_id = ?
-                  AND o.order_date >= DATE_SUB(CURDATE(), INTERVAL 28 DAY)
-                GROUP BY week_index
+        SELECT 
+            FLOOR(DATEDIFF(CURDATE(), o.order_date) / 7) AS week_index,
+            SUM(od.price) AS revenue
+        FROM Orders o
+        JOIN Order_Detail od ON o.order_id = od.order_id
+        JOIN Software s ON od.software_id = s.software_id
+        JOIN Payment_Status ps ON o.payment_status_id = ps.payment_status_id
+        WHERE ps.status_name = 'PAID'
+          AND s.vendor_id = ?
+          AND o.order_date >= DATE_SUB(CURDATE(), INTERVAL 28 DAY)
+        GROUP BY week_index
     """;
 
         try (Connection c = Db.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
@@ -69,19 +69,44 @@ public class VendorDao {
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    int weekIndex = rs.getInt("week_index"); // 1 = gần nhất
+
+                    int weekIndex = rs.getInt("week_index");
                     double revenue = rs.getDouble("revenue");
 
-                    // 🔁 đảo chiều: 1->4, 2->3, 3->2, 4->1
-                    int weekDisplay = 5 - Math.min(weekIndex, 4);
+                    if (weekIndex >= 0 && weekIndex <= 3) {
 
-                    revenueMap.put(
-                            weekDisplay,
-                            revenueMap.get(weekDisplay) + revenue
-                    );
+                        int weekDisplay = 4 - weekIndex;
+
+                        revenueMap.put(
+                                weekDisplay,
+                                revenueMap.getOrDefault(weekDisplay, 0.0) + revenue
+                        );
+                    }
                 }
             }
         }
+
         return revenueMap;
+    }
+
+    public List<VendorPayout> getPayoutByVendorId(int vendorId) throws SQLException {
+        List<VendorPayout> list = new ArrayList<>();
+        String sql = "SELECT * FROM Vendor_Payout\n"
+                + "WHERE vendor_id=?;";
+        try (Connection c = Db.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, vendorId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    VendorPayout vp=new VendorPayout();
+                    vp.setPayoutId(rs.getInt("payout_id"));
+                    vp.setAmount(rs.getDouble("amount"));
+                    vp.setPeriodStart(rs.getObject("period_start", LocalDateTime.class));
+                    vp.setPeriodEnd(rs.getObject("period_end", LocalDateTime.class));
+                    vp.setStatus(rs.getString("status"));
+                    list.add(vp);
+                }
+            }
+        }
+        return list;
     }
 }

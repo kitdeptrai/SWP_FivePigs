@@ -39,7 +39,8 @@ public class AdminDashboardServlet extends DashboardServlet {
         req.setAttribute("topAppsBestSeller", topAppsBestSeller);
 
         // reuse authorization + forward logic in DashboardServlet
-        super.doGet(req, resp);
+//        super.doGet(req, resp);
+        req.getRequestDispatcher("/WEB-INF/views/admin/dashboard.jsp").forward(req, resp);
     }
 
     @Override
