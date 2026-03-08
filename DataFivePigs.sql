@@ -1,121 +1,696 @@
-INSERT INTO Role (role_name) VALUES
+-- Bang insert Role
+
+INSERT INTO Role (role_name)
+VALUES 
 ('ADMIN'),
+('CUSTOMER'),
 ('VENDOR'),
-('CUSTOMER');
--- Admin
-INSERT INTO Users (full_name, email, password, role_id)
-VALUES ('Admin System', 'admin@market.com', '123456',
-        (SELECT role_id FROM Role WHERE role_name='ADMIN'));
+('APPROVAL'),
+('REVIEWER');
 
--- Vendor (CHỈ 1 VENDOR)
-INSERT INTO Users (full_name, email, password, role_id)
-VALUES ('Vendor Alpha', 'vendor@market.com', '123456',
-        (SELECT role_id FROM Role WHERE role_name='VENDOR'));
 
--- Customers
-INSERT INTO Users (full_name, email, password, role_id)
+-- Bang insert Users
+
+INSERT INTO Users (full_name, email, password, role_id, phone)
+VALUES 
+('System Admin', 'admin@gmail.com', '123456', 1, '0900000001');
+
+INSERT INTO Users (full_name, email, password, role_id, phone)
+VALUES 
+('Reviewer', 'reviewer@gmail.com', '123456', 5, '0900000002');
+
+INSERT INTO Users (full_name, email, password, role_id, phone)
+VALUES 
+('Approval', 'approval@gmail.com', '123456', 4, '0900000003');
+
+INSERT INTO Users (full_name, email, password, role_id, phone)
 VALUES
-('Customer One', 'cus1@market.com', '123456',
- (SELECT role_id FROM Role WHERE role_name='CUSTOMER')),
-('Customer Two', 'cus2@market.com', '123456',
- (SELECT role_id FROM Role WHERE role_name='CUSTOMER'));
+('Vendor One', 'vendor1@gmail.com', '123456', 3, '0900000011'),
+('Vendor Two', 'vendor2@gmail.com', '123456', 3, '0900000012'),
+('Vendor Three', 'vendor3@gmail.com', '123456', 3, '0900000013');
+
+INSERT INTO Users (full_name, email, password, role_id, phone)
+VALUES
+('Customer 1', 'customer1@gmail.com', '123456', 2, '0900000101'),
+('Customer 2', 'customer2@gmail.com', '123456', 2, '0900000102'),
+('Customer 3', 'customer3@gmail.com', '123456', 2, '0900000103'),
+('Customer 4', 'customer4@gmail.com', '123456', 2, '0900000104'),
+('Customer 5', 'customer5@gmail.com', '123456', 2, '0900000105'),
+('Customer 6', 'customer6@gmail.com', '123456', 2, '0900000106'),
+('Customer 7', 'customer7@gmail.com', '123456', 2, '0900000107'),
+('Customer 8', 'customer8@gmail.com', '123456', 2, '0900000108'),
+('Customer 9', 'customer9@gmail.com', '123456', 2, '0900000109'),
+('Customer 10', 'customer10@gmail.com', '123456', 2, '0900000110');
+
+
+-- Bang insert Category
+
 INSERT INTO Category (category_name)
-VALUES ('Productivity');
-INSERT INTO Payment_Status (status_name)
-VALUES ('PENDING'), ('PAID'), ('FAILED'), ('REFUNDED');
+VALUES 
+('APP'),
+('GAME');
+
+
+-- Bang insert Sofware
+
+
+
 INSERT INTO Software
-(name, vendor_id, category_id, price, status, download_count, avg_rating)
+(name, short_description, vendor_id, category_id, price, is_free, status, download_count, avg_rating, created_at)
 VALUES
-('Alpha Project Manager',
- (SELECT user_id FROM Users WHERE email='vendor@market.com'),
- 1, 25.00, 'APPROVED', 200, 4.6),
 
-('Alpha Time Tracker',
- (SELECT user_id FROM Users WHERE email='vendor@market.com'),
- 1, 15.00, 'APPROVED', 150, 4.3),
+-- ===== APPS (Vendor 1) =====
+('Facebook', 'Social networking platform', 4, 1, 0.00, 1, 'ACTIVE', 85, 4.3, NOW()),
+('Instagram', 'Photo and video sharing app', 4, 1, 0.00, 1, 'ACTIVE', 72, 4.4, NOW()),
+('TikTok', 'Short-form video entertainment', 4, 1, 0.00, 1, 'ACTIVE', 90, 4.5, NOW()),
+('YouTube', 'Video streaming platform', 4, 1, 0.00, 1, 'ACTIVE', 88, 4.6, NOW()),
+('Spotify', 'Music streaming service', 4, 1, 0.00, 1, 'ACTIVE', 64, 4.5, NOW()),
+('Netflix', 'Movie and TV streaming app', 4, 1, 9.99, 0, 'ACTIVE', 41, 4.4, NOW()),
+('Zalo', 'Vietnam messaging app', 4, 1, 0.00, 1, 'ACTIVE', 55, 4.2, NOW()),
+('Telegram', 'Secure messaging platform', 4, 1, 0.00, 1, 'ACTIVE', 60, 4.6, NOW()),
 
-('Alpha Invoice Tool',
- (SELECT user_id FROM Users WHERE email='vendor@market.com'),
- 1, 10.00, 'APPROVED', 120, 4.1);
-INSERT INTO Orders (customer_id, payment_status_id, total_amount)
-VALUES (
- (SELECT user_id FROM Users WHERE email='cus1@market.com'),
- (SELECT payment_status_id FROM Payment_Status WHERE status_name='PAID'),
- 25.00
-);
+-- ===== APPS (Vendor 3) =====
+('Google Maps', 'Navigation and maps service', 6, 1, 0.00, 1, 'ACTIVE', 78, 4.7, NOW()),
+('WhatsApp', 'Global messaging app', 6, 1, 0.00, 1, 'ACTIVE', 69, 4.5, NOW()),
 
-INSERT INTO Order_Detail (order_id, software_id, price)
-VALUES (
- LAST_INSERT_ID(),
- (SELECT software_id FROM Software WHERE name='Alpha Project Manager'),
- 25.00
-);
-INSERT INTO Orders (customer_id, payment_status_id, total_amount)
-VALUES (
- (SELECT user_id FROM Users WHERE email='cus2@market.com'),
- (SELECT payment_status_id FROM Payment_Status WHERE status_name='PAID'),
- 15.00
-);
+-- ===== GAMES (Vendor 2) =====
+('Resident Evil Requiem', 'Horror survival action game', 5, 2, 59.99, 0, 'ACTIVE', 33, 4.8, NOW()),
+('Grand Theft Auto V', 'Open-world action adventure game', 5, 2, 39.99, 0, 'ACTIVE', 48, 4.9, NOW()),
+('Call of Duty Warzone', 'Battle royale shooter game', 5, 2, 0.00, 1, 'ACTIVE', 70, 4.6, NOW()),
+('League of Legends', 'Multiplayer online battle arena game', 5, 2, 0.00, 1, 'ACTIVE', 75, 4.7, NOW()),
+('Dota 2', 'Competitive MOBA strategy game', 5, 2, 0.00, 1, 'ACTIVE', 58, 4.6, NOW()),
+('Minecraft', 'Sandbox building adventure game', 5, 2, 26.95, 0, 'ACTIVE', 44, 4.8, NOW()),
+('Fortnite', 'Online battle royale game', 5, 2, 0.00, 1, 'ACTIVE', 67, 4.5, NOW()),
+('Valorant', 'Tactical FPS shooter game', 5, 2, 0.00, 1, 'ACTIVE', 62, 4.6, NOW()),
 
-INSERT INTO Order_Detail (order_id, software_id, price)
-VALUES (
- LAST_INSERT_ID(),
- (SELECT software_id FROM Software WHERE name='Alpha Time Tracker'),
- 15.00
-);
-INSERT INTO Orders (customer_id, payment_status_id, total_amount)
-VALUES (
- (SELECT user_id FROM Users WHERE email='cus1@market.com'),
- (SELECT payment_status_id FROM Payment_Status WHERE status_name='PAID'),
- 10.00
-);
+-- ===== GAMES (Vendor 3) =====
+('PUBG Battlegrounds', 'Realistic battle royale game', 6, 2, 0.00, 1, 'ACTIVE', 59, 4.4, NOW()),
+('Elden Ring', 'Dark fantasy action RPG game', 6, 2, 59.99, 0, 'ACTIVE', 37, 4.9, NOW());
+-- Resident Evil Requiem
+-- Resident Evil Requiem (ID = 11)
 
-INSERT INTO Order_Detail (order_id, software_id, price)
-VALUES (
- LAST_INSERT_ID(),
- (SELECT software_id FROM Software WHERE name='Alpha Invoice Tool'),
- 10.00
-);
-INSERT INTO Review (software_id, customer_id, rating, comment)
+INSERT INTO Software
+(name, short_description, vendor_id, category_id, price, is_free, status, download_count, avg_rating, created_at)
 VALUES
-((SELECT software_id FROM Software WHERE name='Alpha Project Manager'),
- (SELECT user_id FROM Users WHERE email='cus1@market.com'),
- 5, 'Excellent app'),
+('Discord','Gaming and community communication platform',4,1,0.00,1,'PENDING_REVIEW',0,0,NOW()),
+('Snapchat','Multimedia messaging app with disappearing messages',4,1,0.00,1,'PENDING_REVIEW',0,0,NOW()),
+('Zoom','Online video conferencing and meeting platform',6,1,0.00,1,'PENDING_REVIEW',0,0,NOW()),
+('Adobe Photoshop','Professional image editing software',6,1,29.99,0,'PENDING_REVIEW',0,0,NOW()),
+('Notion','Productivity workspace for notes and collaboration',4,1,8.99,0,'PENDING_REVIEW',0,0,NOW());
 
-((SELECT software_id FROM Software WHERE name='Alpha Time Tracker'),
- (SELECT user_id FROM Users WHERE email='cus2@market.com'),
- 4, 'Very useful'),
+INSERT INTO Software
+(name, short_description, vendor_id, category_id, price, is_free, status, download_count, avg_rating, created_at)
+VALUES
+('Slack','Team collaboration and messaging platform',6,1,6.99,0,'PENDING_APPROVAL',0,0,NOW()),
+('Twitch','Live streaming platform for gamers',4,1,0.00,1,'PENDING_APPROVAL',0,0,NOW()),
+('Genshin Impact','Open world anime action RPG',5,2,0.00,1,'PENDING_APPROVAL',0,0,NOW()),
+('Cyberpunk 2077','Futuristic open world RPG game',5,2,59.99,0,'PENDING_APPROVAL',0,0,NOW()),
+('Among Us','Online multiplayer social deduction game',5,2,4.99,0,'PENDING_APPROVAL',0,0,NOW());
 
-((SELECT software_id FROM Software WHERE name='Alpha Invoice Tool'),
- (SELECT user_id FROM Users WHERE email='cus1@market.com'),
- 4, 'Good for small business');
-INSERT INTO Vendor_Payout
+INSERT INTO Software_Detail 
+(software_id, description, system_requirement, release_note)
+VALUES
+
+(1,
+'Facebook is one of the largest social networking platforms in the world. It allows users to connect with friends, share posts, photos, and videos, join communities, follow public pages, and communicate through messaging features. Businesses and content creators can also promote products, run advertisements, and build online communities. The platform integrates news feeds, groups, marketplace, and live streaming features that allow users to interact and share information in real time.',
+'Windows 10 / macOS 11 / Android 8 / iOS 13, 2GB RAM, Internet connection required',
+'Improved news feed ranking algorithm, performance optimizations, and bug fixes.'
+),
+
+(2,
+'Instagram is a social media application focused on photo and video sharing. Users can upload pictures, reels, and stories, apply filters, and interact with others through likes, comments, and direct messages. The platform is widely used by influencers, photographers, and brands for visual storytelling and marketing. Instagram also includes features like live streaming, reels, and shopping integrations that help users discover products and trends.',
+'Windows 10 / macOS 11 / Android 8 / iOS 13, 2GB RAM, Internet connection required',
+'Enhanced reels performance, improved story editor, and minor bug fixes.'
+),
+
+(3,
+'TikTok is a short-form video entertainment platform where users create and share engaging videos with music, filters, and effects. The app uses a powerful recommendation algorithm that shows personalized content on the "For You" page. Creators can produce dance videos, tutorials, comedy clips, and educational content. TikTok has become one of the fastest-growing social platforms worldwide with millions of daily active users.',
+'Windows 10 / macOS 11 / Android 8 / iOS 13, 3GB RAM recommended',
+'Improved video editing tools and optimized recommendation engine.'
+),
+
+(4,
+'YouTube is the world’s largest video streaming and sharing platform. It allows users to watch videos ranging from entertainment and music to educational tutorials and documentaries. Content creators can upload videos, build subscriber communities, and monetize through advertisements and memberships. The platform supports live streaming, playlists, recommendations, and cross-device viewing.',
+'Windows 10 / macOS 11 / Android 8 / iOS 13, 4GB RAM recommended',
+'Improved playback stability and new creator analytics features.'
+),
+
+(5,
+'Spotify is a digital music streaming service that gives users access to millions of songs, albums, and podcasts. Users can create playlists, follow artists, and discover new music through personalized recommendations. Spotify provides both free ad-supported streaming and premium subscriptions with offline listening and higher audio quality.',
+'Windows 10 / macOS 11 / Android 8 / iOS 13, 2GB RAM',
+'Improved music recommendation system and faster playlist loading.'
+),
+
+(6,
+'Netflix is a popular online streaming service that provides a large library of movies, TV series, and original productions. Users can watch content on demand across multiple devices and receive personalized recommendations based on their viewing habits. Netflix also offers offline downloads and high-definition streaming for premium users.',
+'Windows 10 / macOS 11 / Android 9 / iOS 13, 4GB RAM recommended',
+'Added new streaming optimization and improved subtitle support.'
+),
+
+(7,
+'Zalo is a Vietnamese messaging and social networking application widely used for communication and business interactions. Users can send messages, make voice and video calls, share images, and create group chats. Zalo also integrates digital services such as payments, official accounts, and mini apps for local businesses.',
+'Windows 10 / macOS 11 / Android 8 / iOS 12, 2GB RAM',
+'Improved call stability and enhanced message synchronization.'
+),
+
+(8,
+'Telegram is a cloud-based messaging application known for its speed, privacy, and security features. It allows users to send encrypted messages, share large files, create channels, and manage large community groups. Telegram supports bots and automation tools that extend the platform’s capabilities for developers and businesses.',
+'Windows 10 / macOS 11 / Android 8 / iOS 12, 2GB RAM',
+'Improved group management tools and enhanced encryption security.'
+),
+
+(9,
+'Google Maps is a navigation and mapping service that helps users find locations, explore places, and get directions for driving, walking, cycling, or public transportation. It provides real-time traffic updates, street views, business listings, and location sharing features. Google Maps is widely used for travel planning and daily navigation.',
+'Windows 10 / macOS 11 / Android 8 / iOS 12, GPS support recommended',
+'Updated navigation accuracy and improved real-time traffic reporting.'
+),
+
+(10,
+'WhatsApp is a globally popular messaging application that allows users to send text messages, voice notes, images, videos, and documents. It also supports voice and video calls, group chats, and end-to-end encryption to ensure secure communication. Businesses use WhatsApp Business features to interact with customers and provide support.',
+'Windows 10 / macOS 11 / Android 8 / iOS 12, 2GB RAM',
+'Enhanced privacy controls and improved voice call quality.'
+),
+
+(11,
+'Resident Evil Requiem is a survival horror action game that continues the legacy of the Resident Evil franchise. Players explore dark environments filled with terrifying creatures while solving puzzles and managing limited resources. The game combines cinematic storytelling with intense gameplay and atmospheric horror elements.',
+'Windows 10 64-bit, Intel i5, 8GB RAM, GTX 1060 or equivalent, 50GB storage',
+'Optimized graphics performance and improved enemy AI behavior.'
+),
+
+(12,
+'Grand Theft Auto V is an open-world action adventure game where players explore the city of Los Santos and complete missions across a massive interactive world. The game features multiple playable characters, a deep storyline, and online multiplayer modes that allow players to build criminal empires and participate in various activities.',
+'Windows 10 64-bit, Intel i5, 8GB RAM, GTX 970, 80GB storage',
+'Improved online stability and additional multiplayer events.'
+),
+
+(13,
+'Call of Duty Warzone is a free-to-play battle royale shooter that drops players into large-scale combat zones where they must survive against dozens of opponents. The game includes intense firefights, tactical gameplay, and team-based strategies. Warzone features seasonal updates with new maps, weapons, and game modes.',
+'Windows 10 64-bit, Intel i5, 12GB RAM, GTX 1060, 70GB storage',
+'New weapons added and map performance optimizations.'
+),
+
+(14,
+'League of Legends is a multiplayer online battle arena game where two teams compete to destroy the opposing base. Players choose champions with unique abilities and coordinate strategies with teammates. The game is known for its competitive esports scene and frequent updates introducing new champions and balance changes.',
+'Windows 10 / macOS 11, Intel i3, 4GB RAM, integrated graphics supported',
+'Champion balance updates and improved matchmaking system.'
+),
+
+(15,
+'Dota 2 is a competitive multiplayer strategy game where two teams of five players battle to destroy the enemy’s Ancient. Each hero has unique abilities that require teamwork and strategic planning. The game has a deep gameplay system and a global esports community with major tournaments.',
+'Windows 10 / macOS 11 / Linux, Intel i3, 4GB RAM, 15GB storage',
+'Improved hero balance and optimized matchmaking performance.'
+),
+
+(16,
+'Minecraft is a sandbox adventure game that allows players to build, explore, and survive in a procedurally generated block-based world. Players can gather resources, craft tools, build structures, and interact with creatures. The game supports both creative and survival modes and has a huge modding and community ecosystem.',
+'Windows 10 / macOS 11, Intel i3, 4GB RAM, 10GB storage',
+'Added new blocks, improved world generation, and bug fixes.'
+),
+
+(17,
+'Fortnite is a popular online battle royale game where players compete to be the last person or team standing. The game is known for its building mechanics, colorful graphics, and frequent in-game events. Fortnite also features collaborations with popular franchises and seasonal updates.',
+'Windows 10, Intel i5, 8GB RAM, GTX 960, 30GB storage',
+'New season content and improved weapon balancing.'
+),
+
+(18,
+'Valorant is a tactical first-person shooter that combines precise gunplay with character abilities. Teams compete in strategic matches where players must plant or defuse a spike while coordinating with teammates. The game emphasizes teamwork, communication, and competitive ranking systems.',
+'Windows 10 64-bit, Intel i3, 4GB RAM, GTX 1050, 20GB storage',
+'New agent released and gameplay balance adjustments.'
+),
+
+(19,
+'PUBG Battlegrounds is a realistic battle royale game where players parachute onto a large island and search for weapons, equipment, and vehicles to survive. The game focuses on tactical shooting mechanics and strategic positioning as the playable area gradually shrinks.',
+'Windows 10 64-bit, Intel i5, 8GB RAM, GTX 1060, 40GB storage',
+'Improved anti-cheat system and map performance enhancements.'
+),
+
+(20,
+'Elden Ring is an open-world action RPG set in a dark fantasy universe. Players explore vast landscapes, fight powerful enemies, and uncover hidden lore while customizing their character builds. The game is known for its challenging combat, deep world design, and immersive storytelling.',
+'Windows 10 64-bit, Intel i5, 12GB RAM, GTX 1070, 60GB storage',
+'Performance improvements and minor gameplay balancing.'
+);
+
+INSERT INTO Software_Detail (software_id, description, system_requirement, release_note)
+VALUES
+
+(21,
+'Discord is a communication platform widely used by gaming communities and online groups. Users can create servers, voice channels, and text channels to communicate with friends or communities. The application supports voice calls, video calls, screen sharing, and integration with bots that automate server management. Discord has become a central hub for gaming communities and online collaboration.',
+'Windows 10 / macOS 11 / Android 8 / iOS 13, 4GB RAM recommended',
+'Initial submission for security and functionality review.'
+),
+
+(22,
+'Snapchat is a multimedia messaging application that allows users to send photos and videos that disappear after being viewed. The platform also offers stories, augmented reality filters, and location-based features. Snapchat is popular among younger users due to its creative tools and social interaction features.',
+'Windows 10 / Android 8 / iOS 13',
+'Initial version submitted for platform review.'
+),
+
+(23,
+'Zoom is a video conferencing application used for online meetings, webinars, and virtual collaboration. It provides screen sharing, chat messaging, breakout rooms, and meeting recording features. Zoom became widely adopted for remote work, online education, and global business meetings.',
+'Windows 10 / macOS 11 / Android 8 / iOS 13, 4GB RAM',
+'Submitted for marketplace security and performance testing.'
+),
+
+(24,
+'Adobe Photoshop is a professional graphics editing software widely used by photographers, designers, and digital artists. It provides powerful tools for image manipulation, layer editing, color correction, and graphic design. Photoshop is considered an industry standard for digital image editing.',
+'Windows 10 64-bit, Intel i5, 8GB RAM, GPU recommended',
+'New version submitted for compatibility testing.'
+),
+
+(25,
+'Notion is an all-in-one productivity workspace used for note taking, task management, documentation, and collaboration. Teams and individuals can organize projects, track tasks, and share knowledge through customizable pages and databases.',
+'Windows 10 / macOS 11 / Android 8 / iOS 13',
+'Initial build awaiting system validation.'
+);	
+
+INSERT INTO Software_Detail (software_id, description, system_requirement, release_note)
+VALUES
+
+(26,
+'Slack is a professional communication platform designed for teams and workplaces. It allows users to organize conversations into channels, share files, integrate with third-party tools, and manage team collaboration efficiently.',
+'Windows 10 / macOS 11 / Android 8 / iOS 13',
+'Version passed technical testing and submitted for final approval.'
+),
+
+(27,
+'Twitch is a live streaming platform focused primarily on gaming content but also supports creative streams, music, and real-life broadcasts. Viewers can interact with streamers through chat, subscriptions, and donations.',
+'Windows 10 / macOS 11 / Android 8 / iOS 13',
+'Platform features validated during technical review.'
+),
+
+(28,
+'Genshin Impact is an open-world action role-playing game featuring anime-style graphics and elemental combat mechanics. Players explore a vast fantasy world, complete quests, collect characters, and engage in cooperative multiplayer gameplay.',
+'Windows 10 64-bit, Intel i5, 8GB RAM, GTX 1060',
+'Gameplay and network features verified during review process.'
+),
+
+(29,
+'Cyberpunk 2077 is a futuristic open-world role-playing game set in Night City, a technologically advanced but chaotic metropolis. Players take on the role of a mercenary navigating story-driven missions and character upgrades.',
+'Windows 10 64-bit, Intel i7, 12GB RAM, GTX 1070',
+'Graphics performance and gameplay systems verified.'
+),
+
+(30,
+'Among Us is a multiplayer party game where players work together to complete tasks while trying to identify impostors among the crew. The game emphasizes social deduction, teamwork, and deception.',
+'Windows 10 / Android 8 / iOS 13',
+'Multiplayer functionality and matchmaking tested.'
+);
+
+INSERT INTO Software_Review_Process (software_id, reviewer_id, test_result)
+VALUES
+(26,2,'Team collaboration features tested successfully'),
+(27,2,'Streaming and chat systems tested successfully'),
+(28,2,'Gameplay and world exploration tested'),
+(29,2,'Performance and gameplay mechanics verified'),
+(30,2,'Multiplayer and matchmaking system tested');
+
+
+-- Resident Evil Requiem (ID = 11)
+INSERT INTO Software_Image (software_id,image_url,is_thumbnail) VALUES
+(11,'uploads/images/RE9_icon.jpg',1),
+(11,'uploads/images/RE9_detail1.jpg',0),
+(11,'uploads/images/RE9_detail2.jpg',0),
+(11,'uploads/images/RE9_detail3.jpg',0),
+(11,'uploads/images/RE9_detail4.jpg',0);
+
+-- Warzone (ID = 13)
+INSERT INTO Software_Image (software_id,image_url,is_thumbnail) VALUES
+(13,'uploads/images/Warzone_icon.png',1),
+(13,'uploads/images/Warzone_detail1.jpg',0),
+(13,'uploads/images/Warzone_detail2.jpg',0),
+(13,'uploads/images/Warzone_detail3.jpg',0),
+(13,'uploads/images/Warzone_detail4.jpg',0);
+
+-- PUBG (ID = 19)
+INSERT INTO Software_Image (software_id,image_url,is_thumbnail) VALUES
+(19,'uploads/images/pubg_icon.png',1),
+(19,'uploads/images/pubg_detail1.png',0),
+(19,'uploads/images/pubg_detail2.webp',0),
+(19,'uploads/images/pubg_detail3.jpg',0),
+(19,'uploads/images/pubg_detail4.jpg',0);
+
+-- Minecraft (ID = 16)
+INSERT INTO Software_Image (software_id,image_url,is_thumbnail) VALUES
+(16,'uploads/images/minecraft.webp',1),
+(16,'uploads/images/Minecraft_info1.jpg',0),
+(16,'uploads/images/Minecraft_info2.jpg',0),
+(16,'uploads/images/minecraft_info3.png',0),
+(16,'uploads/images/minecraft_info4.jpg',0);
+
+-- Facebook (ID = 1)
+INSERT INTO Software_Image (software_id,image_url,is_thumbnail) VALUES
+(1,'uploads/images/facebook_icon.png',1),
+(1,'uploads/images/facebook_detail1.png',0),
+(1,'uploads/images/facebook_detail2.webp',0),
+(1,'uploads/images/facebook_detail3.jpg',0);
+
+-- Instagram (ID = 2)
+INSERT INTO Software_Image (software_id,image_url,is_thumbnail) VALUES
+(2,'uploads/images/instagram_icon.jpg',1),
+(2,'uploads/images/ins_detail1.webp',0),
+(2,'uploads/images/ins_detail2.webp',0),
+(2,'uploads/images/ins_detail3.webp',0),
+(2,'uploads/images/ins_detail4.webp',0);
+
+INSERT INTO Software_Review_Process (software_id, reviewer_id, test_result)
+VALUES
+(1,2,'Application tested successfully, no malware detected'),
+(2,2,'Photo sharing features tested and working'),
+(3,2,'Video streaming functionality stable'),
+(4,2,'Streaming performance acceptable'),
+(5,2,'Music playback tested successfully'),
+(6,2,'Subscription system tested'),
+(7,2,'Messaging features working correctly'),
+(8,2,'Secure communication verified'),
+(9,2,'Map navigation accurate'),
+(10,2,'Messaging service stable'),
+
+(11,2,'Horror game build tested successfully'),
+(12,2,'Open world gameplay verified'),
+(13,2,'Battle royale gameplay stable'),
+(14,2,'MOBA gameplay functional'),
+(15,2,'Multiplayer gameplay verified'),
+(16,2,'Sandbox mechanics tested'),
+(17,2,'Battle royale servers stable'),
+(18,2,'FPS gameplay tested'),
+(19,2,'Realistic shooter gameplay tested'),
+(20,2,'RPG gameplay mechanics verified');
+
+INSERT INTO Review_Score
+(software_id, reviewer_id,
+no_malware, no_copyright_violation, no_spam_content,
+ui_ux_score, technical_score, performance_score, documentation_score,
+total_score, decision, review_note)
+VALUES
+
+(1,2,1,1,1,8,8,8,7,7.75,'APPROVED','Facebook security and privacy review passed.'),
+
+(2,2,1,1,1,8,8,8,7,7.75,'APPROVED','Instagram interface and performance validated.'),
+
+(3,2,1,1,1,9,8,8,7,8.00,'APPROVED','TikTok video system and algorithm verified.'),
+
+(4,2,1,1,1,9,9,9,8,8.75,'APPROVED','YouTube streaming platform stable and secure.'),
+
+(5,2,1,1,1,8,8,8,7,7.75,'APPROVED','Spotify music streaming system verified.'),
+
+(6,2,1,1,1,8,8,8,7,7.75,'APPROVED','Netflix streaming and DRM protection verified.'),
+
+(7,2,1,1,1,7,7,7,6,6.75,'APPROVED','Zalo messaging features verified.'),
+
+(8,2,1,1,1,8,8,8,7,7.75,'APPROVED','Telegram encryption and chat system verified.'),
+
+(9,2,1,1,1,9,9,9,8,8.75,'APPROVED','Google Maps navigation accuracy verified.'),
+
+(10,2,1,1,1,8,8,8,7,7.75,'APPROVED','WhatsApp messaging system validated.');
+
+INSERT INTO Review_Score
+(software_id, reviewer_id,
+no_malware, no_copyright_violation, no_spam_content,
+ui_ux_score, technical_score, performance_score, documentation_score,
+total_score, decision, review_note)
+VALUES
+
+(11,2,1,1,1,9,9,9,8,8.75,'APPROVED','Resident Evil Requiem gameplay and security validated.'),
+
+(12,2,1,1,1,9,9,9,8,8.75,'APPROVED','GTA V open world mechanics verified.'),
+
+(13,2,1,1,1,8,8,8,7,7.75,'APPROVED','Warzone multiplayer stability verified.'),
+
+(14,2,1,1,1,9,9,8,8,8.50,'APPROVED','League of Legends competitive environment validated.'),
+
+(15,2,1,1,1,9,9,8,8,8.50,'APPROVED','Dota 2 gameplay mechanics verified.'),
+
+(16,2,1,1,1,9,8,8,7,8.00,'APPROVED','Minecraft sandbox engine stable.'),
+
+(17,2,1,1,1,8,8,8,7,7.75,'APPROVED','Fortnite gameplay and server system validated.'),
+
+(18,2,1,1,1,9,9,8,8,8.50,'APPROVED','Valorant anti-cheat and gameplay verified.'),
+
+(19,2,1,1,1,8,8,8,7,7.75,'APPROVED','PUBG gameplay and matchmaking tested.'),
+
+(20,2,1,1,1,9,9,9,8,8.75,'APPROVED','Elden Ring performance and gameplay verified.');
+
+INSERT INTO Review_Score
+(software_id, reviewer_id,
+no_malware, no_copyright_violation, no_spam_content,
+ui_ux_score, technical_score, performance_score, documentation_score,
+total_score, decision, review_note)
+VALUES
+
+(26,2,1,1,1,8,8,8,7,7.75,'APPROVED','Slack passed security and collaboration feature testing.'),
+
+(27,2,1,1,1,8,9,8,7,8.00,'APPROVED','Twitch streaming functionality and moderation system verified.'),
+
+(28,2,1,1,1,9,9,9,8,8.75,'APPROVED','Genshin Impact gameplay and performance verified successfully.'),
+
+(29,2,1,1,1,8,8,8,7,7.75,'APPROVED','Cyberpunk 2077 stability and graphics performance acceptable.'),
+
+(30,2,1,1,1,9,8,8,7,8.00,'APPROVED','Among Us multiplayer and matchmaking system tested.');
+
+INSERT INTO Software_Approval
+(software_id, approver_id, decision, approval_note)
+VALUES
+
+(1,3,'APPROVED','Application meets platform requirements'),
+(2,3,'APPROVED','No policy violations'),
+(3,3,'APPROVED','Video features verified'),
+(4,3,'APPROVED','Streaming performance excellent'),
+(5,3,'APPROVED','Music streaming stable'),
+(6,3,'APPROVED','Subscription system validated'),
+(7,3,'APPROVED','Messaging application approved'),
+(8,3,'APPROVED','Secure messaging verified'),
+(9,3,'APPROVED','Navigation service accurate'),
+(10,3,'APPROVED','Messaging features stable'),
+
+(11,3,'APPROVED','AAA horror game approved'),
+(12,3,'APPROVED','Open world game verified'),
+(13,3,'APPROVED','Battle royale gameplay approved'),
+(14,3,'APPROVED','MOBA game stable'),
+(15,3,'APPROVED','Multiplayer mechanics validated'),
+(16,3,'APPROVED','Sandbox game approved'),
+(17,3,'APPROVED','Battle royale game verified'),
+(18,3,'APPROVED','FPS game approved'),
+(19,3,'REJECTED','Performance issues detected'),
+(20,3,'APPROVED','RPG game high quality');
+
+INSERT INTO Payment_Status (status_name) VALUES
+('Pending'),
+('Paid'),
+('Failed'),
+('Refunded');
+
+
+INSERT INTO Orders (customer_id,payment_status_id,total_amount) VALUES
+(7,2,59.99),
+(8,2,26.95),
+(9,2,39.99),
+(10,2,0.00),
+(11,2,0.00),
+(12,2,59.99),
+(13,2,0.00),
+(14,2,39.99),
+(15,2,0.00),
+(16,2,0.00);
+
+INSERT INTO Order_Detail (order_id,software_id,price) VALUES
+
+-- PAID SOFTWARE
+(1,11,59.99),   -- Resident Evil
+(2,16,26.95),   -- Minecraft
+(3,12,39.99),   -- GTA V
+(6,20,59.99),   -- Elden Ring
+(8,12,39.99),   -- GTA V
+
+-- FREE SOFTWARE
+(4,1,0.00),     -- Facebook
+(5,5,0.00),     -- Spotify
+(7,7,0.00),     -- Zalo
+(9,2,0.00),     -- Instagram
+(10,18,0.00),   -- Valorant
+(1,13,0.00),    -- Warzone
+(3,15,0.00),    -- Dota2
+(6,17,0.00),    -- Fortnite
+(8,19,0.00);    -- PUBG
+
+
+INSERT INTO Review (software_id, customer_id, rating, comment) VALUES
+
+-- 1 Facebook (avg 4.3)
+(1,7,4,'Good social app'),
+(1,8,4,'Easy to connect with friends'),
+(1,9,5,'Very useful'),
+
+-- 2 Instagram (avg 4.4)
+(2,7,4,'Nice photo sharing'),
+(2,10,4,'Simple and fun'),
+(2,11,5,'Love the reels'),
+
+-- 3 TikTok (avg 4.5)
+(3,8,5,'Very entertaining'),
+(3,12,4,'Good short videos'),
+(3,13,5,'Addictive content'),
+
+-- 4 YouTube (avg 4.6)
+(4,7,5,'Best video platform'),
+(4,9,4,'Great content'),
+(4,14,5,'Very useful'),
+
+-- 5 Spotify (avg 4.5)
+(5,10,5,'Great music app'),
+(5,11,4,'Nice playlists'),
+(5,12,5,'Love it'),
+
+-- 6 Netflix (avg 4.4)
+(6,13,4,'Good movies'),
+(6,14,4,'Nice series'),
+(6,15,5,'Worth the price'),
+
+-- 7 Zalo (avg 4.2)
+(7,7,4,'Good local chat app'),
+(7,8,4,'Easy to use'),
+(7,9,5,'Works well'),
+
+-- 8 Telegram (avg 4.6)
+(8,10,5,'Very secure'),
+(8,11,4,'Good messaging'),
+(8,12,5,'Fast and clean'),
+
+-- 9 Google Maps (avg 4.7)
+(9,13,5,'Best navigation'),
+(9,14,5,'Very accurate'),
+(9,15,4,'Helpful app'),
+
+-- 10 WhatsApp (avg 4.5)
+(10,16,5,'Simple messaging'),
+(10,7,4,'Works well'),
+(10,8,5,'Reliable'),
+
+-- 11 Resident Evil Requiem (avg 4.8)
+(11,9,5,'Amazing horror game'),
+(11,10,5,'Great graphics'),
+(11,11,4,'Very immersive'),
+
+-- 12 GTA V (avg 4.9)
+(12,12,5,'Masterpiece game'),
+(12,13,5,'Open world is huge'),
+(12,14,5,'Still amazing'),
+
+-- 13 Warzone (avg 4.6)
+(13,15,5,'Great battle royale'),
+(13,16,4,'Good gameplay'),
+(13,7,5,'Fun multiplayer'),
+
+-- 14 League of Legends (avg 4.7)
+(14,8,5,'Very competitive'),
+(14,9,4,'Fun with friends'),
+(14,10,5,'Great MOBA'),
+
+-- 15 Dota 2 (avg 4.6)
+(15,11,5,'Deep gameplay'),
+(15,12,4,'Hard but fun'),
+(15,13,5,'Very strategic'),
+
+-- 16 Minecraft (avg 4.8)
+(16,14,5,'Creative freedom'),
+(16,15,5,'Great sandbox'),
+(16,16,4,'Very fun'),
+
+-- 17 Fortnite (avg 4.5)
+(17,7,5,'Fun battle royale'),
+(17,8,4,'Nice graphics'),
+(17,9,5,'Great gameplay'),
+
+-- 18 Valorant (avg 4.6)
+(18,10,5,'Great tactical shooter'),
+(18,11,4,'Competitive'),
+(18,12,5,'Very fun'),
+
+-- 19 PUBG (avg 4.4)
+(19,13,4,'Realistic gameplay'),
+(19,14,4,'Good battle royale'),
+(19,15,5,'Very intense'),
+
+-- 20 Elden Ring (avg 4.9)
+(20,16,5,'One of the best RPGs'),
+(20,7,5,'Amazing world'),
+(20,8,5,'Perfect gameplay');
+
+INSERT INTO Vendor_Payout 
 (vendor_id, amount, period_start, period_end, status)
 VALUES
-(
- (SELECT user_id FROM Users WHERE email='vendor@market.com'),
- 45.00,   -- giả sử hệ thống giữ 5$ commission
- '2025-01-01',
- '2025-01-31',
- 'PAID'
-);
-SELECT 
-    s.name AS app_name,
-    COUNT(od.order_detail_id) AS total_sales,
-    SUM(od.price) AS revenue
-FROM Software s
-JOIN Order_Detail od ON s.software_id = od.software_id
-JOIN Orders o ON od.order_id = o.order_id
-JOIN Payment_Status ps ON o.payment_status_id = ps.payment_status_id
-WHERE s.vendor_id = (SELECT user_id FROM Users WHERE email='vendor@market.com')
-  AND ps.status_name = 'PAID'
-GROUP BY s.software_id
-ORDER BY revenue DESC;
-INSERT INTO Users(full_name, email, password, role_id, status)
-VALUES (
-    'Test User',
-    'test@gmail.com',
-    '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92',
-    1,
-    'ACTIVE'
-);
+(4,79.17,'2026-01-01','2026-01-31','PAID'),
+(5,359.94,'2026-01-01','2026-01-31','PAID'),
+(6,103.98,'2026-01-01','2026-01-31','PENDING');
+
+
+INSERT INTO Orders (customer_id,payment_status_id,total_amount) VALUES
+(7,2,59.99),
+(8,2,39.99),
+(9,2,26.95),
+(10,2,59.99),
+(11,2,39.99),
+(12,2,26.95),
+(13,2,59.99),
+(14,2,39.99),
+(15,2,26.95),
+(16,2,59.99),
+
+(7,2,39.99),
+(8,2,59.99),
+(9,2,26.95),
+(10,2,39.99),
+(11,2,59.99),
+(12,2,26.95),
+(13,2,39.99),
+(14,2,59.99),
+(15,2,26.95),
+(16,2,39.99);
+
+INSERT INTO Order_Detail (order_id,software_id,price) VALUES
+(1,11,59.99),
+(2,12,39.99),
+(3,16,26.95),
+(4,20,59.99),
+(5,12,39.99),
+(6,16,26.95),
+(7,11,59.99),
+(8,12,39.99),
+(9,16,26.95),
+(10,20,59.99),
+
+(11,12,39.99),
+(12,11,59.99),
+(13,16,26.95),
+(14,12,39.99),
+(15,20,59.99),
+(16,16,26.95),
+(17,12,39.99),
+(18,11,59.99),
+(19,16,26.95),
+(20,12,39.99);
+
+
+INSERT INTO License (license_key,software_id,customer_id,purchase_date,expire_date,status) VALUES
+('LIC-RE9-AX92KD',11,7,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'Active'),
+('LIC-GTA5-2KD82S',12,8,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'Active'),
+('LIC-MC-92KDLS',16,9,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'Active'),
+('LIC-ER-92KD83',20,10,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'Active'),
+('LIC-GTA5-29DKS9',12,11,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'Active'),
+('LIC-MC-93KDL2',16,12,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'Active'),
+('LIC-RE9-12KD',11,13,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'Active'),
+('LIC-GTA5-9DK2',12,14,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'Active'),
+('LIC-MC-29SKD',16,15,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'Active'),
+('LIC-ER-99SKD',20,16,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'Active'),
+
+('LIC-GTA5-82KDL',12,7,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'Active'),
+('LIC-RE9-92KD2',11,8,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'Active'),
+('LIC-MC-72KDL',16,9,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'Active'),
+('LIC-GTA5-72SKD',12,10,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'Active'),
+('LIC-ER-38SKD',20,11,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'Active'),
+('LIC-MC-92KDJ',16,12,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'Active'),
+('LIC-GTA5-82JDK',12,13,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'Active'),
+('LIC-RE9-12KDL',11,14,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'Active'),
+('LIC-MC-44SDK',16,15,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'Active'),
+('LIC-GTA5-88SKD',12,16,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'Active');
+

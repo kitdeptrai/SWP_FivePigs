@@ -1,4 +1,4 @@
-package com.fivepigs.app.controller.reviewer;
+package com.fivepigs.app.web;
 
 import com.fivepigs.app.dao.SoftwareDao;
 import com.fivepigs.app.model.Software;

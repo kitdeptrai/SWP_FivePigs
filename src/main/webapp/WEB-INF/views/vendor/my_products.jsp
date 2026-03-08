@@ -13,7 +13,7 @@
         <title>My Products</title>
 
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/vendor.css">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/vendor/vendor.css">
         <style>
             .header{
                 display:flex;
@@ -195,7 +195,7 @@
                         <h1>My Products</h1>
                         <p class="subtitle">Manage your software products and uploads</p>
                     </div>                   
-                    <a href="upload_product" class="btn-primary">+ Upload New Product</a>
+                    <a href="/vendor/upload_product" class="btn-primary">+ Upload New Product</a>
                 </div>
 
                 <!-- Stats -->
@@ -260,7 +260,7 @@
                 <div class="products">
                     <c:forEach var="item" items="${softwareCardList}">
                         <div class="product-card">
-                            <img src="${software.softwareImage.imageUrl}" />
+                            <img src="/${item.softwareImage.imageUrl}" />
                             <div class="product-info">
                                 <div class="product-header">
                                     <div class="product-title">${item.name}</div>
@@ -291,7 +291,7 @@
                                     <div><span>Revenue</span><div class="revenue">$${item.revenue}</div></div>
                                 </div>
                                 <div class="actions">
-                                    <a href="product_detail?softwareId=${item.softwareId}" class="btn-outline">View Details</a>
+                                    <a href="/vendor/product_detail?softwareId=${item.softwareId}" class="btn-outline">View Details</a>
                                     <div class="icon-btn"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                                         <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
