@@ -1,4 +1,5 @@
 package com.fivepigs.app.dao;
+
 import com.fivepigs.app.config.Db;
 import com.fivepigs.app.model.Software;
 import java.sql.*;
@@ -98,104 +99,6 @@ public class SoftwareDao {
 
     """;
 
-    try (Connection conn = Db.getConnection();
-         PreparedStatement ps = conn.prepareStatement(sql);
-         ResultSet rs = ps.executeQuery()) {
-
-        while (rs.next()) {
-            Software s = new Software();
-            s.setSoftwareId(rs.getInt("software_id"));
-            s.setName(rs.getString("name"));
-            s.setShortDescription(rs.getString("short_description"));
-            s.setPrice(rs.getDouble("price"));
-            s.setStatus(rs.getString("status"));
-            Timestamp ts = rs.getTimestamp("created_at");
-                 if (ts != null) {
-                     s.setCreatedAt(ts.toLocalDateTime());
-              }
-            s.setVersion(rs.getString("version"));
-            s.setLanguage(rs.getString("language"));     
-            s.setCategoryName(rs.getString("category_name")); // QUAN TRỌNG
-
-            list.add(s);
-        }
-    }
-
-    return list;
-}
-    // update status trong pending reviews
-    public boolean updateStatus(int softwareId, String status) throws SQLException {
-
-    String sql = "UPDATE Software SET status = ? WHERE software_id = ?";
-
-    try (Connection conn = Db.getConnection();
-         PreparedStatement ps = conn.prepareStatement(sql)) {
-
-        ps.setString(1, status);
-        ps.setInt(2, softwareId);
-
-        return ps.executeUpdate() > 0;
-    }
-}
-
-
-    public List<Software> searchPendingSoftware(String keyword) throws SQLException {
-
-    List<Software> list = new ArrayList<>();
-
-    String sql = "SELECT * FROM software " +
-                 "WHERE status = 'pending' " +
-                 "AND name LIKE ?";
-
-    try (Connection conn = Db.getConnection();
-         PreparedStatement ps = conn.prepareStatement(sql)) {
-
-        ps.setString(1, "%" + keyword + "%");
-
-        ResultSet rs = ps.executeQuery();
-
-        while (rs.next()) {
-            Software s = new Software();
-            s.setSoftwareId(rs.getInt("software_id"));
-            s.setName(rs.getString("name"));
-            s.setPrice(rs.getDouble("price"));
-            list.add(s);
-        }
-    }
-
-    return list;
-}
-    
-    // My Reviews (apps được assign cho reviewer)
-public List<Software> getMyReviews(Integer reviewerId) throws SQLException {
-
-    List<Software> list = new ArrayList<>();
-
-    String sql = """
-        SELECT s.software_id,
-               s.name,
-               s.short_description,
-               s.price,
-               s.status,
-               s.created_at,
-               s.version,
-               s.language,
-               c.category_name,
-               si.image_url,
-               rp.quality_score
-        FROM Software_Review_Process rp
-        JOIN Software s 
-             ON rp.software_id = s.software_id
-        LEFT JOIN Category c
-             ON s.category_id = c.category_id
-        LEFT JOIN Software_Image si
-             ON s.software_id = si.software_id
-             AND si.is_thumbnail = 1
-        WHERE rp.reviewer_id = ?
-
-        ORDER BY s.created_at DESC
-    """;
-
         try (Connection conn = Db.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
@@ -205,29 +108,29 @@ public List<Software> getMyReviews(Integer reviewerId) throws SQLException {
                 s.setShortDescription(rs.getString("short_description"));
                 s.setPrice(rs.getDouble("price"));
                 s.setStatus(rs.getString("status"));
-
                 Timestamp ts = rs.getTimestamp("created_at");
                 if (ts != null) {
                     s.setCreatedAt(ts.toLocalDateTime());
                 }
-
                 s.setVersion(rs.getString("version"));
-                s.setCategoryName(rs.getString("category_name"));
-                s.setLanguage(null); // schema mới không có
+
+                s.setCategoryName(rs.getString("category_name")); // QUAN TRỌNG
 
                 list.add(s);
             }
         }
+
         return list;
     }
 
     // update status trong pending reviews
-    public boolean updateStatus(int softwareId, String status) throws SQLException {
+    public void updateSoftwareStatus(int softwareId, String status) throws SQLException {
         String sql = "UPDATE Software SET status = ? WHERE software_id = ?";
+
         try (Connection conn = Db.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, status);
             ps.setInt(2, softwareId);
-            return ps.executeUpdate() > 0;
+            ps.executeUpdate();
         }
     }
 
@@ -236,28 +139,124 @@ public List<Software> getMyReviews(Integer reviewerId) throws SQLException {
         List<Software> list = new ArrayList<>();
 
         String sql = """
-        SELECT s.software_id, s.name, s.price
+        SELECT s.software_id,
+               s.name,
+               s.short_description,
+               s.price,
+               s.created_at,
+               c.category_name,
+               u.full_name AS vendor_name,
+               sv.version_name AS version,
+               si.image_url
         FROM Software s
+        LEFT JOIN Category c
+               ON s.category_id = c.category_id
+        LEFT JOIN Users u
+               ON s.vendor_id = u.user_id
+        LEFT JOIN Software_Version sv
+               ON sv.software_id = s.software_id
+              AND sv.is_active = 1
+        LEFT JOIN Software_Image si
+               ON s.software_id = si.software_id
+              AND si.is_thumbnail = 1
         WHERE s.status = 'PENDING_REVIEW'
-          AND s.name LIKE ?
+          AND (
+                s.name LIKE ?
+                OR s.short_description LIKE ?
+                OR c.category_name LIKE ?
+                OR u.full_name LIKE ?
+                OR sv.version_name LIKE ?
+                OR CAST(s.price AS CHAR) LIKE ?
+              )
         ORDER BY s.created_at DESC
     """;
 
         try (Connection conn = Db.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, "%" + keyword + "%");
+            String kw = "%" + keyword + "%";
+            ps.setString(1, kw);
+            ps.setString(2, kw);
+            ps.setString(3, kw);
+            ps.setString(4, kw);
+            ps.setString(5, kw);
+            ps.setString(6, kw);
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     Software s = new Software();
                     s.setSoftwareId(rs.getInt("software_id"));
                     s.setName(rs.getString("name"));
+                    s.setShortDescription(rs.getString("short_description"));
                     s.setPrice(rs.getDouble("price"));
+                    s.setCategoryName(rs.getString("category_name"));
+                    s.setVersion(rs.getString("version"));
+                    s.setImageUrl(rs.getString("image_url"));
+
+                    Timestamp ts = rs.getTimestamp("created_at");
+                    if (ts != null) {
+                        s.setCreatedAt(ts.toLocalDateTime());
+                    }
+
                     list.add(s);
                 }
             }
         }
+
         return list;
+    }
+
+    public Software getSoftwareById(int softwareId) throws SQLException {
+        String sql = """
+        SELECT s.software_id,
+               s.name,
+               s.short_description,
+               s.price,
+               s.created_at,
+               c.category_name,
+               u.full_name AS vendor_name,
+               sv.version_name AS version,
+               si.image_url
+        FROM Software s
+        LEFT JOIN Category c
+               ON s.category_id = c.category_id
+        LEFT JOIN Users u
+               ON s.vendor_id = u.user_id
+        LEFT JOIN Software_Version sv
+               ON sv.software_id = s.software_id
+              AND sv.is_active = 1
+        LEFT JOIN Software_Image si
+               ON s.software_id = si.software_id
+              AND si.is_thumbnail = 1
+        WHERE s.software_id = ?
+        LIMIT 1
+    """;
+
+        try (Connection conn = Db.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, softwareId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Software s = new Software();
+                    s.setSoftwareId(rs.getInt("software_id"));
+                    s.setName(rs.getString("name"));
+                    s.setShortDescription(rs.getString("short_description"));
+                    s.setPrice(rs.getDouble("price"));
+                    s.setCategoryName(rs.getString("category_name"));
+                    s.setVersion(rs.getString("version"));
+                    s.setImageUrl(rs.getString("image_url"));
+
+                    Timestamp ts = rs.getTimestamp("created_at");
+                    if (ts != null) {
+                        s.setCreatedAt(ts.toLocalDateTime());
+                    }
+
+                    return s;
+                }
+            }
+        }
+
+        return null;
     }
 
     // My Reviews (apps đã có record trong Software_Review_Process)
@@ -309,7 +308,7 @@ public List<Software> getMyReviews(Integer reviewerId) throws SQLException {
                     }
 
                     s.setVersion(rs.getString("version"));
-                    s.setLanguage(null);
+
                     s.setCategoryName(rs.getString("category_name"));
                     s.setImageUrl(rs.getString("image_url"));
                     s.setQualityScore(null); // schema mới không có quality_score
@@ -322,9 +321,9 @@ public List<Software> getMyReviews(Integer reviewerId) throws SQLException {
     }
 
     public List<Software> getMyAssignedPendingReviews(int reviewerId) throws SQLException {
-    List<Software> list = new ArrayList<>();
+        List<Software> list = new ArrayList<>();
 
-    String sql = """
+        String sql = """
         SELECT s.software_id,
                s.name,
                s.short_description,
@@ -357,33 +356,29 @@ public List<Software> getMyReviews(Integer reviewerId) throws SQLException {
         ORDER BY ra.assigned_at DESC
     """;
 
-    try (Connection conn = Db.getConnection();
-         PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = Db.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
-        ps.setInt(1, reviewerId);
+            ps.setInt(1, reviewerId);
 
-        try (ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                Software s = new Software();
-                s.setSoftwareId(rs.getInt("software_id"));
-                s.setName(rs.getString("name"));
-                s.setShortDescription(rs.getString("short_description"));
-                s.setPrice(rs.getDouble("price"));
-                s.setStatus(rs.getString("status"));
-                s.setVersion(rs.getString("version"));
-                s.setCategoryName(rs.getString("category_name"));
-                s.setImageUrl(rs.getString("image_url"));
-                list.add(s);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Software s = new Software();
+                    s.setSoftwareId(rs.getInt("software_id"));
+                    s.setName(rs.getString("name"));
+                    s.setShortDescription(rs.getString("short_description"));
+                    s.setPrice(rs.getDouble("price"));
+                    s.setStatus(rs.getString("status"));
+                    s.setVersion(rs.getString("version"));
+                    s.setCategoryName(rs.getString("category_name"));
+                    s.setImageUrl(rs.getString("image_url"));
+                    list.add(s);
+                }
             }
         }
+        return list;
     }
-    return list;
-}
-
 
     // Top3RevenueByVendor: OK (không dùng cột bị xóa)
-
-    
     public List<Software> Top3RevenueByVendor(Integer vendorId) throws SQLException {
         List<Software> list = new ArrayList<>();
         String sql = """
@@ -420,7 +415,6 @@ public List<Software> getMyReviews(Integer reviewerId) throws SQLException {
         }
         return list;
     }
-
 
     public Integer totalProductsByVendor(Integer vendorId) throws SQLException {
         String sql = "SELECT \n"
@@ -658,7 +652,7 @@ public List<Software> getMyReviews(Integer reviewerId) throws SQLException {
                     Software sw = new Software();
                     SoftwareDetail swDetail = new SoftwareDetail();
                     SoftwareVersion swVersion = new SoftwareVersion();
-                    SoftwareImage simg=new SoftwareImage();
+                    SoftwareImage simg = new SoftwareImage();
                     Category cat = new Category();
 
                     sw.setName(rs.getString("name"));
@@ -680,5 +674,16 @@ public List<Software> getMyReviews(Integer reviewerId) throws SQLException {
         return null;
     }
 
+    public int countPendingReviewSoftware() throws SQLException {
+        String sql = "SELECT COUNT(*) FROM Software WHERE status = 'PENDING_REVIEW'";
 
+        try (Connection conn = Db.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        }
+
+        return 0;
+    }
 }

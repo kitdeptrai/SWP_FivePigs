@@ -206,17 +206,8 @@ CREATE TABLE Vendor_Payout (
     FOREIGN KEY (vendor_id) REFERENCES Users(user_id)
 );
 
--- 20. Vendor Payout Detail
-CREATE TABLE Vendor_Payout_Detail (
-    payout_detail_id INT AUTO_INCREMENT PRIMARY KEY,
-    payout_id INT,
-    order_detail_id INT,
-    amount DECIMAL(12,2),
-    FOREIGN KEY (payout_id) REFERENCES Vendor_Payout(payout_id),
-    FOREIGN KEY (order_detail_id) REFERENCES Order_Detail(order_detail_id)
-);
 
--- 21. Wallet
+-- 20. Wallet
 CREATE TABLE Wallet (
     wallet_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT UNIQUE,
@@ -226,7 +217,7 @@ CREATE TABLE Wallet (
     FOREIGN KEY (user_id) REFERENCES Users(user_id)
 );
 
--- 22. Wallet Transaction
+-- 21. Wallet Transaction
 CREATE TABLE Wallet_Transaction (
     transaction_id INT AUTO_INCREMENT PRIMARY KEY,
     wallet_id INT,
@@ -237,7 +228,7 @@ CREATE TABLE Wallet_Transaction (
     FOREIGN KEY (wallet_id) REFERENCES Wallet(wallet_id)
 );
 
--- 23. Support Ticket
+-- 22. Support Ticket
 CREATE TABLE Support_Ticket (
     ticket_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
@@ -252,7 +243,7 @@ CREATE TABLE Support_Ticket (
     FOREIGN KEY (assigned_admin_id) REFERENCES Users(user_id)
 );
 
--- 24. Support Ticket Message
+-- 23. Support Ticket Message
 CREATE TABLE Support_Ticket_Message (
     message_id INT AUTO_INCREMENT PRIMARY KEY,
     ticket_id INT NOT NULL,
@@ -263,7 +254,7 @@ CREATE TABLE Support_Ticket_Message (
     FOREIGN KEY (sender_id) REFERENCES Users(user_id)
 );
 
--- 25. pending review
+-- 24. pending review
 CREATE TABLE Review_Score (
     review_score_id INT AUTO_INCREMENT PRIMARY KEY,
     software_id INT NOT NULL,
@@ -289,7 +280,7 @@ CREATE TABLE Review_Score (
     FOREIGN KEY (reviewer_id) REFERENCES Users(user_id)
 );
 
--- 26.my reviews
+-- 25.my reviews
 
 
 -- ===== Review Guidelines =====
@@ -307,6 +298,7 @@ CREATE TABLE Review_Guideline (
     FOREIGN KEY (created_by) REFERENCES Users(user_id)
 );
 
+-- 26.Review_Guideline_Item
 CREATE TABLE Review_Guideline_Item (
     item_id INT AUTO_INCREMENT PRIMARY KEY,
     guideline_id INT NOT NULL,
@@ -321,29 +313,3 @@ CREATE INDEX idx_guideline_category ON Review_Guideline(category);
 CREATE INDEX idx_guideline_title ON Review_Guideline(title);
 CREATE INDEX idx_item_guideline ON Review_Guideline_Item(guideline_id);
 
-<<<<<<< HEAD
--- ====     27.   Tảo bảng assignment cho phần My reviews======
-
-USE fivepigs;
-
-CREATE TABLE Reviewer_Assignment (
-    assignment_id INT AUTO_INCREMENT PRIMARY KEY,
-    software_id INT NOT NULL,
-    reviewer_id INT NOT NULL,
-
-    status VARCHAR(20) DEFAULT 'ASSIGNED',  -- ASSIGNED / IN_PROGRESS / COMPLETED / CANCELLED
-    assigned_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    due_at DATETIME NULL,
-    note LONGTEXT NULL,
-
-    UNIQUE KEY uq_assignment_active (software_id, reviewer_id, status),
-
-    FOREIGN KEY (software_id) REFERENCES Software(software_id) ON DELETE CASCADE,
-    FOREIGN KEY (reviewer_id) REFERENCES Users(user_id) ON DELETE CASCADE
-);
-
-CREATE INDEX idx_assignment_reviewer ON Reviewer_Assignment(reviewer_id, status, assigned_at);
-CREATE INDEX idx_assignment_software ON Reviewer_Assignment(software_id, status);
-
-=======
->>>>>>> 9bffd4b37bed06535e41f64f16d53329b89f62b7
