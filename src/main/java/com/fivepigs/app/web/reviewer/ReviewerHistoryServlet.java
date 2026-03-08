@@ -1,4 +1,4 @@
-package com.fivepigs.app.web;
+package com.fivepigs.app.web.reviewer;
 
 import com.fivepigs.app.dao.ReviewHistoryDao;
 import com.fivepigs.app.model.ReviewHistoryDTO;
@@ -18,7 +18,7 @@ public class ReviewerHistoryServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request,
-                         HttpServletResponse response)
+            HttpServletResponse response)
             throws ServletException, IOException {
 
         // 1️⃣ Kiểm tra session
@@ -46,34 +46,45 @@ public class ReviewerHistoryServlet extends HttpServlet {
                 currentPage = 1;
             }
         }
+        String keyword = request.getParameter("keyword");
+        if (keyword != null) {
+            keyword = keyword.trim();
+        }
 
         ReviewHistoryDao dao = new ReviewHistoryDao();
 
-        // 3️⃣ Đếm tổng record trước
-        int totalRecords = dao.countHistory(reviewerId);
-        int totalPages = (int) Math.ceil((double) totalRecords / PAGE_SIZE);
+        int totalRecords;
+        List<ReviewHistoryDTO> historyList;
 
+        if (keyword != null && !keyword.isEmpty()) {
+            totalRecords = dao.countSearchHistory(reviewerId, keyword);
+        } else {
+            totalRecords = dao.countHistory(reviewerId);
+        }
+
+        int totalPages = (int) Math.ceil((double) totalRecords / PAGE_SIZE);
         if (totalPages == 0) {
             totalPages = 1;
         }
 
-        // 4️⃣ Nếu page vượt quá tổng số trang
         if (currentPage > totalPages) {
             currentPage = totalPages;
         }
 
-        // 5️⃣ Tính OFFSET
         int offset = (currentPage - 1) * PAGE_SIZE;
 
-        // 6️⃣ Lấy dữ liệu phân trang
-        List<ReviewHistoryDTO> historyList =
-                dao.getHistoryByReviewer(reviewerId, offset, PAGE_SIZE);
+        if (keyword != null && !keyword.isEmpty()) {
+            historyList = dao.searchHistoryByReviewer(reviewerId, keyword, offset, PAGE_SIZE);
+        } else {
+            historyList = dao.getHistoryByReviewer(reviewerId, offset, PAGE_SIZE);
+        }
 
         // 7️⃣ Set attribute
         request.setAttribute("user", user);
         request.setAttribute("historyList", historyList);
         request.setAttribute("currentPage", currentPage);
         request.setAttribute("totalPages", totalPages);
+        request.setAttribute("keyword", keyword);
 
         // 8️⃣ Forward
         request.getRequestDispatcher(

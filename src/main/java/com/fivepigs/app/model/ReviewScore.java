@@ -12,9 +12,66 @@ public class ReviewScore {
     private int softwareId;
     private int reviewerId;
 
+    
+    private String softwareName;
+    private String shortDescription;
+    private double price;
+    private String categoryName;
+    private String version;
+    private String imageUrl;
+    
+
     private boolean noMalware;
     private boolean noCopyrightViolation;
     private boolean noSpamContent;
+
+    public String getSoftwareName() {
+        return softwareName;
+    }
+
+    public void setSoftwareName(String softwareName) {
+        this.softwareName = softwareName;
+    }
+
+    public String getShortDescription() {
+        return shortDescription;
+    }
+
+    public void setShortDescription(String shortDescription) {
+        this.shortDescription = shortDescription;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
 
     private int uiUxScore;
     private int technicalScore;
@@ -31,7 +88,6 @@ public class ReviewScore {
     }
 
     // Getter & Setter đầy đủ
-
     public int getReviewScoreId() {
         return reviewScoreId;
     }
