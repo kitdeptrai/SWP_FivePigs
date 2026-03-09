@@ -296,7 +296,27 @@
             .review-actions span:hover {
                 color: #fff;
             }
+            .product-actions{
+                margin-left:auto;
+            }
 
+            .btn-version{
+                background:#6366f1;
+                padding:10px 18px;
+                border-radius:8px;
+                color:white;
+                text-decoration:none;
+                font-size:14px;
+                font-weight:500;
+                display:flex;
+                align-items:center;
+                gap:8px;
+                transition:0.3s;
+            }
+
+            .btn-version:hover{
+                background:#4f46e5;
+            }
         </style>
     </head>
 
@@ -320,6 +340,12 @@
                         </div>
                     </div>
                     <div class="badge">Approved</div>
+                    <div class="product-actions">
+                        <a href="/vendor/version_management?softwareId=${infoSoftware.softwareId}" class="btn-version">
+                            <i class="fa-solid fa-code-branch"></i>
+                            Version Management
+                        </a>
+                    </div>
                 </div>
 
                 <!-- STATS -->
@@ -432,8 +458,8 @@
                             <c:forEach var="item" items="${listImage}">
                                 <img src="/${item.imageUrl}">
                             </c:forEach>
-                            
-                            
+
+
                         </div>
 
                     </div>
