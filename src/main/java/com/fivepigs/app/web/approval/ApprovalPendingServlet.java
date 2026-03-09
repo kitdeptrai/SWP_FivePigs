@@ -2,11 +2,11 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
-package com.fivepigs.app.web;
+
+package com.fivepigs.app.web.approval;
 
 import com.fivepigs.app.dao.ApprovalDao;
 import com.fivepigs.app.model.Software;
-import com.fivepigs.app.model.User;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -21,39 +21,36 @@ import java.util.List;
  *
  * @author thanh
  */
-@WebServlet(name = "ApprovalPendingDetail", urlPatterns = {"/approval_pending_detail"})
-public class ApprovalPendingDetail extends HttpServlet {
-
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
+@WebServlet(name="ApprovalPendingServlet", urlPatterns={"/approval_pending"})
+public class ApprovalPendingServlet extends HttpServlet {
+   
+    /** 
+     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
      * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet ApprovalPendingDetail</title>");
+            out.println("<title>Servlet ApprovalPendingServlet</title>");  
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet ApprovalPendingDetail at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet ApprovalPendingServlet at " + request.getContextPath () + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
-    }
+    } 
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
+    /** 
      * Handles the HTTP <code>GET</code> method.
-     *
      * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
@@ -61,31 +58,20 @@ public class ApprovalPendingDetail extends HttpServlet {
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        User user = (User) request.getSession().getAttribute("user");
-
-        if (user == null) {
-            response.sendRedirect(request.getContextPath() + "/login");
-            return;
+    throws ServletException, IOException {
+        try{
+        ApprovalDao adao = new ApprovalDao();
+        List<Software> list = adao.getPendingApprovals();
+        request.setAttribute("listpending", list);
+        request.getRequestDispatcher("/WEB-INF/views/Approval/approval_pending.jsp").forward(request, response);
+        }catch(SQLException e){
+            
         }
+        
+    } 
 
-        try {
-            ApprovalDao adao = new ApprovalDao();
-            Integer softwareId = Integer.parseInt(request.getParameter("softwareId"));
-            Software s = adao.getPendingDetail(softwareId);
-            request.setAttribute("pendingDetail", s);
-            request.setAttribute("softwareId", softwareId);
-            request.getRequestDispatcher("/WEB-INF/views/Approval/approval_pending_detail.jsp")
-                    .forward(request, response);
-
-        } catch (SQLException e) {
-            throw new ServletException(e);
-        }
-    }
-
-    /**
+    /** 
      * Handles the HTTP <code>POST</code> method.
-     *
      * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
@@ -93,41 +79,12 @@ public class ApprovalPendingDetail extends HttpServlet {
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-         try {
-
-        User user = (User) request.getSession().getAttribute("user");
-        if (user == null) {
-            response.getWriter().println("User session is null");
-            return;
-        }
-
-        String softwareIdStr = request.getParameter("softwareId");
-        String decision = request.getParameter("decision");
-        String note = request.getParameter("note");
-
-        if (softwareIdStr == null || decision == null) {
-            response.getWriter().println("Missing parameters");
-            return;
-        }
-
-        int softwareId = Integer.parseInt(softwareIdStr);
-        int approverId = user.getUserId();
-
-        ApprovalDao adao = new ApprovalDao();
-        adao.submitDecision(softwareId, approverId, decision, note);
-
-        response.sendRedirect(request.getContextPath() + "/approval_history");
-
-    } catch (Exception e) {
-        e.printStackTrace();
-        throw new ServletException(e); 
-    }
+    throws ServletException, IOException {
+        processRequest(request, response);
     }
 
-    /**
+    /** 
      * Returns a short description of the servlet.
-     *
      * @return a String containing servlet description
      */
     @Override

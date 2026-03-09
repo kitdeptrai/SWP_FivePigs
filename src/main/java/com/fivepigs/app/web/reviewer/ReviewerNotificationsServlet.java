@@ -1,4 +1,4 @@
-package com.fivepigs.app.web;
+package com.fivepigs.app.web.reviewer;
 
 import com.fivepigs.app.dao.NotificationDao;
 import com.fivepigs.app.model.Notification;

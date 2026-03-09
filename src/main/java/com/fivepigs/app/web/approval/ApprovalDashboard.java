@@ -3,9 +3,8 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
 
-package com.fivepigs.app.web;
+package com.fivepigs.app.web.approval;
 
-import com.fivepigs.app.dao.SoftwareDao;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -13,15 +12,18 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import com.fivepigs.app.dao.ApprovalDao;
+import com.fivepigs.app.model.Software;
 import java.sql.SQLException;
-
+import java.util.List;
+import java.util.Map;
 /**
  *
- * @author Admin
+ * @author thanh
  */
-@WebServlet(name="ReviewerDashboard", urlPatterns={"/reviewer_dashboard"})
-public class ReviewerDashboard extends HttpServlet {
-   
+@WebServlet(name="ApprovalDashboard", urlPatterns={"/approval_dashboard"})
+public class ApprovalDashboard extends HttpServlet {
+
     /** 
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
      * @param request servlet request
@@ -37,10 +39,10 @@ public class ReviewerDashboard extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet ReviewerDashboard</title>");  
+            out.println("<title>Servlet ApprovalDashboard</title>");  
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet ReviewerDashboard at " + request.getContextPath () + "</h1>");
+            out.println("<h1>Servlet ApprovalDashboard at " + request.getContextPath () + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -54,30 +56,23 @@ public class ReviewerDashboard extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-   @Override
-protected void doGet(HttpServletRequest request, HttpServletResponse response)
-throws ServletException, IOException {
-
-    try {
-        SoftwareDao sDao = new SoftwareDao();
-
-        Integer pendingReviewApp = sDao.pendingReviewApp();
-        Integer completeReviewApp = sDao.completeReviewApp();
-        Integer reviewedToday = sDao.reviewedToday();
-//        Integer qualityScore = sDao.getQualityScore();
-
-        request.setAttribute("pendingReviewApp", pendingReviewApp);
-        request.setAttribute("completeReviewApp", completeReviewApp);
-        request.setAttribute("reviewedToday", reviewedToday);
-//        request.setAttribute("qualityScore", qualityScore);
-
-        request.getRequestDispatcher("/WEB-INF/views/reviewer/reviewer_dashboard.jsp")
-               .forward(request, response);
-
-    } catch (SQLException e) {
-        e.printStackTrace();
-    }
-}
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+    throws ServletException, IOException {
+        try{
+        ApprovalDao adao = new ApprovalDao();
+        Map<String, Integer> counts = adao.getDashboardCounts();
+        List<Software> approvedApp = adao.getApprovalApp(1);
+        List<Software> getPendingApp = adao.getPendingApp(1);
+        request.setAttribute("counts", counts);
+        request.setAttribute("approvedApp",approvedApp);
+        request.setAttribute("pendingApp", getPendingApp);
+        request.getRequestDispatcher("/WEB-INF/views/Approval/approval_dashboard.jsp").forward(request, response);
+        }catch(SQLException e){
+            System.out.println(e.getMessage());
+        }
+        
+    } 
 
     /** 
      * Handles the HTTP <code>POST</code> method.
@@ -89,7 +84,7 @@ throws ServletException, IOException {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-        processRequest(request, response);
+        doGet(request,response);
     }
 
     /** 

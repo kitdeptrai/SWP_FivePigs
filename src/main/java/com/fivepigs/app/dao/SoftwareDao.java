@@ -1,4 +1,5 @@
 package com.fivepigs.app.dao;
+
 import com.fivepigs.app.config.Db;
 import com.fivepigs.app.model.Software;
 import java.sql.*;
@@ -79,7 +80,8 @@ public class SoftwareDao {
 
     // Pending reviews (đã sửa: lấy version từ Software_Version, bỏ language)
     public List<Software> getPendingSoftware() throws SQLException {
-        List<Software> list = new ArrayList<>();
+
+    List<Software> list = new ArrayList<>();
 
         String sql = """
         SELECT s.software_id,
@@ -101,23 +103,24 @@ public class SoftwareDao {
 
         try (Connection conn = Db.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 
-        while (rs.next()) {
-            Software s = new Software();
-            s.setSoftwareId(rs.getInt("software_id"));
-            s.setName(rs.getString("name"));
-            s.setShortDescription(rs.getString("short_description"));
-            s.setPrice(rs.getDouble("price"));
-            s.setStatus(rs.getString("status"));
-            Timestamp ts = rs.getTimestamp("created_at");
-                 if (ts != null) {
-                     s.setCreatedAt(ts.toLocalDateTime());
-              }
-            s.setVersion(rs.getString("version"));
-            s.setCategoryName(rs.getString("category_name")); // QUAN TRÃ¡Â»Å’NG
+            while (rs.next()) {
+                Software s = new Software();
+                s.setSoftwareId(rs.getInt("software_id"));
+                s.setName(rs.getString("name"));
+                s.setShortDescription(rs.getString("short_description"));
+                s.setPrice(rs.getDouble("price"));
+                s.setStatus(rs.getString("status"));
+                Timestamp ts = rs.getTimestamp("created_at");
+                if (ts != null) {
+                    s.setCreatedAt(ts.toLocalDateTime());
+                }
+                s.setVersion(rs.getString("version"));
+                s.setLanguage(rs.getString("language"));
+                s.setCategoryName(rs.getString("category_name")); // QUAN TRỌNG
 
-            list.add(s);
+                list.add(s);
+            }
         }
-    }
 
     return list;
 }
@@ -125,12 +128,8 @@ public class SoftwareDao {
 
 
 
-
+    
     // My Reviews (apps được assign cho reviewer)
-
-
-
-
 
 
     // update status trong pending reviews
@@ -143,7 +142,7 @@ public class SoftwareDao {
         }
     }
 
-    // Search pending software (Ã„â€˜ÃƒÂ£ sÃ¡Â»Â­a: Ã„â€˜ÃƒÂºng table + Ã„â€˜ÃƒÂºng status)
+    // Search pending software (đã sửa: đúng table + đúng status)
     public List<Software> searchPendingSoftware(String keyword) throws SQLException {
 
     List<Software> list = new ArrayList<>();
@@ -608,7 +607,9 @@ public class SoftwareDao {
             ps.setDouble(5, software.getPrice());
 
             ps.executeUpdate();
+
             ResultSet rs = ps.getGeneratedKeys();
+
             if (rs.next()) {
                 return rs.getInt(1);
             }

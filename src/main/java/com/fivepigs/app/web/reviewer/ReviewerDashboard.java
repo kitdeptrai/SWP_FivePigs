@@ -2,12 +2,11 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
-package com.fivepigs.app.web;
+package com.fivepigs.app.web.reviewer;
 
-import com.fivepigs.app.dao.ApprovalDao;
-import com.fivepigs.app.model.ApprovalProcess;
-import com.fivepigs.app.model.ReviewerProcess;
-import com.fivepigs.app.model.Software;
+import com.fivepigs.app.dao.ReviewScoreDao;
+import com.fivepigs.app.dao.SoftwareDao;
+import com.fivepigs.app.model.User;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -15,16 +14,15 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.List;
 
 /**
  *
- * @author thanh
+ * @author Admin
  */
-@WebServlet(name = "ApprovalHistory", urlPatterns = {"/approval_history"})
-public class ApprovalHistory extends HttpServlet {
+@WebServlet(name = "ReviewerDashboard", urlPatterns = {"/reviewer_dashboard"})
+public class ReviewerDashboard extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -43,10 +41,10 @@ public class ApprovalHistory extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet ApprovalHistory</title>");
+            out.println("<title>Servlet ReviewerDashboard</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet ApprovalHistory at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet ReviewerDashboard at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -64,17 +62,37 @@ public class ApprovalHistory extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        try {
-            
-            ApprovalDao adao = new ApprovalDao();
-            List<Software> list = adao.getApprovalHistory();
 
-            request.setAttribute("approvalHistory", list);
-            request.getRequestDispatcher("/WEB-INF/views/Approval/approval_history.jsp")
+        try {
+            SoftwareDao sDao = new SoftwareDao();
+            ReviewScoreDao reviewScoreDao = new ReviewScoreDao();
+
+            HttpSession session = request.getSession(false);
+            User user = (User) session.getAttribute("user");
+            int reviewerId = user.getUserId();
+
+            Integer pendingReviewApp = sDao.pendingReviewApp();
+            Integer completeReviewApp = sDao.completeReviewApp();
+            Integer reviewedToday = sDao.reviewedToday();
+
+            int inReviewCount = sDao.countPendingReviewSoftware();
+            int reviewedCount = reviewScoreDao.countReviewsByReviewer(reviewerId);
+
+            request.setAttribute("user", user);
+            request.setAttribute("pendingReviewApp", pendingReviewApp);
+            request.setAttribute("completeReviewApp", completeReviewApp);
+            request.setAttribute("reviewedToday", reviewedToday);
+            request.setAttribute("pendingList", sDao.getPendingSoftware());
+
+            request.setAttribute("inReviewCount", inReviewCount);
+            request.setAttribute("reviewedCount", reviewedCount);
+
+            request.getRequestDispatcher("/WEB-INF/views/reviewer/reviewer_dashboard.jsp")
                     .forward(request, response);
 
-        } catch (Exception e) {
-            throw new ServletException(e);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            response.sendRedirect(request.getContextPath() + "/login");
         }
     }
 

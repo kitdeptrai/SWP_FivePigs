@@ -1,17 +1,15 @@
-<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
+<c:set var="activeMenu" value="guidelines" />
 
 <!DOCTYPE html>
 <html>
     <head>
         <title>Review Guidelines</title>
 
-        <!-- GLOBAL LAYOUT -->
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/reviewer/reviewer.css">
-
-        <!-- PAGE STYLE -->
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/reviewer/reviewGuideline.css">
-
         <link rel="stylesheet"
               href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     </head>
@@ -19,68 +17,8 @@
 
         <div class="layout">
 
-            <!-- ================= SIDEBAR ================= -->
-            <aside class="sidebar">
-                <div>
-                    <div class="logo">
-                        <img src="${pageContext.request.contextPath}/assets/images/pig.png" alt="Pig Logo">
-                        <div>
-                            <h2>FivePigs</h2>
-                            <span>Software Market</span>
-                        </div>
-                    </div>
+            <%@ include file="layout/sidebar.jsp" %>
 
-                    <ul class="menu">
-                        <li>
-                            <a href="${pageContext.request.contextPath}/reviewer_dashboard" class="menu-link">
-                                <span class="icon">📊</span> Dashboard
-                            </a>
-                        </li>
-
-                        <li>
-                            <a href="${pageContext.request.contextPath}/reviewer_pending" class="menu-link">
-                                <span class="icon">🕒</span> Pending Reviews
-                            </a>
-                        </li>
-
-                        <li>
-                            <a href="${pageContext.request.contextPath}/reviewer_my_reviews" class="menu-link">
-                                <span class="icon">📄</span> My Reviews
-                            </a>
-                        </li>
-
-                        <li>
-                            <a href="${pageContext.request.contextPath}/reviewer_history" class="menu-link">
-                                <span class="icon">⏱</span> Review History
-                            </a>
-                        </li>
-
-                        <li>
-                            <a href="${pageContext.request.contextPath}/reviewer_guidelines" class="menu-link active">
-                                <span class="icon">📖</span> Review Guidelines
-                            </a>
-                        </li>
-
-                        <li>
-                            <a href="${pageContext.request.contextPath}/reviewer_notifications" class="menu-link">
-                                <span class="icon">🔔</span> Notifications
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-
-                <div class="user-box">
-                    <div class="avatar">AJ</div>
-                    <div>
-                        <p class="name">${user.fullName}</p>
-                        <p class="role">Reviewer</p>
-                    </div>
-                </div>
-
-                <a class="logout" href="${pageContext.request.contextPath}/logout">Logout</a>
-            </aside>
-
-            <!-- ================= MAIN ================= -->
             <main class="main">
 
                 <div class="page-header">
@@ -100,7 +38,6 @@
                     </div>
                 </div>
 
-                <!-- SEARCH + FILTER -->
                 <form class="toolbar" method="get" action="${pageContext.request.contextPath}/reviewer_guidelines">
                     <div class="search-box">
                         <i class="fa-solid fa-magnifying-glass"></i>
@@ -120,7 +57,6 @@
                     <button type="submit" class="btn btn-secondary">Search</button>
                 </form>
 
-                <!-- STATS -->
                 <c:set var="st" value="${stats}" />
                 <div class="stats-row">
                     <div class="stat-card">
@@ -156,7 +92,6 @@
                     </div>
                 </div>
 
-                <!-- LIST GUIDELINES -->
                 <h2 class="section-title">Review Guidelines</h2>
 
                 <c:if test="${empty guidelines}">
@@ -230,7 +165,6 @@
                     </c:forEach>
                 </div>
 
-                <!-- ===== Modal Add guideline ===== -->
                 <div id="guidelineModal" class="modal" style="display:none;">
                     <div class="modal-content guideline-modal">
                         <span class="close-btn" onclick="closeGuidelineModal()">&times;</span>
@@ -277,7 +211,6 @@
                                 </select>
                             </div>
 
-                            <!-- Checklist editor -->
                             <div class="checklist-editor">
                                 <div class="checklist-head">
                                     <strong>Checklist items</strong>
@@ -309,7 +242,6 @@
         <script>
             const BASE = "${pageContext.request.contextPath}";
 
-            /* ===================== View checklist items (AJAX) ===================== */
             async function toggleItems(guidelineId) {
                 const box = document.getElementById("items-" + guidelineId);
                 const link = document.getElementById("toggle-" + guidelineId);
@@ -318,17 +250,13 @@
                 box.style.display = willShow ? "block" : "none";
 
                 if (!willShow) {
-                    if (link)
-                        link.innerText = "View checklist items";
+                    if (link) link.innerText = "View checklist items";
                     return;
                 }
 
-                if (link)
-                    link.innerText = "Hide checklist";
+                if (link) link.innerText = "Hide checklist";
 
-                // loaded once
-                if (box.dataset.loaded === "1")
-                    return;
+                if (box.dataset.loaded === "1") return;
 
                 box.innerHTML = '<div class="items-loading">Loading...</div>';
 
@@ -348,9 +276,9 @@
                     } else {
                         box.innerHTML = items.map(it =>
                             '<div class="check-item">' +
-                                    '<i class="fa-regular fa-circle-check"></i>' +
-                                    '<span>' + escapeHtml(it.itemText) + '</span>' +
-                                    '</div>'
+                            '<i class="fa-regular fa-circle-check"></i>' +
+                            '<span>' + escapeHtml(it.itemText) + '</span>' +
+                            '</div>'
                         ).join("");
                     }
 
@@ -370,13 +298,11 @@
                         .replaceAll("'", "&#039;");
             }
 
-            /* ===================== Modal basic ===================== */
             function openGuidelineModal(mode, guidelineId) {
                 const modal = document.getElementById("guidelineModal");
                 const title = document.getElementById("modalTitle");
                 const form = document.getElementById("guidelineForm");
 
-                // reset
                 document.getElementById("guidelineId").value = "";
                 document.getElementById("fCategory").value = "";
                 document.getElementById("fPriority").value = "";
@@ -385,7 +311,6 @@
                 document.getElementById("fIcon").value = "";
                 document.getElementById("fColor").value = "";
 
-                // reset checklist modal items
                 modalItems = [];
                 renderModalItems();
 
@@ -396,7 +321,6 @@
                     return;
                 }
 
-                // edit placeholder (chưa làm)
                 title.innerText = "Edit Guideline";
                 form.action = BASE + "/reviewer_guideline_update";
                 document.getElementById("guidelineId").value = guidelineId;
@@ -410,11 +334,9 @@
 
             window.onclick = function (event) {
                 const modal = document.getElementById("guidelineModal");
-                if (event.target === modal)
-                    modal.style.display = "none";
+                if (event.target === modal) modal.style.display = "none";
             }
 
-            /* ===================== Modal checklist add/remove ===================== */
             let modalItems = [];
 
             function renderModalItems() {
@@ -448,8 +370,7 @@
             function addChecklistItem() {
                 const inp = document.getElementById("newItemText");
                 const v = (inp.value || "").trim();
-                if (!v)
-                    return;
+                if (!v) return;
 
                 modalItems.push(v);
                 inp.value = "";
