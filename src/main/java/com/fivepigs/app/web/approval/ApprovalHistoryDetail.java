@@ -3,7 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
 
-package com.fivepigs.app.web;
+package com.fivepigs.app.web.approval;
 
 import com.fivepigs.app.dao.ApprovalDao;
 import com.fivepigs.app.model.Software;
