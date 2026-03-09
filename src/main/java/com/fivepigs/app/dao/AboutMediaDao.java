@@ -1,7 +1,7 @@
 package com.fivepigs.app.dao;
 
+import com.fivepigs.app.config.Db;
 import com.fivepigs.app.model.AboutMedia;
-import config.Db;
 import java.sql.*;
 import java.util.*;
 

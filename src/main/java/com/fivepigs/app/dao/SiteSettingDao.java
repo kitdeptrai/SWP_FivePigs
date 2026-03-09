@@ -1,6 +1,6 @@
 package com.fivepigs.app.dao;
 
-import config.Db;
+import com.fivepigs.app.config.Db;
 import java.sql.*;
 import java.util.*;
 
