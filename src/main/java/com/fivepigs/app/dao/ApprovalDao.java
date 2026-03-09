@@ -134,7 +134,7 @@ public class ApprovalDao {
                 FROM Software s
                 LEFT JOIN Software_Approval sa
                     ON s.software_id = sa.software_id
-                WHERE s.status = 'PENDING'
+                WHERE s.status = 'PENDING_APPROVAL'
                 ORDER BY sa.approval_date DESC;
     """;
 
@@ -165,7 +165,7 @@ public class ApprovalDao {
 
         String sql = """
         SELECT
-          (SELECT COUNT(*) FROM Software WHERE status = 'PENDING') AS pending_count,
+          (SELECT COUNT(*) FROM Software WHERE status = 'PENDING_APPROVAL') AS pending_count,
           (SELECT COUNT(*) FROM Software_Approval WHERE decision = 'APPROVED') AS approved_count,
           (SELECT COUNT(*) FROM Software_Approval WHERE decision = 'REJECTED') AS rejected_count
     """;
@@ -212,7 +212,7 @@ public class ApprovalDao {
            AND rp.reviewed_at = last_rp.max_reviewed_at
           LEFT JOIN Users u ON u.user_id = rp.reviewer_id
           LEFT JOIN Category c ON c.category_id = s.category_id
-          WHERE s.status = 'PENDING'
+          WHERE s.status = 'PENDING_APPROVAL'
           ORDER BY rp.reviewed_at DESC, s.created_at DESC;        
     """;
 

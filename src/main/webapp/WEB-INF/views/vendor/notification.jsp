@@ -31,7 +31,7 @@
     <jsp:include page="layout/side_bar.jsp"/>
 
     <!-- ================= MAIN ================= -->
-    <main class="main">
+    <div class="main">
 
         <!-- ===== Header (giống ảnh 2) ===== -->
         <div class="noti-head">
@@ -205,7 +205,7 @@
 
         </div>
 
-    </main>
+    </div>
 </div>
 
 <!-- ===== Modal View Details ===== -->
