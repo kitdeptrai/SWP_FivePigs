@@ -22,8 +22,8 @@ import java.util.List;
  *
  * @author MinhPD
  */
-@WebServlet(name = "MyProductsServlet", urlPatterns = {"/my_products"})
-public class MyProductsServlet extends HttpServlet {
+@WebServlet(name = "MyProductsServlet", urlPatterns = {"/vendor/my_products"})
+public class VendorMyProductsServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -38,8 +38,8 @@ public class MyProductsServlet extends HttpServlet {
         }
         
         Integer totalApps = swdao.totalProductsByVendor(user.getUserId());
-        Integer pendingApps=swdao.totalAppByStatusAndVendor(user.getUserId(),"PENDING_REVIEW");
-        Integer activeApps=swdao.totalAppByStatusAndVendor(user.getUserId(), "APPROVED");
+        Integer pendingApps=swdao.totalAppByStatusAndVendor(user.getUserId(),"PENDING%");
+        Integer activeApps=swdao.totalAppByStatusAndVendor(user.getUserId(), "ACTIVE");
         Double revenueByVendor=swdao.totalRevenueByVendor(user.getUserId());
         List<Software> softwareCardList=swdao.getSoftwareCardListByVendorID(user.getUserId());
         

@@ -25,8 +25,8 @@ import java.util.List;
  *
  * @author MinhPD
  */
-@WebServlet(name = "ProductDetailServlet", urlPatterns = {"/product_detail"})
-public class ProductDetailServlet extends HttpServlet {
+@WebServlet(name = "ProductDetailServlet", urlPatterns = {"/vendor/product_detail"})
+public class VendorProductDetailServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)

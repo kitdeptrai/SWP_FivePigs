@@ -3,6 +3,8 @@ package com.fivepigs.app.web.customer;
 import com.fivepigs.app.dao.CartDao;
 import com.fivepigs.app.model.Software;
 import com.fivepigs.app.model.User;
+import com.fivepigs.app.util.EmailService;
+import com.fivepigs.app.util.OtpUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -16,6 +18,14 @@ import java.util.List;
 
 @WebServlet(name = "CartServlet", urlPatterns = {"/cart"})
 public class CartServlet extends HttpServlet {
+
+    public static final String CHECKOUT_OTP_HASH = "checkout_otp_hash";
+    public static final String CHECKOUT_OTP_EXPIRE = "checkout_otp_expire";
+    public static final String CHECKOUT_OTP_ATTEMPTS = "checkout_otp_attempts";
+    public static final String CHECKOUT_PENDING_USER_ID = "checkout_pending_user_id";
+    public static final String CHECKOUT_OTP_LAST_SENT = "checkout_otp_last_sent";
+
+    private static final long CHECKOUT_OTP_TTL_MS = 5 * 60 * 1000L;
 
     private final CartDao cartDao = new CartDao();
 
@@ -43,7 +53,8 @@ public class CartServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        Integer userId = resolveUserId(request.getSession(false));
+        HttpSession session = request.getSession(false);
+        Integer userId = resolveUserId(session);
         if (userId == null) {
             response.sendRedirect(request.getContextPath() + "/login?redirect=/cart");
             return;
@@ -80,12 +91,20 @@ public class CartServlet extends HttpServlet {
             }
 
             if ("checkout".equals(action)) {
-                int count = cartDao.checkout(userId);
-                if (count > 0) {
-                    response.sendRedirect(request.getContextPath() + "/library?msg=checkout_success");
-                } else {
+                List<Software> cartItems = cartDao.getCartItems(userId);
+                if (cartItems == null || cartItems.isEmpty()) {
                     response.sendRedirect(request.getContextPath() + "/cart?msg=empty");
+                    return;
                 }
+
+                User user = resolveUser(session);
+                if (user == null || user.getEmail() == null || user.getEmail().isBlank()) {
+                    response.sendRedirect(request.getContextPath() + "/login?redirect=/cart");
+                    return;
+                }
+
+                issueCheckoutOtp(session, user);
+                response.sendRedirect(request.getContextPath() + "/verify-checkout-otp?sent=1");
                 return;
             }
 
@@ -93,6 +112,24 @@ public class CartServlet extends HttpServlet {
         } catch (SQLException e) {
             throw new ServletException(e);
         }
+    }
+
+    private void issueCheckoutOtp(HttpSession session, User user) {
+        String otp = OtpUtil.generateOtp();
+        session.setAttribute(CHECKOUT_OTP_HASH, OtpUtil.hashOtp(otp));
+        session.setAttribute(CHECKOUT_OTP_EXPIRE, System.currentTimeMillis() + CHECKOUT_OTP_TTL_MS);
+        session.setAttribute(CHECKOUT_OTP_ATTEMPTS, 0);
+        session.setAttribute(CHECKOUT_PENDING_USER_ID, user.getUserId());
+        session.setAttribute(CHECKOUT_OTP_LAST_SENT, System.currentTimeMillis());
+
+        String body = "<div style='font-family:Arial,sans-serif;max-width:540px;margin:0 auto;'>"
+                + "<h2 style='color:#6b70ff'>Checkout Verification</h2>"
+                + "<p>Use OTP below to confirm your purchase on FIVEPIGS:</p>"
+                + "<h3 style='color:#0f172a;font-size:28px;letter-spacing:4px'><b>" + otp + "</b></h3>"
+                + "<p>This OTP expires in <b>5 minutes</b>.</p>"
+                + "</div>";
+
+        new Thread(() -> EmailService.sendHtmlEmail(user.getEmail(), "FIVEPIGS - Checkout OTP", body)).start();
     }
 
     private Integer resolveUserId(HttpSession session) {
@@ -112,6 +149,13 @@ public class CartServlet extends HttpServlet {
             return parseInt((String) userIdAttr);
         }
         return null;
+    }
+
+    private User resolveUser(HttpSession session) {
+        if (session == null) {
+            return null;
+        }
+        return (User) session.getAttribute("user");
     }
 
     private String appendMsg(String url, String msg) {
@@ -134,4 +178,3 @@ public class CartServlet extends HttpServlet {
         }
     }
 }
-

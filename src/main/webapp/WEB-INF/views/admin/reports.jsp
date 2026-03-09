@@ -116,38 +116,8 @@
 <body>
 
 <div class="layout">
-    <aside class="sidebar">
-        <h2>FivePigs Admin</h2>
-        <nav>
-            <a href="${pageContext.request.contextPath}/admin/dashboard" class="menu-item">
-                <span>Dashboard</span>
-            </a>
-            <a href="${pageContext.request.contextPath}/admin/notifications" class="menu-item">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
-                <span>Notifications</span>
-            </a>
-            <a href="${pageContext.request.contextPath}/admin/employees" class="menu-item">
-                <span>Employees</span>
-            </a>
-            <a href="${pageContext.request.contextPath}/admin/users" class="menu-item">
-                <span>Users</span>
-            </a>
-            <a href="${pageContext.request.contextPath}/admin/products" class="menu-item">
-                <span>Products</span>
-            </a>
-            <a href="${pageContext.request.contextPath}/admin/orders" class="menu-item">
-                <span>Orders</span>
-            </a>
-            <a href="${pageContext.request.contextPath}/admin/reports" class="menu-item active">
-                <span>Reports</span>
-            </a>
-        </nav>
-
-        <div style="margin-top: auto; padding: 12px;">
-            <p style="font-size: 12px; color: #64748b; margin-bottom: 8px;">Admin: <c:out value="${user.fullName}"/></p>
-            <a href="${pageContext.request.contextPath}/logout" class="menu-item logout-btn">Logout</a>
-        </div>
-    </aside>
+    <c:set var="activeMenu" value="reports"/>
+    <jsp:include page="sidebar.jsp"/>
 
     <main class="main">
         <h1 style="margin-top: 0;">Reports Management</h1>

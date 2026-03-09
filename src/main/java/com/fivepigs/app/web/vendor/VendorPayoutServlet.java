@@ -4,9 +4,11 @@
  */
 package com.fivepigs.app.web.vendor;
 
-import com.fivepigs.app.dao.LicenseDao;
-import com.fivepigs.app.model.License;
+import com.fivepigs.app.dao.SoftwareDao;
+import com.fivepigs.app.dao.VendorDao;
+import com.fivepigs.app.model.Software;
 import com.fivepigs.app.model.User;
+import com.fivepigs.app.model.VendorPayout;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -16,7 +18,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.sql.SQLException;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,32 +25,24 @@ import java.util.List;
  *
  * @author MinhPD
  */
-@WebServlet(name = "LicenseManagementServlet", urlPatterns = {"/license_management"})
-public class LicenseManagementServlet extends HttpServlet {
+@WebServlet(name = "PayoutServlet", urlPatterns = {"/vendor/payout"})
+public class VendorPayoutServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
+
             HttpSession session = request.getSession();
             User user = (User) session.getAttribute("user");
             if (user == null) {
                 request.getRequestDispatcher("/login").forward(request, response);
                 return;
             }
-            LicenseDao lidao = new LicenseDao();
-            List<License> listLicense = lidao.getLicenseByVendorId(user.getUserId());
-            Integer totalLicense=lidao.getTotalLicenseByVendor(user.getUserId());
-            Integer totalLicenseActive=lidao.getTotalLicenseByVendorAndStatus(user.getUserId(), "ACTIVE");
-            Integer totalLicenseExpire=lidao.getTotalLicenseByVendorAndStatus(user.getUserId(), "EXPIRE");
-            Integer totalLicenseRevoke=lidao.getTotalLicenseByVendorAndStatus(user.getUserId(), "REVOKE");
-            
-            request.setAttribute("totalLicense",totalLicense);
-            request.setAttribute("totalLicenseActive",totalLicenseActive);
-            request.setAttribute("totalLicenseExpire",totalLicenseExpire);
-            request.setAttribute("totalLicenseRevoke",totalLicenseRevoke);
-            request.setAttribute("listLicense", listLicense);
-            request.getRequestDispatcher("/WEB-INF/views/vendor/license_management.jsp").forward(request, response);
+            VendorDao vdao = new VendorDao();
+            List<VendorPayout> list = vdao.getPayoutByVendorId(user.getUserId());
+            request.setAttribute("list", list);
+            request.getRequestDispatcher("/WEB-INF/views/vendor/payout.jsp").forward(request, response);
         } catch (SQLException e) {
 
         }
@@ -58,11 +51,17 @@ public class LicenseManagementServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
     }
 
+    /**
+     * Returns a short description of the servlet.
+     *
+     * @return a String containing servlet description
+     */
     @Override
     public String getServletInfo() {
         return "Short description";
-    }
+    }// </editor-fold>
 
 }

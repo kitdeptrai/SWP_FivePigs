@@ -7,7 +7,7 @@
         <meta charset="UTF-8">
         <title>Vendor Dashboard</title>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/vendor.css">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/vendor/vendor.css">
     </head>
     <body>
 
@@ -69,7 +69,7 @@
                             <line x1="12" y1="22.08" x2="12" y2="12"></line>
                             </svg>
                         </div>
-                        <p class="card-title">Total Approved Apps</p>
+                        <p class="card-title">Total Active Apps</p>
                         <h2>${sumApprovedApps}</h2>
                         <span class="purple-text">${sumApprovedApps} total</span>
                     </div>
@@ -121,7 +121,7 @@
                                     <td class="revenue">$${item.revenue}</td>
                                     <td>${item.avgRating}</td>
                                     <td>
-                                        <span class="status approved">APPROVED</span>
+                                        <span class="status approved">${item.status}</span>
                                     </td>
                                     <td>
                                         <a 

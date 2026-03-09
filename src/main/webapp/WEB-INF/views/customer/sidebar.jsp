@@ -1,8 +1,19 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="com.fivepigs.app.model.User" %>
 <%
     String activePage = (String) request.getAttribute("activePage");
-
     if (activePage == null) activePage = "";
+
+    User currentUser = (User) session.getAttribute("user");
+    boolean isGuest = (currentUser == null);
+
+    String libraryHref = isGuest
+            ? (request.getContextPath() + "/login?redirect=/library")
+            : (request.getContextPath() + "/library");
+
+    String cartHref = isGuest
+            ? (request.getContextPath() + "/login?redirect=/cart")
+            : (request.getContextPath() + "/cart");
 %>
 
 <div class="sidebar">
@@ -23,21 +34,20 @@
         <i class="fa-solid fa-cubes"></i> Apps
     </a>
 
-    <a href="${pageContext.request.contextPath}/library" class="menu-item <%= activePage.equals("library") ? "active" : "" %>">
+    <a href="<%= libraryHref %>" class="menu-item <%= activePage.equals("library") ? "active" : "" %>" title="<%= isGuest ? "Login to open Library" : "Library" %>">
         <i class="fa-solid fa-book-open"></i> Library
     </a>
 
-    <a href="${pageContext.request.contextPath}/cart" class="menu-item <%= activePage.equals("cart") ? "active" : "" %>">
+    <a href="<%= cartHref %>" class="menu-item <%= activePage.equals("cart") ? "active" : "" %>" title="<%= isGuest ? "Login to open Cart" : "Cart" %>">
         <i class="fa-solid fa-cart-shopping"></i> Cart
     </a>
 
     <div class="sidebar-footer">
         <a href="${pageContext.request.contextPath}/news" class="menu-item <%= activePage.equals("news") ? "active" : "" %>">
-        <i class="fa-solid fa-book-open"></i> News
-    </a>
-       <a href="${pageContext.request.contextPath}/aboutus" class="menu-item <%= activePage.equals("about") ? "active" : "" %>">
-               <i class="fa-solid fa-circle-info"></i> About
-           </a>
+            <i class="fa-solid fa-book-open"></i> News
+        </a>
+        <a href="${pageContext.request.contextPath}/aboutus" class="menu-item <%= activePage.equals("about") ? "active" : "" %>">
+            <i class="fa-solid fa-circle-info"></i> About
+        </a>
     </div>
 </div>
-
