@@ -128,7 +128,7 @@ public class SoftwareDao {
 
 
 
-    
+
     // My Reviews (apps được assign cho reviewer)
 
 
@@ -294,7 +294,7 @@ public class SoftwareDao {
 
     // Top3RevenueByVendor: OK (không dùng cột bị xóa)
 
-    
+
     public List<Software> Top3RevenueByVendor(Integer vendorId) throws SQLException {
         List<Software> list = new ArrayList<>();
         String sql = """
@@ -1192,7 +1192,74 @@ public class SoftwareDao {
             ps.executeUpdate();
         }
     }
-    
+
+    public Software getSoftwareById(int softwareId) throws SQLException {
+        String sql = """
+        SELECT s.software_id,
+               s.name,
+               s.short_description,
+               s.price,
+               s.created_at,
+               c.category_name,
+               u.full_name AS vendor_name,
+               sv.version_name AS version,
+               si.image_url
+        FROM Software s
+        LEFT JOIN Category c
+               ON s.category_id = c.category_id
+        LEFT JOIN Users u
+               ON s.vendor_id = u.user_id
+        LEFT JOIN Software_Version sv
+               ON sv.software_id = s.software_id
+              AND sv.is_active = 1
+        LEFT JOIN Software_Image si
+               ON s.software_id = si.software_id
+              AND si.is_thumbnail = 1
+        WHERE s.software_id = ?
+        LIMIT 1
+    """;
+
+        try (Connection conn = Db.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, softwareId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Software s = new Software();
+                    s.setSoftwareId(rs.getInt("software_id"));
+                    s.setName(rs.getString("name"));
+                    s.setShortDescription(rs.getString("short_description"));
+                    s.setPrice(rs.getDouble("price"));
+                    s.setCategoryName(rs.getString("category_name"));
+                    s.setVersion(rs.getString("version"));
+                    s.setImageUrl(rs.getString("image_url"));
+
+                    Timestamp ts = rs.getTimestamp("created_at");
+                    if (ts != null) {
+                        s.setCreatedAt(ts.toLocalDateTime());
+                    }
+
+                    return s;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    // update status trong pending reviews
+    public void updateSoftwareStatus(int softwareId, String status) throws SQLException {
+        String sql = "UPDATE Software SET status = ? WHERE software_id = ?";
+
+        try (Connection conn = Db.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, status);
+            ps.setInt(2, softwareId);
+            ps.executeUpdate();
+        }
+    }
+
+
+
 }
 
 
