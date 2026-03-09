@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -121,7 +122,7 @@
                                     <td class="revenue">$${item.revenue}</td>
                                     <td>${item.avgRating}</td>
                                     <td>
-                                        <span class="status approved">${item.status}</span>
+                                        <span class="status ${fn:toLowerCase(item.status)}">${item.status}</span>
                                     </td>
                                     <td>
                                         <a 

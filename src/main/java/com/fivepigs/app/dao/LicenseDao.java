@@ -104,4 +104,32 @@ public class LicenseDao {
 
         return null;
     }
+
+    public void changeStatusSoftware(String status, int licenseId) throws SQLException {
+
+        String sql = "UPDATE License\n"
+                + "SET status = ?\n"
+                + "WHERE license_id = ?;";
+
+        try (Connection conn = Db.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(2, licenseId);
+            ps.setString(1, status);
+
+            ps.executeUpdate();
+        }
+    }
+
+    public void updateExpiredLicense() throws SQLException {
+        String sql = """
+                UPDATE license
+                SET status = 'EXPIRED'
+                WHERE status = 'ACTIVE'
+                AND expire_date < NOW()
+                """;
+
+        try (Connection conn = Db.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.executeUpdate();
+        }
+    }
 }

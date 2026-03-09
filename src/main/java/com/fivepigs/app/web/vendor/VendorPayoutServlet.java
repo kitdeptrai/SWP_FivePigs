@@ -51,17 +51,32 @@ public class VendorPayoutServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        try {
 
+            HttpSession session = request.getSession();
+            User user = (User) session.getAttribute("user");
+            if (user == null) {
+                request.getRequestDispatcher("/login").forward(request, response);
+                return;
+            }
+            Double amount = Double.parseDouble(request.getParameter("amount"));
+            String paymentMethod = request.getParameter("paymentMethod");
+            String paymentAccount = request.getParameter("paymentAccount");
+            VendorDao vdao = new VendorDao();
+            vdao.createPayoutRequest(user.getUserId(), amount, paymentMethod, paymentAccount);
+
+            response.sendRedirect(request.getContextPath() + "/vendor/payout");
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setContentType("text/plain");
+            e.printStackTrace(response.getWriter());
+
+        }
     }
 
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
     @Override
     public String getServletInfo() {
         return "Short description";
-    }// </editor-fold>
+    }
 
 }

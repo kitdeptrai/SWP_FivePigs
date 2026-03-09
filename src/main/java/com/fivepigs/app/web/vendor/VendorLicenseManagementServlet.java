@@ -38,19 +38,23 @@ public class VendorLicenseManagementServlet extends HttpServlet {
                 return;
             }
             LicenseDao lidao = new LicenseDao();
+            lidao.updateExpiredLicense();
             List<License> listLicense = lidao.getLicenseByVendorId(user.getUserId());
-            Integer totalLicense=lidao.getTotalLicenseByVendor(user.getUserId());
-            Integer totalLicenseActive=lidao.getTotalLicenseByVendorAndStatus(user.getUserId(), "ACTIVE");
-            Integer totalLicenseExpire=lidao.getTotalLicenseByVendorAndStatus(user.getUserId(), "EXPIRE");
-            Integer totalLicenseRevoke=lidao.getTotalLicenseByVendorAndStatus(user.getUserId(), "REVOKE");
-            
-            request.setAttribute("totalLicense",totalLicense);
-            request.setAttribute("totalLicenseActive",totalLicenseActive);
-            request.setAttribute("totalLicenseExpire",totalLicenseExpire);
-            request.setAttribute("totalLicenseRevoke",totalLicenseRevoke);
+            Integer totalLicense = lidao.getTotalLicenseByVendor(user.getUserId());
+            Integer totalLicenseActive = lidao.getTotalLicenseByVendorAndStatus(user.getUserId(), "ACTIVE");
+            Integer totalLicenseExpire = lidao.getTotalLicenseByVendorAndStatus(user.getUserId(), "EXPIRED");
+            Integer totalLicenseRevoke = lidao.getTotalLicenseByVendorAndStatus(user.getUserId(), "REVOKED");
+
+            request.setAttribute("totalLicense", totalLicense);
+            request.setAttribute("totalLicenseActive", totalLicenseActive);
+            request.setAttribute("totalLicenseExpire", totalLicenseExpire);
+            request.setAttribute("totalLicenseRevoke", totalLicenseRevoke);
             request.setAttribute("listLicense", listLicense);
             request.getRequestDispatcher("/WEB-INF/views/vendor/license_management.jsp").forward(request, response);
-        } catch (SQLException e) {
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setContentType("text/plain");
+            e.printStackTrace(response.getWriter());
 
         }
     }
@@ -58,11 +62,6 @@ public class VendorLicenseManagementServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-    }
-
-    @Override
-    public String getServletInfo() {
-        return "Short description";
     }
 
 }

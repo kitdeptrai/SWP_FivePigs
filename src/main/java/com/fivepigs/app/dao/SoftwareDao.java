@@ -81,7 +81,7 @@ public class SoftwareDao {
     // Pending reviews (đã sửa: lấy version từ Software_Version, bỏ language)
     public List<Software> getPendingSoftware() throws SQLException {
 
-    List<Software> list = new ArrayList<>();
+        List<Software> list = new ArrayList<>();
 
         String sql = """
         SELECT s.software_id,
@@ -102,7 +102,6 @@ public class SoftwareDao {
     """;
 
         try (Connection conn = Db.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
-       
 
             while (rs.next()) {
                 Software s = new Software();
@@ -122,7 +121,6 @@ public class SoftwareDao {
                 list.add(s);
             }
         }
-            
 
         return list;
     }
@@ -361,7 +359,6 @@ public class SoftwareDao {
     """;
 
         try (Connection conn = Db.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-        
 
             ps.setInt(1, reviewerId);
             ps.setInt(1, reviewerId);
@@ -651,7 +648,7 @@ public class SoftwareDao {
                     SoftwareDetail swDetail = new SoftwareDetail();
                     SoftwareVersion swVersion = new SoftwareVersion();
                     SoftwareImage simg = new SoftwareImage();
-                  
+
                     Category cat = new Category();
 
                     sw.setName(rs.getString("name"));
@@ -685,8 +682,9 @@ public class SoftwareDao {
 
         return 0;
     }
+
     //Upload Software
-    public int createSoftware(Software software) throws Exception {
+    public int createSoftware(Software software) throws SQLException {
 
         String sql = "INSERT INTO Software(name, short_description, vendor_id, category_id, price) "
                 + "VALUES (?, ?, ?, ?, ?)";
@@ -732,7 +730,7 @@ public class SoftwareDao {
         }
     }
 
-    public void addSoftwareImage(int softwareId, String imageUrl, boolean isThumbnail) throws Exception {
+    public void addSoftwareImage(int softwareId, String imageUrl, boolean isThumbnail) throws SQLException {
 
         String sql = "INSERT INTO Software_Image(software_id, image_url, is_thumbnail) VALUES (?, ?, ?)";
 
@@ -752,7 +750,7 @@ public class SoftwareDao {
             String fileUrl,
             String releaseNote,
             long fileSize
-    ) throws Exception {
+    ) throws SQLException {
 
         String sql = "INSERT INTO Software_Version(software_id, version_name, file_url, release_note, file_size) "
                 + "VALUES (?, ?, ?, ?, ?)";
@@ -768,4 +766,22 @@ public class SoftwareDao {
             ps.executeUpdate();
         }
     }
+
+    public void changeStatusSoftware(int vendorId, int softwareId,String status) throws SQLException {
+
+        String sql = "UPDATE Software\n"
+                + "SET status = ?\n"
+                + "WHERE software_id = ?\n"
+                + "AND vendor_id = ?;";
+
+        try (Connection conn = Db.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(3, vendorId);
+            ps.setInt(2, softwareId);
+            ps.setString(1, status);
+
+            ps.executeUpdate();
+        }
+    }
+    
 }
