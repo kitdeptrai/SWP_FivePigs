@@ -5,15 +5,17 @@
 package com.fivepigs.app.model;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  *
  * @author thanh
  */
 public class Software {
-//        software_id INT IDENTITY(1,1) PRIMARY KEY,
+//    software_id INT IDENTITY(1,1) PRIMARY KEY,
 //    name NVARCHAR(150) NOT NULL,
 //    short_description NVARCHAR(255),
 //    vendor_id INT NOT NULL,
@@ -27,7 +29,7 @@ public class Software {
 //    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     private Integer softwareId;
     private String name;
-    private String short_description;
+    private String shortDescription;
     private Integer vendorId;
     private Integer categoryId;
     private Double price;
@@ -45,13 +47,68 @@ public class Software {
     private ReviewerProcess reviewerProcess;
     private SoftwareVersion softwareVersion;
     private SoftwareDetail softwareDetail;
+
+    private Date reviewDate;
+    private String recommendation;
+    private String categoryName;
+    private String version;
+    private String language;
+    
+    private String imageUrl;
+     private Double qualityScore;
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public Double getQualityScore() {
+        return qualityScore;
+    }
+
+    public void setQualityScore(Double qualityScore) {
+        this.qualityScore = qualityScore;
+    }
+    
+    
+    
+    public String getVersion() {
+    return version;
+}
+
+public void setVersion(String version) {
+    this.version = version;
+}
+
+public String getLanguage() {
+    return language;
+}
+
+public void setLanguage(String language) {
+    this.language = language;
+}
+   
+public String getCategoryName() {
+    return categoryName;
+}
+
+public void setCategoryName(String categoryName) {
+    this.categoryName = categoryName;
+}
+
+
+
+  
     public Software() {
     }
 
     public Software(Integer softwareId, String name, String short_description, Integer vendorId, Integer categoryId, Double price, Integer isFree, String status, Integer downloadCount, Double avgRating, LocalDateTime createdAt, Double revenue, String appName, ApprovalProcess ap, ReviewerProcess rp) {
         this.softwareId = softwareId;
         this.name = name;
-        this.short_description = short_description;
+        this.shortDescription = shortDescription;
         this.vendorId = vendorId;
         this.categoryId = categoryId;
         this.price = price;
@@ -129,7 +186,7 @@ public class Software {
     public void setReviewerProcess(ReviewerProcess rp) {
         this.reviewerProcess = rp;
     }
-    
+
     public Integer getSoftwareId() {
         return softwareId;
     }
@@ -146,12 +203,12 @@ public class Software {
         this.name = name;
     }
 
-    public String getShort_description() {
-        return short_description;
+    public String getShortDescription() {
+        return shortDescription;
     }
 
-    public void setShort_description(String short_description) {
-        this.short_description = short_description;
+    public void setShortDescription(String short_description) {
+        this.shortDescription = short_description;
     }
 
     public Integer getVendorId() {
@@ -226,6 +283,7 @@ public class Software {
         this.revenue = revenue;
     }
 
+
     public String getAppName() {
         return appName;
     }
@@ -233,6 +291,15 @@ public class Software {
     public void setAppName(String appName) {
         this.appName = appName;
     }
+
+
+   
+public String getFormattedCreatedAt() {
+    if (createdAt == null) return "";
+    DateTimeFormatter formatter =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    return createdAt.format(formatter);
+}
 
 
 }

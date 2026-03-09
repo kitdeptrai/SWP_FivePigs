@@ -1,0 +1,409 @@
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>License Management</title>
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/vendor/vendor.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+        <style>
+
+            /* ===== STATS ===== */
+            .stats-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+                gap: 20px;
+                margin-bottom: 30px;
+            }
+
+            .stat-card {
+                background: #1e293b;
+                padding: 25px;
+                border-radius: 16px;
+            }
+
+            .stat-card h2 {
+                margin: 10px 0;
+            }
+
+            /* ===== TOOLBAR ===== */
+            .toolbar {
+                display: flex;
+                justify-content: space-between;
+                margin:20px 0;
+            }
+
+            .toolbar input {
+                width: 350px;
+                padding: 10px;
+                border-radius: 10px;
+                border: none;
+                background: #1e293b;
+                color: white;
+            }
+
+            .filter-btn {
+                padding: 8px 15px;
+                margin-left: 8px;
+                background: #1e293b;
+                border-radius: 8px;
+                border: none;
+                color: white;
+                cursor: pointer;
+            }
+
+            .filter-btn.active,
+            .filter-btn:hover {
+                background: #3b82f6;
+            }
+
+            /* ===== TABLE ===== */
+            .table-container {
+                background: #1e293b;
+                padding: 24px;
+                border-radius: 20px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            }
+
+            .license-table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+
+            .license-table thead {
+                border-bottom: 1px solid #334155;
+            }
+
+            .license-table th {
+                padding: 14px 12px;
+                font-weight: 600;
+                font-size: 14px;
+                color: #94a3b8;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            .license-table td {
+                padding: 16px 12px;
+                border-bottom: 1px solid #334155;
+                font-size: 14px;
+                color: #e2e8f0;
+            }
+
+            .license-table tbody tr {
+                transition: all 0.2s ease;
+            }
+
+            .license-table tbody tr:hover {
+                background: #334155;
+                transform: scale(1.01);
+            }
+
+            /* License Key */
+            .license-key {
+                background: #0f172a;
+                padding: 6px 12px;
+                border-radius: 8px;
+                font-weight: 600;
+                letter-spacing: 0.5px;
+                display: inline-block;
+            }
+
+            /* Product */
+            .product-name {
+                font-weight: 500;
+            }
+
+            /* Customer */
+            .customer-email {
+                font-size: 14px;
+                color: #cbd5e1;
+            }
+
+            /* STATUS */
+            .status {
+                padding: 6px 14px;
+                border-radius: 30px;
+                font-size: 12px;
+                font-weight: 600;
+                text-transform: uppercase;
+                display: inline-block;
+            }
+
+            .status.active {
+                background: rgba(34,197,94,0.15);
+                color: #22c55e;
+            }
+
+            .status.expired {
+                background: rgba(250,204,21,0.15);
+                color: #facc15;
+            }
+
+            .status.revoked {
+                background: rgba(239,68,68,0.15);
+                color: #ef4444;
+            }
+
+            /* ACTIONS */
+            .actions {
+                white-space: nowrap;
+            }
+
+            .action-btn {
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                background: #0f172a;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                margin-right: 6px;
+                cursor: pointer;
+                transition: 0.2s;
+            }
+
+            .action-btn:hover {
+                background: #475569;
+            }
+
+            .action-btn.revoke:hover {
+                background: #7f1d1d;
+            }
+            .license-box {
+                display: inline-flex;
+                align-items: center;
+                background: #0f172a;
+                padding: 8px 14px;
+                border-radius: 10px;
+                gap: 12px;
+                font-weight: 600;
+                letter-spacing: 0.5px;
+                color: #e2e8f0;
+            }
+
+            .license-text {
+                font-size: 14px;
+            }
+
+            .copy-icon {
+                background: transparent;
+                border: none;
+                color: #94a3b8;
+                cursor: pointer;
+                padding: 4px;
+                border-radius: 6px;
+                transition: 0.2s;
+            }
+
+            .copy-icon:hover {
+                background: #1e293b;
+                color: #ffffff;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="layout">
+            <jsp:include page="layout/side_bar.jsp"/>
+            <div class="main">
+                <h1>License Management</h1>
+                <p class="subtitle">Monitor and manage all license keys for your products</p>
+
+                <!-- ===== STATS ===== -->
+                <div class="cards">
+                    <div class="card">
+                        <div class="card-icon info">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3-3.5 3.5z"></path>
+                            </svg>
+                        </div>
+                        <h2>${totalLicense}</h2>
+                        <p>Total Licenses</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon success">
+                            <svg width="22" height="22" viewBox="0 0 24 24"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 stroke-width="2"
+                                 stroke-linecap="round"
+                                 stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                        </div>
+                        <h2>${totalLicenseActive}</h2>
+                        <p>Active Licenses</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon warning">
+                            <svg width="22" height="22" viewBox="0 0 24 24" 
+                                 fill="none" 
+                                 stroke="currentColor" 
+                                 stroke-width="2" 
+                                 stroke-linecap="round" 
+                                 stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                        </div>
+                        <h2>${totalLicenseExpire}</h2>
+                        <p>Expired Licenses</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon danger">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ff4d4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
+                            </svg>
+                        </div>
+                        <h2>${totalLicenseRevoke}</h2>
+                        <p>Revoked Licenses</p>
+                    </div>
+                </div>
+
+                <!-- ===== TOOLBAR ===== -->
+                <div class="toolbar">
+                    <input type="text" id="searchInput"
+                           placeholder="Search by license key, email, or product..."
+                           onkeyup="applyFilter()">
+
+                    <div>
+                        <button class="filter-btn active" onclick="setStatus('all', this)">All</button>
+                        <button class="filter-btn" onclick="setStatus('active', this)">Active</button>
+                        <button class="filter-btn" onclick="setStatus('expired', this)">Expired</button>
+                        <button class="filter-btn" onclick="setStatus('revoked', this)">Revoked</button>
+                    </div>
+                </div>
+
+                <!-- ===== TABLE ===== -->
+                <div class="table-card">
+
+                    <table class="dashboard-table">
+                        <thead>
+                            <tr>
+                                <th>License Key</th>
+                                <th>Product</th>
+                                <th>Customer</th>
+                                <th>Activation</th>
+                                <th>Expiry</th>
+
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            <c:forEach var="l" items="${listLicense}">
+                                <tr data-status="${l.status}">
+                                    <td>
+                                        <div class="license-box">
+                                            <span class="license-text">${l.licenseKey}</span>
+                                            <button class="copy-icon"
+                                                    onclick="copyLicense('${l.licenseKey}', this)">
+                                                <svg xmlns="http://www.w3.org/2000/svg" 
+                                                     width="16" height="16" 
+                                                     fill="none" viewBox="0 0 24 24" 
+                                                     stroke="currentColor">
+                                                <rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/>
+                                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke-width="2"/>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </td>
+
+                                    <td class="product-name">
+                                        ${l.software.name}
+                                    </td>
+
+                                    <td class="customer-cell">
+                                        <div class="customer-email">${l.user.email}</div>
+                                    </td>
+
+                                    <td>
+                                        ${l.purchaseDate.toLocalDate()}
+                                    </td>
+
+                                    <td>
+                                        ${l.expireDate.toLocalDate()}
+                                    </td>
+
+                                    <td>
+                                        <span class="status ${l.status.toLowerCase()}">
+                                            ${l.status}
+                                        </span>
+                                    </td>
+
+                                    <td class="actions">
+                                        <span class="action-btn view">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                            </svg>
+                                        </span>
+                                        <span class="action-btn revoke">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ff4d4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <circle cx="12" cy="12" r="10"></circle>
+                                            <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
+                                            </svg>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </c:forEach>
+
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+        <!-- ===== JAVASCRIPT FILTER ===== -->
+        <script>
+
+            let currentStatus = "all";
+            function setStatus(status, btn) {
+
+                currentStatus = status;
+                document.querySelectorAll(".filter-btn")
+                        .forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+                applyFilter();
+            }
+
+            function applyFilter() {
+
+                const keyword = document
+                        .getElementById("searchInput")
+                        .value
+                        .toLowerCase();
+                const rows = document.querySelectorAll("tbody tr");
+                rows.forEach(row => {
+
+                    const textMatch =
+                            row.innerText.toLowerCase().includes(keyword);
+                    const statusMatch =
+                            currentStatus === "all" ||
+                            row.dataset.status.toLowerCase() === currentStatus;
+                    if (textMatch && statusMatch) {
+                        row.style.display = "";
+                    } else {
+                        row.style.display = "none";
+                    }
+
+                });
+            }
+
+            function copyLicense(key, btn) {
+                navigator.clipboard.writeText(key);
+                btn.style.color = "#22c55e";
+                setTimeout(() => {
+                    btn.style.color = "#94a3b8";
+                }, 1000);
+            }
+
+        </script>
+
+    </body>
+</html>

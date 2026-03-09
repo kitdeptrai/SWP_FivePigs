@@ -10,6 +10,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -21,34 +22,6 @@ import java.util.Map;
  * @author MinhPD
  */
 public class VendorDao {
-
-    public Integer sumApprovedApps(int vendorId) throws SQLException {
-        String sql = "SELECT COUNT(*) AS total_approved_apps FROM Software\n"
-                + "WHERE vendor_id = ? AND status = 'APPROVED';";
-        try (Connection c = Db.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setInt(1, vendorId);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt("total_approved_apps");
-                }
-            }
-        }
-        return null;
-    }
-
-    public Integer sumPendingApps(int vendorId) throws SQLException {
-        String sql = "SELECT COUNT(*) AS total_pending_apps FROM Software\n"
-                + "WHERE vendor_id = ? AND status = 'PENDING';";
-        try (Connection c = Db.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setInt(1, vendorId);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt("total_pending_apps");
-                }
-            }
-        }
-        return null;
-    }
 
     public Double sumRevenue(int vendorId) throws SQLException {
         String sql = "SELECT s.vendor_id,SUM(od.price) AS total_revenue FROM Orders o \n"
@@ -68,34 +41,17 @@ public class VendorDao {
         return null;
     }
 
-    public Double avgRating(int vendorId) throws SQLException {
-        String sql = "SELECT s.vendor_id,ROUND(AVG(r.rating), 2) AS avg_rating FROM Software s\n"
-                + "JOIN Review r ON s.software_id = r.software_id\n"
-                + "WHERE s.vendor_id =?\n"
-                + "GROUP BY s.vendor_id;";
-        try (Connection c = Db.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setInt(1, vendorId);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getDouble("avg_rating");
-                }
-            }
-        }
-        return null;
-    }
-
     public Map<Integer, Double> revenueMap(int vendorId) throws SQLException {
 
         Map<Integer, Double> revenueMap = new HashMap<>();
 
-        // luôn đảm bảo đủ 4 tuần
         for (int i = 1; i <= 4; i++) {
             revenueMap.put(i, 0.0);
         }
 
         String sql = """
         SELECT 
-            CEIL(DATEDIFF(CURDATE(), o.order_date) / 7) AS week_index,
+            FLOOR(DATEDIFF(CURDATE(), o.order_date) / 7) AS week_index,
             SUM(od.price) AS revenue
         FROM Orders o
         JOIN Order_Detail od ON o.order_id = od.order_id
@@ -113,67 +69,44 @@ public class VendorDao {
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    int weekIndex = rs.getInt("week_index"); // 1 = gần nhất
+
+                    int weekIndex = rs.getInt("week_index");
                     double revenue = rs.getDouble("revenue");
 
-                    // 🔁 đảo chiều: 1->4, 2->3, 3->2, 4->1
-                    int weekDisplay = 5 - Math.min(weekIndex, 4);
+                    if (weekIndex >= 0 && weekIndex <= 3) {
 
-                    revenueMap.put(
-                            weekDisplay,
-                            revenueMap.get(weekDisplay) + revenue
-                    );
+                        int weekDisplay = 4 - weekIndex;
+
+                        revenueMap.put(
+                                weekDisplay,
+                                revenueMap.getOrDefault(weekDisplay, 0.0) + revenue
+                        );
+                    }
                 }
             }
         }
+
         return revenueMap;
     }
 
-    public Integer downloadCount(int vendorId) throws SQLException {
-        String sql = "SELECT SUM(download_count) AS total_download FROM Software\n"
-                + "WHERE vendor_id = ?;";
+    public List<VendorPayout> getPayoutByVendorId(int vendorId) throws SQLException {
+        List<VendorPayout> list = new ArrayList<>();
+        String sql = "SELECT * FROM Vendor_Payout\n"
+                + "WHERE vendor_id=?;";
         try (Connection c = Db.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, vendorId);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt("total_download");
-                }
-            }
-        }
-        return null;
-    }
-
-    public Map<Integer, Double> downloadByWeek(int vendorId) throws SQLException {
-        String sql = "SELECT \n"
-                + "    FLOOR(DATEDIFF(CURDATE(), l.purchase_date) / 7) AS week_index,\n"
-                + "    COUNT(*) AS downloads\n"
-                + "FROM License l\n"
-                + "JOIN Software s ON l.software_id = s.software_id\n"
-                + "WHERE s.vendor_id = ?\n"
-                + "  AND l.purchase_date >= DATE_SUB(CURDATE(), INTERVAL 28 DAY)\n"
-                + "GROUP BY week_index\n"
-                + "HAVING week_index BETWEEN 1 AND 4";
-        Map<Integer, Double> downloadMap = new LinkedHashMap<>();
-        for (int i = 0; i < 4; i++) {
-            downloadMap.put(i, 0.0);
-        }
-
-        try (Connection c = Db.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
-
-            ps.setInt(1, vendorId);
-
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    int weekIndex = rs.getInt("week_index"); // 0..3
-                    double downloads = rs.getDouble("downloads");
-
-                    downloadMap.put(
-                            weekIndex,
-                            downloadMap.get(weekIndex) + downloads
-                    );
+                    VendorPayout vp=new VendorPayout();
+                    vp.setPayoutId(rs.getInt("payout_id"));
+                    vp.setAmount(rs.getDouble("amount"));
+                    vp.setPeriodStart(rs.getObject("period_start", LocalDateTime.class));
+                    vp.setPeriodEnd(rs.getObject("period_end", LocalDateTime.class));
+                    vp.setStatus(rs.getString("status"));
+                    list.add(vp);
                 }
             }
         }
-        return downloadMap;
+        return list;
     }
 }
