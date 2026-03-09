@@ -19,6 +19,3 @@ Thumbs.db
 
 # Tomcat
 /apache-tomcat-*/
-
-target/
-*.class

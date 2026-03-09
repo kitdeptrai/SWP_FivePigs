@@ -1,0 +1,87 @@
+/* CART - Add To Cart Modal Overlay */
+.cart-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(18, 23, 37, 0.58);
+  backdrop-filter: blur(2px);
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+/* CART - Modal Box */
+.cart-modal {
+  width: 100%;
+  max-width: 620px;
+  background: linear-gradient(135deg, #ffffff 0%, #f7f9ff 100%);
+  border: 1px solid #dde3ff;
+  border-radius: 14px;
+  padding: 22px;
+  position: relative;
+  box-shadow: 0 20px 40px rgba(13, 18, 40, 0.3);
+}
+
+/* CART - Modal Title */
+.cart-modal h3 {
+  font-size: 30px;
+  font-weight: 800;
+  color: #1d274d;
+  margin-bottom: 8px;
+}
+
+/* CART - Modal Message */
+.cart-modal p {
+  color: #52608d;
+  font-size: 20px;
+  line-height: 1.5;
+  margin-bottom: 18px;
+}
+
+/* CART - Close Button */
+.cart-modal-close {
+  position: absolute;
+  right: 10px;
+  top: 8px;
+  border: none;
+  background: transparent;
+  color: #7c86ad;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/* CART - Action Area */
+.cart-modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+/* CART - Action Button Base */
+.cart-modal-btn {
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-weight: 700;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+}
+
+/* CART - Primary Button */
+.cart-modal-btn.primary {
+  background: var(--primary-color);
+  color: #fff;
+}
+
+/* CART - Secondary Button */
+.cart-modal-btn.ghost {
+  background: #eef1ff;
+  color: #425188;
+}
+
+/* CART - Responsive Typography */
+@media (max-width: 768px) {
+  .cart-modal h3 { font-size: 24px; }
+  .cart-modal p { font-size: 16px; }
+}
