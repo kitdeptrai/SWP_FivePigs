@@ -29,6 +29,18 @@ public class SoftwareDao {
     }
 
     // Đếm số app đã được review (completed)
+    public int countPendingReviewSoftware() throws SQLException {
+        String sql = "SELECT COUNT(*) AS total FROM Software WHERE status = 'PENDING_REVIEW'";
+        try (Connection c = Db.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt("total");
+            }
+        }
+        return 0;
+    }
+
     public Integer completeReviewApp() throws SQLException {
         String sql = "SELECT COUNT(DISTINCT software_id) AS count FROM Software_Review_Process";
         try (Connection c = Db.getConnection(); PreparedStatement ps = c.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
@@ -140,6 +152,10 @@ public class SoftwareDao {
             ps.setInt(2, softwareId);
             return ps.executeUpdate() > 0;
         }
+    }
+
+    public boolean updateSoftwareStatus(int softwareId, String status) throws SQLException {
+        return updateStatus(softwareId, status);
     }
 
     // Search pending software (đã sửa: đúng table + đúng status)
@@ -590,6 +606,10 @@ public class SoftwareDao {
             }
         }
         return null;
+    }
+
+    public Software getSoftwareById(int softwareId) throws SQLException {
+        return getSoftwareDetailBySoftwareId(softwareId);
     }
 
     //Upload Software
@@ -1163,6 +1183,7 @@ public class SoftwareDao {
         }
     }
 }
+
 
 
 
