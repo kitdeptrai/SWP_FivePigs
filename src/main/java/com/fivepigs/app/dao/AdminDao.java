@@ -210,6 +210,96 @@ public class AdminDao {
         return rows;
     }
 
+    public int countEmployees(String keyword, String role, String status) {
+        StringBuilder sql = new StringBuilder(
+                "SELECT COUNT(*) FROM users u JOIN role r ON u.role_id = r.role_id " +
+                "WHERE LOWER(r.role_name) IN ('reviewer', 'approval', 'aproval')"
+        );
+        List<Object> params = new ArrayList<>();
+
+        if (role != null) {
+            sql.append(" AND LOWER(r.role_name) = ?");
+            params.add(role.toLowerCase());
+        }
+        if (status != null) {
+            sql.append(" AND u.status = ?");
+            params.add(status);
+        }
+        if (keyword != null) {
+            sql.append(" AND (LOWER(u.full_name) LIKE ? OR LOWER(u.email) LIKE ? OR LOWER(COALESCE(u.phone, '')) LIKE ?)");
+            String kw = "%" + keyword.toLowerCase() + "%";
+            params.add(kw);
+            params.add(kw);
+            params.add(kw);
+        }
+
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? rs.getInt(1) : 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    public List<UserRow> listEmployeesPaged(int limit, int offset, String keyword, String role, String status) {
+        StringBuilder sql = new StringBuilder(
+                "SELECT u.user_id, u.full_name, u.email, u.phone, u.status, u.created_at, r.role_name " +
+                "FROM users u JOIN role r ON u.role_id = r.role_id " +
+                "WHERE LOWER(r.role_name) IN ('reviewer', 'approval', 'aproval')"
+        );
+        List<Object> params = new ArrayList<>();
+
+        if (role != null) {
+            sql.append(" AND LOWER(r.role_name) = ?");
+            params.add(role.toLowerCase());
+        }
+        if (status != null) {
+            sql.append(" AND u.status = ?");
+            params.add(status);
+        }
+        if (keyword != null) {
+            sql.append(" AND (LOWER(u.full_name) LIKE ? OR LOWER(u.email) LIKE ? OR LOWER(COALESCE(u.phone, '')) LIKE ?)");
+            String kw = "%" + keyword.toLowerCase() + "%";
+            params.add(kw);
+            params.add(kw);
+            params.add(kw);
+        }
+
+        sql.append(" ORDER BY u.created_at DESC LIMIT ? OFFSET ?");
+        params.add(limit);
+        params.add(offset);
+
+        List<UserRow> rows = new ArrayList<>();
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    rows.add(new UserRow(
+                            rs.getInt("user_id"),
+                            rs.getString("full_name"),
+                            rs.getString("email"),
+                            rs.getString("phone"),
+                            rs.getString("role_name"),
+                            rs.getString("status"),
+                            rs.getTimestamp("created_at")
+                    ));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return rows;
+    }
+
     public List<UserRow> listUsers() {
         // Users: Customer + Vendor
         String sql = "SELECT u.user_id, u.full_name, u.email, u.phone, u.status, u.created_at, r.role_name " +
@@ -230,6 +320,114 @@ public class AdminDao {
                         rs.getString("status"),
                         rs.getTimestamp("created_at")
                 ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return rows;
+    }
+
+    public List<UserRow> listVendors() {
+        String sql = "SELECT u.user_id, u.full_name, u.email, u.phone, u.status, u.created_at, r.role_name " +
+                     "FROM users u JOIN role r ON u.role_id = r.role_id " +
+                     "WHERE r.role_name = 'Vendor' " +
+                     "ORDER BY u.created_at DESC";
+        List<UserRow> rows = new ArrayList<>();
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                rows.add(new UserRow(
+                        rs.getInt("user_id"),
+                        rs.getString("full_name"),
+                        rs.getString("email"),
+                        rs.getString("phone"),
+                        rs.getString("role_name"),
+                        rs.getString("status"),
+                        rs.getTimestamp("created_at")
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return rows;
+    }
+
+    public int countVendors(String keyword, String status) {
+        StringBuilder sql = new StringBuilder(
+                "SELECT COUNT(*) FROM users u JOIN role r ON u.role_id = r.role_id " +
+                "WHERE r.role_name = 'Vendor'"
+        );
+        List<Object> params = new ArrayList<>();
+
+        if (status != null) {
+            sql.append(" AND u.status = ?");
+            params.add(status);
+        }
+        if (keyword != null) {
+            sql.append(" AND (LOWER(u.full_name) LIKE ? OR LOWER(u.email) LIKE ? OR LOWER(COALESCE(u.phone, '')) LIKE ?)");
+            String kw = "%" + keyword.toLowerCase() + "%";
+            params.add(kw);
+            params.add(kw);
+            params.add(kw);
+        }
+
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? rs.getInt(1) : 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    public List<UserRow> listVendorsPaged(int limit, int offset, String keyword, String status) {
+        StringBuilder sql = new StringBuilder(
+                "SELECT u.user_id, u.full_name, u.email, u.phone, u.status, u.created_at, r.role_name " +
+                "FROM users u JOIN role r ON u.role_id = r.role_id " +
+                "WHERE r.role_name = 'Vendor'"
+        );
+        List<Object> params = new ArrayList<>();
+
+        if (status != null) {
+            sql.append(" AND u.status = ?");
+            params.add(status);
+        }
+        if (keyword != null) {
+            sql.append(" AND (LOWER(u.full_name) LIKE ? OR LOWER(u.email) LIKE ? OR LOWER(COALESCE(u.phone, '')) LIKE ?)");
+            String kw = "%" + keyword.toLowerCase() + "%";
+            params.add(kw);
+            params.add(kw);
+            params.add(kw);
+        }
+
+        sql.append(" ORDER BY u.created_at DESC LIMIT ? OFFSET ?");
+        params.add(limit);
+        params.add(offset);
+
+        List<UserRow> rows = new ArrayList<>();
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    rows.add(new UserRow(
+                            rs.getInt("user_id"),
+                            rs.getString("full_name"),
+                            rs.getString("email"),
+                            rs.getString("phone"),
+                            rs.getString("role_name"),
+                            rs.getString("status"),
+                            rs.getTimestamp("created_at")
+                    ));
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -271,6 +469,15 @@ public class AdminDao {
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, status);
             ps.setInt(2, userId);
+            ps.executeUpdate();
+        }
+    }
+
+    public void deleteUser(int userId) throws SQLException {
+        String sql = "DELETE FROM users WHERE user_id = ?";
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
             ps.executeUpdate();
         }
     }
