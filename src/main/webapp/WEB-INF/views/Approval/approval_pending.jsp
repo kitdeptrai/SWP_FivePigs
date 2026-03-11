@@ -16,7 +16,7 @@
     </head>
 
     <body>
-        
+
         <div class="app">
             <jsp:include page="./layout/sidebar.jsp"/>
             <div class="content-pending">
@@ -24,7 +24,7 @@
                     <h1 class="pending-title">Pending Approvals</h1>
                     <div class="pending-sub">Apps with completed technical reviews</div>
 
-                    <div class="pending-panel">
+                    <div class="pending-panel" id="pending-container">
                         <c:if test="${empty listpending}">
                             <div class="empty">Không có ứng dụng nào đang chờ duyệt.</div>
                         </c:if>
@@ -80,11 +80,65 @@
                                 </div>
                             </div>
                         </c:forEach>
-
+                        <div class="pagination" id="pending-pagination"></div>
                     </div>
                 </div>
             </div>
         </div>
+        <script>
 
+            function setupPagination(containerId, paginationId, itemsPerPage = 4) {
+
+                const container = document.getElementById(containerId);
+                const items = container.querySelectorAll(".pending-card");
+                const pagination = document.getElementById(paginationId);
+
+                let currentPage = 1;
+                const totalPages = Math.ceil(items.length / itemsPerPage);
+
+                function showPage(page) {
+                    currentPage = page;
+
+                    items.forEach(item => {
+                        item.style.display = "none";
+                    });
+
+                    const start = (page - 1) * itemsPerPage;
+                    const end = start + itemsPerPage;
+
+                    for (let i = start; i < end && i < items.length; i++) {
+                        items[i].style.display = "block";
+                    }
+
+                    const buttons = pagination.querySelectorAll("button");
+                    buttons.forEach(btn => btn.classList.remove("active"));
+                    buttons[page - 1].classList.add("active");
+                }
+
+                function createPagination() {
+                    pagination.innerHTML = "";
+
+                    for (let i = 1; i <= totalPages; i++) {
+                        const btn = document.createElement("button");
+                        btn.innerText = i;
+
+                        btn.onclick = () => showPage(i);
+
+                        pagination.appendChild(btn);
+                    }
+                }
+
+                if (items.length > 0) {
+                    createPagination();
+                    showPage(1);
+            }
+            }
+
+            document.addEventListener("DOMContentLoaded", function () {
+
+                setupPagination("pending-container", "pending-pagination", 4);
+            });
+
+        </script>
     </body>
 </html>

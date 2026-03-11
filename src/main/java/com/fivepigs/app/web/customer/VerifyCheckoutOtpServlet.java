@@ -65,7 +65,9 @@ public class VerifyCheckoutOtpServlet extends HttpServlet {
         Long expire = (Long) session.getAttribute(CartServlet.CHECKOUT_OTP_EXPIRE);
         Integer attempts = (Integer) session.getAttribute(CartServlet.CHECKOUT_OTP_ATTEMPTS);
 
-        if (attempts == null) attempts = 0;
+        if (attempts == null) {
+            attempts = 0;
+        }
 
         if (otpHash == null || expire == null || System.currentTimeMillis() > expire) {
             clearCheckoutOtpSession(session);
@@ -94,18 +96,9 @@ public class VerifyCheckoutOtpServlet extends HttpServlet {
             return;
         }
 
-        try {
-            int count = cartDao.checkout(user.getUserId());
-            clearCheckoutOtpSession(session);
+        clearCheckoutOtpSession(session);
 
-            if (count > 0) {
-                response.sendRedirect(request.getContextPath() + "/library?msg=checkout_success");
-            } else {
-                response.sendRedirect(request.getContextPath() + "/cart?msg=empty");
-            }
-        } catch (SQLException e) {
-            throw new ServletException(e);
-        }
+        response.sendRedirect(request.getContextPath() + "/create-payment");
     }
 
     private void handleResend(HttpServletRequest request, HttpServletResponse response, HttpSession session)
@@ -149,14 +142,18 @@ public class VerifyCheckoutOtpServlet extends HttpServlet {
     }
 
     private boolean hasPendingCheckout(HttpSession session) {
-        if (session == null) return false;
+        if (session == null) {
+            return false;
+        }
         return session.getAttribute(CartServlet.CHECKOUT_OTP_HASH) != null
                 && session.getAttribute(CartServlet.CHECKOUT_OTP_EXPIRE) != null
                 && session.getAttribute(CartServlet.CHECKOUT_PENDING_USER_ID) != null;
     }
 
     private void clearCheckoutOtpSession(HttpSession session) {
-        if (session == null) return;
+        if (session == null) {
+            return;
+        }
         session.removeAttribute(CartServlet.CHECKOUT_OTP_HASH);
         session.removeAttribute(CartServlet.CHECKOUT_OTP_EXPIRE);
         session.removeAttribute(CartServlet.CHECKOUT_OTP_ATTEMPTS);
@@ -165,7 +162,9 @@ public class VerifyCheckoutOtpServlet extends HttpServlet {
     }
 
     private String trim(String s) {
-        if (s == null) return null;
+        if (s == null) {
+            return null;
+        }
         String t = s.trim();
         return t.isEmpty() ? null : t;
     }

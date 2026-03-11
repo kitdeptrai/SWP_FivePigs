@@ -303,7 +303,8 @@ public class SoftwareDao {
                    s.avg_rating AS rating,
                    s.status,
                    s.download_count,
-                   s.vendor_id
+                   s.vendor_id,
+                   s.software_id
             FROM Software s
             JOIN Order_Detail od ON s.software_id = od.software_id
             JOIN Orders o ON od.order_id = o.order_id
@@ -325,6 +326,7 @@ public class SoftwareDao {
                     sw.setAvgRating(rs.getDouble("rating"));
                     sw.setDownloadCount(rs.getInt("download_count"));
                     sw.setVendorId(rs.getInt("vendor_id"));
+                    sw.setSoftwareId(rs.getInt("software_id"));
                     list.add(sw);
                 }
             }
