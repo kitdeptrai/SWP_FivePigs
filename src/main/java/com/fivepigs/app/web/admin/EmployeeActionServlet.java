@@ -14,7 +14,8 @@ import java.sql.SQLException;
         "/admin/employees/create",
         "/admin/employees/update",
         "/admin/employees/enable",
-        "/admin/employees/disable"
+        "/admin/employees/disable",
+        "/admin/employees/delete"
 })
 public class EmployeeActionServlet extends HttpServlet {
     private final AdminService adminService = new AdminService();
@@ -30,6 +31,7 @@ public class EmployeeActionServlet extends HttpServlet {
                 case "/admin/employees/update" -> handleUpdate(req, resp);
                 case "/admin/employees/enable" -> handleStatus(req, resp, "ACTIVE", "enabled");
                 case "/admin/employees/disable" -> handleStatus(req, resp, "INACTIVE", "disabled");
+                case "/admin/employees/delete" -> handleDelete(req, resp);
                 default -> resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
         } catch (SQLException e) {
@@ -76,5 +78,16 @@ public class EmployeeActionServlet extends HttpServlet {
             return;
         }
         resp.sendRedirect(req.getContextPath() + "/admin/employees?success=" + success);
+    }
+
+    private void handleDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException, SQLException {
+        String userIdStr = req.getParameter("userId");
+
+        String error = adminService.deleteUser(userIdStr);
+        if (error != null) {
+            resp.sendRedirect(req.getContextPath() + "/admin/employees?error=" + error);
+            return;
+        }
+        resp.sendRedirect(req.getContextPath() + "/admin/employees?success=deleted");
     }
 }

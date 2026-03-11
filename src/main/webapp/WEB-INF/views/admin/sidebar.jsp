@@ -11,8 +11,8 @@
         <a href="${pageContext.request.contextPath}/admin/employees" class="menu-item ${activeMenu == 'employees' ? 'active' : ''}">
             <span>Employees</span>
         </a>
-        <a href="${pageContext.request.contextPath}/admin/users" class="menu-item ${activeMenu == 'users' ? 'active' : ''}">
-            <span>Users</span>
+        <a href="${pageContext.request.contextPath}/admin/vendors" class="menu-item ${activeMenu == 'vendors' ? 'active' : ''}">
+            <span>Vendors</span>
         </a>
         <a href="${pageContext.request.contextPath}/admin/products" class="menu-item ${activeMenu == 'products' ? 'active' : ''}">
             <span>Products</span>
