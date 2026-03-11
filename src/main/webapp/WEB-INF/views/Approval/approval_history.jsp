@@ -31,7 +31,7 @@
                                     <th>Actions</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="history-body">
                                 <c:forEach var="it" items="${approvalHistory}">
                                     <c:if test="${it.approvalProcess.decision == 'APPROVED' || it.approvalProcess.decision == 'REJECTED'}">
                                         <tr>
@@ -57,10 +57,70 @@
                                 </c:if>
                             </tbody>
                         </table>
+                        <div class="pagination" id="history-pagination"></div>
                     </div>
                 </div>
             </div>
         </div>
+        <script>
 
+            function setupPagination(tbodyId, paginationId, rowsPerPage = 10) {
+
+                const tbody = document.getElementById(tbodyId);
+                const rows = tbody.querySelectorAll("tr");
+                const pagination = document.getElementById(paginationId);
+
+                let currentPage = 1;
+                const totalPages = Math.ceil(rows.length / rowsPerPage);
+
+                function showPage(page) {
+                    currentPage = page;
+
+                    rows.forEach((row) => {
+                        row.style.display = "none";
+                    });
+
+                    const start = (page - 1) * rowsPerPage;
+                    const end = start + rowsPerPage;
+
+                    for (let i = start; i < end && i < rows.length; i++) {
+                        rows[i].style.display = "";
+                    }
+
+                    // cập nhật active button
+                    const buttons = pagination.querySelectorAll("button");
+                    buttons.forEach(btn => btn.classList.remove("active"));
+                    buttons[page - 1].classList.add("active");
+                }
+
+                function createPagination() {
+                    pagination.innerHTML = "";
+
+                    for (let i = 1; i <= totalPages; i++) {
+                        const btn = document.createElement("button");
+                        btn.innerText = i;
+
+                        btn.onclick = () => {
+                            showPage(i);
+                        };
+
+                        pagination.appendChild(btn);
+                    }
+                }
+
+                if (rows.length > 0) {
+                    createPagination();
+                    showPage(1);
+            }
+            }
+
+            document.addEventListener("DOMContentLoaded", function () {
+
+                setupPagination("history-body", "history-pagination", 10);
+                
+
+            });
+
+        </script>
     </body>
 </html>

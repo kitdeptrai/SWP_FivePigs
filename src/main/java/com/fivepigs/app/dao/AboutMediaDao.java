@@ -3,8 +3,8 @@ package com.fivepigs.app.dao;
 import com.fivepigs.app.config.Db;
 import com.fivepigs.app.model.AboutMedia;
 import java.sql.*;
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.List;
 public class AboutMediaDao {
     private static final String SQL =
             "SELECT media_id, title, image_url, media_type, sort_order " +

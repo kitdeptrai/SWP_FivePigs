@@ -129,13 +129,13 @@ public class ApprovalDao {
                 SELECT
                     s.name,
                     s.status,
-                    sa.approval_date,
+                    s.created_at,
                     sa.approval_note
                 FROM Software s
                 LEFT JOIN Software_Approval sa
                     ON s.software_id = sa.software_id
                 WHERE s.status = 'PENDING_APPROVAL'
-                ORDER BY sa.approval_date DESC;
+                ORDER BY s.created_at DESC;
     """;
 
         try (Connection c = Db.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
@@ -145,11 +145,10 @@ public class ApprovalDao {
             while (rs.next()) {
                 Software s = new Software();
                 ApprovalProcess ap = new ApprovalProcess();
-                ReviewerProcess rp = new ReviewerProcess();
                 s.setAppName(rs.getString("name"));
                 s.setStatus(rs.getString("status"));
-                if (rs.getTimestamp("approval_date") != null) {
-                    ap.setApproval_date(rs.getTimestamp("approval_date").toLocalDateTime());
+                if (rs.getTimestamp("created_at") != null) {
+                    ap.setApproval_date(rs.getTimestamp("created_at").toLocalDateTime());
                 }
 
                 ap.setApproval_note(rs.getString("approval_note"));

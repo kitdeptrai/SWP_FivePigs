@@ -97,6 +97,9 @@ public class CartServlet extends HttpServlet {
                     return;
                 }
 
+                double total = cartDao.getCartTotal(userId);
+                session.setAttribute("checkout_total", total);
+
                 User user = resolveUser(session);
                 if (user == null || user.getEmail() == null || user.getEmail().isBlank()) {
                     response.sendRedirect(request.getContextPath() + "/login?redirect=/cart");

@@ -1047,3 +1047,29 @@ textarea {
     margin-bottom: 14px;
 }
 
+.pagination{
+    margin-top:20px;
+    display:flex;
+    justify-content: center;
+    gap:8px;
+}
+
+.pagination button{
+    width:36px;
+    height:36px;
+    border:none;
+    border-radius:8px;
+    background:transparent;
+    color:#ffffff;
+    cursor:pointer;
+    font-size:14px;
+}
+
+.pagination button:hover{
+    background:#1f3a5f;
+}
+
+.pagination button.active{
+    background:#3b82f6;
+    color:white;
+}
