@@ -58,13 +58,13 @@ public class GameServlet extends HttpServlet {
         SoftwareDao sdao = new SoftwareDao();
 
         try {
-            List<Software> softwareList = sdao.getSoftwareByCategoryWithIcon("3");
+            List<Software> softwareList = sdao.getSoftwareByCategoryWithIcon("2");
             Map<String, List<Software>> sections = new LinkedHashMap<>();
 
             try {
-                List<String> genres = sdao.getGenresByCategory(3); // category 3 = games
+                List<String> genres = sdao.getGenresByCategory(2); // category 3 = games
                 for (String genre : genres) {
-                    List<Software> list = sdao.getSoftwareByCategoryAndGenre(3, genre);
+                    List<Software> list = sdao.getSoftwareByCategoryAndGenre(2, genre);
                     sections.put(genre, list);
                 }
             } catch (SQLException ignored) {
