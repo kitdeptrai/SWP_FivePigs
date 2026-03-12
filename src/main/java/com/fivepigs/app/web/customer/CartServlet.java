@@ -70,7 +70,7 @@ public class CartServlet extends HttpServlet {
             if ("add".equals(action)) {
                 Integer softwareId = parseInt(param(request, "softwareId"));
                 if (softwareId == null) {
-                    softwareId = parseInt(param(request, "appId"));
+                    softwareId = parseInt(param(request, "softwareId"));
                 }
 
                 if (softwareId != null) {

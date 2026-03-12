@@ -44,6 +44,7 @@
                             <p style="font-size: 12px;">SALE IN WINTER</p>
                         </div>
                     </div>
+
                     <div class="sub-card" style="background:linear-gradient(135deg,#4f46e5,#7c3aed)">
                         <div class="sub-card-content" style="background: linear-gradient(transparent, rgba(0,0,0,0.45));">
                             <h3>Best Selling</h3>

@@ -587,6 +587,7 @@ public class SoftwareDao {
                     SoftwareDetail swDetail = new SoftwareDetail();
                     SoftwareVersion swVersion = new SoftwareVersion();
                     SoftwareImage simg = new SoftwareImage();
+
                     Category cat = new Category();
 
                     sw.setName(rs.getString("name"));
@@ -893,6 +894,23 @@ public class SoftwareDao {
         return list;
     }
 
+    public void changeStatusSoftware(int vendorId, int softwareId,String status) throws SQLException {
+
+        String sql = "UPDATE Software\n"
+                + "SET status = ?\n"
+                + "WHERE software_id = ?\n"
+                + "AND vendor_id = ?;";
+
+        try (Connection conn = Db.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(3, vendorId);
+            ps.setInt(2, softwareId);
+            ps.setString(1, status);
+
+            ps.executeUpdate();
+        }
+    }
+
     public List<Software> getLibraryByUserIdWithIcon(int userId) throws SQLException {
         String sql =
                 "SELECT s.*, img.image_url AS icon_url " +
@@ -1183,7 +1201,6 @@ public class SoftwareDao {
         }
     }
 }
-
 
 
 

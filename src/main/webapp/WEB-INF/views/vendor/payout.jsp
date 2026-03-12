@@ -215,10 +215,10 @@
                                 <tr>
                                     <td><span class="badge-id">${item.payoutId}</span></td>
                                     <td class="amount">$${item.amount}</td>
-                                    <td>${item.periodStart.toLocalDate()}</td>
+                                    <td>${item.createdAt.toLocalDate()}</td>
                                     <td><c:choose>
-                                            <c:when test="${not empty item.periodEnd.toLocalDate()}">
-                                                ${item.periodEnd.toLocalDate()}
+                                            <c:when test="${not empty item.processedAt.toLocalDate()}">
+                                                ${item.processedAt.toLocalDate()}
                                             </c:when>
 
                                             <c:otherwise>
@@ -258,23 +258,49 @@
 
                 <span class="close-btn" id="closePayout">&times;</span>
 
-                <p class="modal-text">
-                    Minimum payout amount is $50. Funds will be transferred within 5-7 business days.
-                </p>
+                <form action="/vendor/payout" method="post">
 
-                <input type="number" class="input-field" placeholder="0.00">
+                    <p class="modal-text">
+                        Minimum payout amount is $50. Funds will be transferred within 5-7 business days.
+                    </p>
 
-                <p class="balance">Available balance: $56520.47</p>
+                    <!-- Amount -->
+                    <input 
+                        type="number"
+                        name="amount"
+                        class="input-field"
+                        placeholder="Enter payout amount"
+                        step="0.01"
+                        min="50"
+                        required>
 
-                <select class="input-field">
-                    <option>Select payment method</option>
-                    <option>Bank Transfer</option>
-                    <option>Paypal</option>
-                </select>
+                    <!-- Balance -->
+                    <p class="balance">
+                        Available balance: $${wallet.balance}
+                    </p>
 
-                <input type="text" class="input-field" placeholder="Account number, email, or IBAN">
+                    <!-- Payment Method -->
+                    <select name="paymentMethod" class="input-field" required>
+                        <option value="">Select payment method</option>
+                        <option value="BANK">Bank Transfer</option>
+                        <option value="PAYPAL">Paypal</option>
+                    </select>
 
-                <button class="submit-btn">Submit Request</button>
+                    <!-- Payment Account -->
+                    <input 
+                        type="text"
+                        name="paymentAccount"
+                        class="input-field"
+                        placeholder="Account number, email, or IBAN"
+                        required>
+
+                    <!-- Note -->
+
+                    <button type="submit" class="submit-btn">
+                        Submit Request
+                    </button>
+
+                </form>
 
             </div>
 

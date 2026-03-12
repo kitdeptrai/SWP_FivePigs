@@ -15,7 +15,40 @@
     </form>
 
     <div class="user-actions">
-        <div class="icon-btn"><i class="fa-regular fa-bell"></i></div>
+        <% if (currentUser != null) { %>
+            <div class="icon-btn notification-wrap" tabindex="0">
+                <i class="fa-regular fa-bell"></i>
+
+                <c:if test="${unreadCount > 0}">
+                    <span class="noti-badge">${unreadCount}</span>
+                </c:if>
+
+                <div class="noti-dropdown">
+                    <div class="noti-dropdown-head">
+                        <span>Notifications</span>
+                        <a class="noti-view-all" href="${pageContext.request.contextPath}/notifications">View all</a>
+                    </div>
+
+                    <c:if test="${empty topNotifications}">
+                        <div class="noti-empty">No notifications yet.</div>
+                    </c:if>
+
+                    <c:forEach var="n" items="${topNotifications}">
+                        <a class="noti-item" href="${pageContext.request.contextPath}/notifications">
+                            <div class="noti-title-row">
+                                <div class="noti-title">${n.title}</div>
+                                <c:if test="${not n.read}">
+                                    <span class="noti-dot"></span>
+                                </c:if>
+                            </div>
+                            <div class="noti-content">${n.content}</div>
+                        </a>
+                    </c:forEach>
+                </div>
+            </div>
+        <% } else { %>
+            <div class="icon-btn" title="Login to view notifications"><i class="fa-regular fa-bell"></i></div>
+        <% } %>
 
         <% if (currentUser == null) { %>
             <a href="${pageContext.request.contextPath}/login"

@@ -1,6 +1,7 @@
 package com.fivepigs.app.web.customer;
 
 import com.fivepigs.app.dao.CartDao;
+import com.fivepigs.app.dao.NotificationDao;
 import com.fivepigs.app.model.User;
 import com.fivepigs.app.util.EmailService;
 import com.fivepigs.app.util.OtpUtil;
@@ -21,6 +22,7 @@ public class VerifyCheckoutOtpServlet extends HttpServlet {
     private static final long RESEND_COOLDOWN_MS = 60_000L;
 
     private final CartDao cartDao = new CartDao();
+    private final NotificationDao notificationDao = new NotificationDao();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -99,6 +101,11 @@ public class VerifyCheckoutOtpServlet extends HttpServlet {
             clearCheckoutOtpSession(session);
 
             if (count > 0) {
+                notificationDao.insertNotification(
+                        user.getUserId(),
+                        "Purchase completed",
+                        count + " item(s) have been added to your Library."
+                );
                 response.sendRedirect(request.getContextPath() + "/library?msg=checkout_success");
             } else {
                 response.sendRedirect(request.getContextPath() + "/cart?msg=empty");

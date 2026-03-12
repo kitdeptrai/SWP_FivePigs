@@ -1,4 +1,8 @@
-<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+
+
 <%-- 
     Document   : my_products
     Created on : Feb 16, 2026, 4:17:45 PM
@@ -179,6 +183,25 @@
             .icon-btn:hover{
                 background:#334155;
             }
+            .pagination{
+                display:flex;
+                justify-content:center;
+                gap:10px;
+                margin-top:30px;
+            }
+
+            .pagination button{
+                padding:6px 12px;
+                border:none;
+                background:#1e293b;
+                color:white;
+                border-radius:6px;
+                cursor:pointer;
+            }
+
+            .pagination button.active{
+                background:#4f46e5;
+            }
         </style>
     </head>
 
@@ -264,7 +287,8 @@
                             <div class="product-info">
                                 <div class="product-header">
                                     <div class="product-title">${item.name}</div>
-                                    <div class="status approved">${item.status}</div>
+                                    <div class="status ${fn:toLowerCase(item.status)}">${item.status}</div>
+
                                 </div>
                                 <div class="product-desc">
                                     ${item.shortDescription}
@@ -292,24 +316,98 @@
                                 </div>
                                 <div class="actions">
                                     <a href="/vendor/product_detail?softwareId=${item.softwareId}" class="btn-outline">View Details</a>
-                                    <div class="icon-btn"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                                        </svg></div>
-                                    <div class="icon-btn"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ff4d4d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <polyline points="3 6 5 6 21 6"></polyline>
-                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                        <line x1="10" y1="11" x2="10" y2="17"></line>
-                                        <line x1="14" y1="11" x2="14" y2="17"></line>
-                                        </svg></div>
+                                    <c:choose>
+
+                                        
+                                        <c:when test="${item.status == 'ACTIVE'}">
+                                            <form action="change_status_product" method="post">
+                                                <input type="hidden" name="softwareId" value="${item.softwareId}">
+                                                <input type="hidden" name="status" value="DEACTIVE">
+
+                                                <button type="submit" class="icon-btn" title="Deactivate">
+                                                    <svg width="24" height="24" viewBox="0 0 24 24"
+                                                         fill="none" stroke="#ff4d4d" stroke-width="2"
+                                                         stroke-linecap="round" stroke-linejoin="round">
+                                                    <circle cx="12" cy="12" r="10"></circle>
+                                                    <line x1="8" y1="12" x2="16" y2="12"></line>
+                                                    </svg>
+                                                </button>
+                                            </form>
+                                        </c:when>
+
+                                        
+                                        <c:when test="${item.status == 'DEACTIVE'}">
+                                            <form action="change_status_product" method="post">
+                                                <input type="hidden" name="softwareId" value="${item.softwareId}">
+                                                <input type="hidden" name="status" value="ACTIVE">
+
+                                                <button type="submit" class="icon-btn" title="Activate">
+                                                    <svg width="24" height="24" viewBox="0 0 24 24"
+                                                         fill="none" stroke="#22c55e" stroke-width="2"
+                                                         stroke-linecap="round" stroke-linejoin="round">
+                                                    <circle cx="12" cy="12" r="10"></circle>
+                                                    <polyline points="9 12 12 15 16 9"></polyline>
+                                                    </svg>
+                                                </button>
+                                            </form>
+                                        </c:when>
+
+                                    </c:choose>
+
                                 </div>
                             </div>
                         </div>
                     </c:forEach>
 
                 </div>
+                <div class="pagination" id="pagination"></div>
 
             </div>
         </div>
+        <script>
+            const itemsPerPage = 8;
+
+            const products = document.querySelectorAll(".product-card");
+            const pagination = document.getElementById("pagination");
+
+            const totalPages = Math.ceil(products.length / itemsPerPage);
+
+            function showPage(page) {
+
+                const start = (page - 1) * itemsPerPage;
+                const end = start + itemsPerPage;
+
+                products.forEach((card, index) => {
+                    if (index >= start && index < end) {
+                        card.style.display = "flex";
+                    } else {
+                        card.style.display = "none";
+                    }
+                });
+
+                document.querySelectorAll(".pagination button").forEach(btn => {
+                    btn.classList.remove("active");
+                });
+
+                document.getElementById("page-" + page).classList.add("active");
+            }
+
+            function createPagination() {
+
+                for (let i = 1; i <= totalPages; i++) {
+
+                    const btn = document.createElement("button");
+                    btn.innerText = i;
+                    btn.id = "page-" + i;
+
+                    btn.onclick = () => showPage(i);
+
+                    pagination.appendChild(btn);
+                }
+            }
+
+            createPagination();
+            showPage(1);
+        </script>
     </body>
 </html>

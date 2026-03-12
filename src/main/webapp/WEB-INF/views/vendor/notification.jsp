@@ -15,16 +15,11 @@
 
    
     <link rel="stylesheet"
-          href="${pageContext.request.contextPath}/assets/css/vendor/vendor.css">
-
-    
+          href="${pageContext.request.contextPath}/assets/css/vendor/vendor.css">  
     <link rel="stylesheet"
           href="${pageContext.request.contextPath}/assets/reviewer/pending.css">
-
-    
     <link rel="stylesheet"
           href="${pageContext.request.contextPath}/assets/reviewer/notifications.css">
-
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
@@ -36,7 +31,7 @@
     <jsp:include page="layout/side_bar.jsp"/>
 
     <!-- ================= MAIN ================= -->
-    <main class="main">
+    <div class="main">
 
         <!-- ===== Header (giống ảnh 2) ===== -->
         <div class="noti-head">
@@ -210,7 +205,7 @@
 
         </div>
 
-    </main>
+    </div>
 </div>
 
 <!-- ===== Modal View Details ===== -->
