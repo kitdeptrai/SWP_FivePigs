@@ -23,14 +23,33 @@
                 <div class="pending-wrap">
                     <h1 class="pending-title">Pending Approvals</h1>
                     <div class="pending-sub">Apps with completed technical reviews</div>
+                    <div class="pending-filters">
 
+                        <input type="text" id="searchApp" placeholder="Search App Name">
+
+                        <input type="text" id="searchReviewer" placeholder="Reviewer">
+
+                        <select id="searchCategory">
+                            <option value="">All Category</option>
+                            <option value="APP">APP</option>
+                            <option value="GAME">GAME</option>
+                        </select>
+
+                        <input type="date" id="searchDate">
+
+                    </div>
                     <div class="pending-panel" id="pending-container">
                         <c:if test="${empty listpending}">
                             <div class="empty">Không có ứng dụng nào đang chờ duyệt.</div>
                         </c:if>
 
                         <c:forEach var="it" items="${listpending}">
-                            <div class="pending-card" style="margin-bottom: 18px;">
+                            <div class="pending-card"
+                                 data-name="${it.appName}"
+                                 data-reviewer="${it.user.fullName}"
+                                 data-category="${it.category.categoryName}"
+                                 data-date="${it.reviewerProcess.reviewed_at}"
+                                 style="margin-bottom:18px;">
                                 <div class="pending-card-inner">
 
                                     <!-- Hiển thị ảnh thumbnail -->
@@ -86,59 +105,114 @@
             </div>
         </div>
         <script>
+            const itemsPerPage = 4;
 
-            function setupPagination(containerId, paginationId, itemsPerPage = 4) {
+            const cards = Array.from(document.querySelectorAll(".pending-card"));
+            const pagination = document.getElementById("pending-pagination");
 
-                const container = document.getElementById(containerId);
-                const items = container.querySelectorAll(".pending-card");
-                const pagination = document.getElementById(paginationId);
+            const searchApp = document.getElementById("searchApp");
+            const searchReviewer = document.getElementById("searchReviewer");
+            const searchCategory = document.getElementById("searchCategory");
+            const searchDate = document.getElementById("searchDate");
 
-                let currentPage = 1;
-                const totalPages = Math.ceil(items.length / itemsPerPage);
 
-                function showPage(page) {
-                    currentPage = page;
+            function getFilteredCards() {
 
-                    items.forEach(item => {
-                        item.style.display = "none";
-                    });
+                const appValue = searchApp.value.toLowerCase();
+                const reviewerValue = searchReviewer.value.toLowerCase();
+                const categoryValue = searchCategory.value;
+                const dateValue = searchDate.value;
 
-                    const start = (page - 1) * itemsPerPage;
-                    const end = start + itemsPerPage;
+                return cards.filter(card => {
 
-                    for (let i = start; i < end && i < items.length; i++) {
-                        items[i].style.display = "block";
-                    }
+                    const name = card.dataset.name.toLowerCase();
+                    const reviewer = card.dataset.reviewer.toLowerCase();
+                    const category = card.dataset.category;
+                    const date = card.dataset.date;
 
-                    const buttons = pagination.querySelectorAll("button");
-                    buttons.forEach(btn => btn.classList.remove("active"));
-                    buttons[page - 1].classList.add("active");
+                    const matchName = name.includes(appValue);
+                    const matchReviewer = reviewer.includes(reviewerValue);
+                    const matchCategory = categoryValue === "" || category === categoryValue;
+                    const matchDate = dateValue === "" || (date && date.includes(dateValue));
+
+                    return matchName && matchReviewer && matchCategory && matchDate;
+
+                });
+
+            }
+
+
+            function showPage(page, filteredCards) {
+
+                const start = (page - 1) * itemsPerPage;
+                const end = start + itemsPerPage;
+
+                cards.forEach(card => card.style.display = "none");
+
+                filteredCards.slice(start, end).forEach(card => {
+                    card.style.display = "block";
+                });
+
+            }
+
+
+            function createPagination(filteredCards) {
+
+                pagination.innerHTML = "";
+
+                const totalPages = Math.ceil(filteredCards.length / itemsPerPage);
+
+                if (totalPages === 0)
+                    return;
+
+                for (let i = 1; i <= totalPages; i++) {
+
+                    const btn = document.createElement("button");
+                    btn.innerText = i;
+
+                    btn.onclick = () => {
+
+                        showPage(i, filteredCards);
+
+                        document.querySelectorAll(".pagination button")
+                                .forEach(b => b.classList.remove("active"));
+
+                        btn.classList.add("active");
+
+                    };
+
+                    pagination.appendChild(btn);
+
                 }
 
-                function createPagination() {
+                pagination.querySelector("button").click();
+
+            }
+
+
+            function filterCards() {
+
+                const filteredCards = getFilteredCards();
+
+                cards.forEach(card => card.style.display = "none");
+
+                if (filteredCards.length === 0) {
                     pagination.innerHTML = "";
-
-                    for (let i = 1; i <= totalPages; i++) {
-                        const btn = document.createElement("button");
-                        btn.innerText = i;
-
-                        btn.onclick = () => showPage(i);
-
-                        pagination.appendChild(btn);
-                    }
+                    return;
                 }
 
-                if (items.length > 0) {
-                    createPagination();
-                    showPage(1);
-            }
+                createPagination(filteredCards);
+
             }
 
-            document.addEventListener("DOMContentLoaded", function () {
 
-                setupPagination("pending-container", "pending-pagination", 4);
-            });
+            searchApp.addEventListener("input", filterCards);
+            searchReviewer.addEventListener("input", filterCards);
+            searchCategory.addEventListener("change", filterCards);
+            searchDate.addEventListener("change", filterCards);
 
+
+            filterCards();
         </script>
     </body>
 </html>

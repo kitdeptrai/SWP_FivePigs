@@ -49,7 +49,7 @@ public class LibraryServlet extends HttpServlet {
         }
     }
 
-    private Integer resolveUserId(HttpSession session) {
+    private Integer resolveUserId(HttpSession session) { 
         if (session == null) {
             return null;
         }

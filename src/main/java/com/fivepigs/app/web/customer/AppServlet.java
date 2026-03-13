@@ -25,13 +25,13 @@ public class AppServlet extends HttpServlet {
         SoftwareDao sdao = new SoftwareDao();
 
         try {
-            List<Software> softwareList = sdao.getSoftwareByCategoryWithIcon("2");
+            List<Software> softwareList = sdao.getSoftwareByCategoryWithIcon("1");
             Map<String, List<Software>> sections = new LinkedHashMap<>();
 
             try {
-                List<String> genres = sdao.getGenresByCategory(2); // category 2 = apps
+                List<String> genres = sdao.getGenresByCategory(1); // category 1 = apps
                 for (String genre : genres) {
-                    List<Software> list = sdao.getSoftwareByCategoryAndGenre(2, genre);
+                    List<Software> list = sdao.getSoftwareByCategoryAndGenre(1, genre);
                     sections.put(genre, list);
                 }
             } catch (SQLException ignored) {
