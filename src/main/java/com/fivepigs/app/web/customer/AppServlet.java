@@ -29,7 +29,7 @@ public class AppServlet extends HttpServlet {
             Map<String, List<Software>> sections = new LinkedHashMap<>();
 
             try {
-                List<String> genres = sdao.getGenresByCategory(1); // category 2 = apps
+                List<String> genres = sdao.getGenresByCategory(1); // category 1 = apps
                 for (String genre : genres) {
                     List<Software> list = sdao.getSoftwareByCategoryAndGenre(1, genre);
                     sections.put(genre, list);

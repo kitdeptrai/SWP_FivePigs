@@ -105,17 +105,22 @@ public class ApprovalPendingDetail extends HttpServlet {
         String softwareIdStr = request.getParameter("softwareId");
         String decision = request.getParameter("decision");
         String note = request.getParameter("note");
-
+        String status="";
+        if(decision.equals("APPROVED")){
+            status="ACTIVE";
+        }
+        
+        else status="REJECTED";
         if (softwareIdStr == null || decision == null) {
             response.getWriter().println("Missing parameters");
             return;
         }
-
+        
         int softwareId = Integer.parseInt(softwareIdStr);
         int approverId = user.getUserId();
 
         ApprovalDao adao = new ApprovalDao();
-        adao.submitDecision(softwareId, approverId, decision, note);
+        adao.submitDecision(softwareId, approverId, decision, note,status);
 
         response.sendRedirect(request.getContextPath() + "/approval_history");
 

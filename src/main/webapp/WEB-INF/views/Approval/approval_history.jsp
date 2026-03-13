@@ -21,6 +21,21 @@
                     <p class="history-sub">Your past approval decisions</p>
 
                     <div class="history-card">
+                        <div class="history-filters">
+
+                            <input type="text" id="searchName" placeholder="Search App Name">
+
+                            <input type="text" id="searchVendor" placeholder="Search Vendor">
+
+                            <input type="date" id="searchDate">
+
+                            <select id="searchDecision">
+                                <option value="">All Decision</option>
+                                <option value="APPROVED">Approved</option>
+                                <option value="REJECTED">Rejected</option>
+                            </select>
+
+                        </div>
                         <table class="history-table">
                             <thead>
                                 <tr>
@@ -64,63 +79,114 @@
         </div>
         <script>
 
-            function setupPagination(tbodyId, paginationId, rowsPerPage = 10) {
+            const itemsPerPage = 10;
 
-                const tbody = document.getElementById(tbodyId);
-                const rows = tbody.querySelectorAll("tr");
-                const pagination = document.getElementById(paginationId);
+            const rows = Array.from(document.querySelectorAll("#history-body tr"));
+            const pagination = document.getElementById("history-pagination");
 
-                let currentPage = 1;
-                const totalPages = Math.ceil(rows.length / rowsPerPage);
+            const searchName = document.getElementById("searchName");
+            const searchVendor = document.getElementById("searchVendor");
+            const searchDate = document.getElementById("searchDate");
+            const searchDecision = document.getElementById("searchDecision");
 
-                function showPage(page) {
-                    currentPage = page;
 
-                    rows.forEach((row) => {
-                        row.style.display = "none";
-                    });
+            function getFilteredRows() {
 
-                    const start = (page - 1) * rowsPerPage;
-                    const end = start + rowsPerPage;
+                const nameValue = searchName.value.toLowerCase();
+                const vendorValue = searchVendor.value.toLowerCase();
+                const dateValue = searchDate.value;
+                const decisionValue = searchDecision.value;
 
-                    for (let i = start; i < end && i < rows.length; i++) {
-                        rows[i].style.display = "";
-                    }
+                return rows.filter(row => {
 
-                    // cập nhật active button
-                    const buttons = pagination.querySelectorAll("button");
-                    buttons.forEach(btn => btn.classList.remove("active"));
-                    buttons[page - 1].classList.add("active");
+                    const appName = row.cells[0].innerText.toLowerCase();
+                    const vendor = row.cells[1].innerText.toLowerCase();
+                    const date = row.cells[2].innerText;
+                    const decision = row.cells[3].innerText;
+
+                    const matchName = appName.includes(nameValue);
+                    const matchVendor = vendor.includes(vendorValue);
+                    const matchDate = dateValue === "" || date.includes(dateValue);
+                    const matchDecision = decisionValue === "" || decision === decisionValue;
+
+                    return matchName && matchVendor && matchDate && matchDecision;
+
+                });
+
+            }
+
+
+            function showPage(page, filteredRows) {
+
+                const start = (page - 1) * itemsPerPage;
+                const end = start + itemsPerPage;
+
+                rows.forEach(row => row.style.display = "none");
+
+                filteredRows.slice(start, end).forEach(row => {
+                    row.style.display = "";
+                });
+
+            }
+
+
+            function createPagination(filteredRows) {
+
+                pagination.innerHTML = "";
+
+                const totalPages = Math.ceil(filteredRows.length / itemsPerPage);
+
+                if (totalPages === 0)
+                    return;
+
+                for (let i = 1; i <= totalPages; i++) {
+
+                    const btn = document.createElement("button");
+                    btn.innerText = i;
+
+                    btn.onclick = () => {
+
+                        showPage(i, filteredRows);
+
+                        document.querySelectorAll(".pagination button").forEach(b => b.classList.remove("active"));
+                        btn.classList.add("active");
+
+                    };
+
+                    pagination.appendChild(btn);
+
                 }
 
-                function createPagination() {
+                pagination.querySelector("button").click();
+
+            }
+
+
+            function filterTable() {
+
+                const filteredRows = getFilteredRows();
+
+                rows.forEach(row => row.style.display = "none");
+
+                if (filteredRows.length === 0) {
+
                     pagination.innerHTML = "";
+                    return;
 
-                    for (let i = 1; i <= totalPages; i++) {
-                        const btn = document.createElement("button");
-                        btn.innerText = i;
-
-                        btn.onclick = () => {
-                            showPage(i);
-                        };
-
-                        pagination.appendChild(btn);
-                    }
                 }
 
-                if (rows.length > 0) {
-                    createPagination();
-                    showPage(1);
-            }
+                createPagination(filteredRows);
+
             }
 
-            document.addEventListener("DOMContentLoaded", function () {
 
-                setupPagination("history-body", "history-pagination", 10);
-                
+            searchName.addEventListener("input", filterTable);
+            searchVendor.addEventListener("input", filterTable);
+            searchDate.addEventListener("change", filterTable);
+            searchDecision.addEventListener("change", filterTable);
 
-            });
 
+            filterTable();
         </script>
     </body>
 </html>

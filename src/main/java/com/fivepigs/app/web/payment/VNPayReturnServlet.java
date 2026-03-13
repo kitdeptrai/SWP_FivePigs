@@ -1,105 +1,77 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
 package com.fivepigs.app.web.payment;
 
-import java.io.IOException;
-import java.io.PrintWriter;
+import com.fivepigs.app.dao.CartDao;
+import com.fivepigs.app.dao.NotificationDao;
+import com.fivepigs.app.model.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.*;
+import jakarta.servlet.http.HttpSession;
 
-/**
- *
- * @author thanh
- */
+import java.io.IOException;
+import java.sql.SQLException;
+
 @WebServlet(name = "VNPayReturnServlet", urlPatterns = {"/vnpay-return"})
 public class VNPayReturnServlet extends HttpServlet {
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet VNPayReturnServlet</title>");
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet VNPayReturnServlet at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
-        }
-    }
+    private final CartDao cartDao = new CartDao();
+    private final NotificationDao notificationDao = new NotificationDao();
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-            
+
+        HttpSession session = request.getSession(false);
+        User user = session == null ? null : (User) session.getAttribute("user");
         String responseCode = request.getParameter("vnp_ResponseCode");
         String transactionStatus = request.getParameter("vnp_TransactionStatus");
         String amount = request.getParameter("vnp_Amount");
+        String txnRef = request.getParameter("vnp_TxnRef");
+        String sessionTxnRef = session == null ? null : (String) session.getAttribute("vnp_txn_ref");
 
-        if ("00".equals(responseCode) && "00".equals(transactionStatus)) {
+        boolean success = user != null
+                && txnRef != null
+                && txnRef.equals(sessionTxnRef)
+                && "00".equals(responseCode)
+                && "00".equals(transactionStatus);
 
-            request.setAttribute("message", "Thanh toán thành công!");
-            request.setAttribute("amount", Integer.parseInt(amount) / 100);
-
+        if (success) {
+            try {
+                int count = cartDao.checkout(user.getUserId());
+                if (count > 0) {
+                    notificationDao.insertNotification(
+                            user.getUserId(),
+                            "Purchase completed",
+                            count + " item(s) have been added to your Library."
+                    );
+                }
+                request.setAttribute("message", "Thanh toan thanh cong!");
+                request.setAttribute("success", true);
+                if (amount != null && !amount.isBlank()) {
+                    request.setAttribute("amount", Long.parseLong(amount) / 100);
+                }
+            } catch (SQLException e) {
+                throw new ServletException(e);
+            } finally {
+                clearCheckoutSession(session);
+            }
         } else {
-
-            request.setAttribute("message", "Thanh toán thất bại!");
-
+            request.setAttribute("message", "Thanh toan that bai!");
+            request.setAttribute("success", false);
+            clearCheckoutSession(session);
         }
 
-        request.getRequestDispatcher("/WEB-INF/views/customer/payment-result.jsp")
-                .forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/views/customer/payment-result.jsp").forward(request, response);
     }
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        processRequest(request, response);
+    private void clearCheckoutSession(HttpSession session) {
+        if (session == null) {
+            return;
+        }
+        session.removeAttribute("checkout_total");
+        session.removeAttribute("checkout_pending_user_id");
+        session.removeAttribute("vnp_txn_ref");
     }
-
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
-    @Override
-    public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
-
 }
