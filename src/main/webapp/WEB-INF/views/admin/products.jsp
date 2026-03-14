@@ -223,7 +223,7 @@
                         <td>
                             <div style="display:flex; gap:8px; flex-wrap:wrap;">
                                 <a href="${pageContext.request.contextPath}/admin/products/detail?softwareId=${p.softwareId}" style="padding:6px 10px; border-radius:6px; border:1px solid #cbd5e1; text-decoration:none; color:#334155; font-weight:600;">Detail</a>
-                                <form method="post" action="${pageContext.request.contextPath}/admin/products/${p.status == 'ACTIVE' ? 'disable' : 'enable'}" style="margin:0;">
+                                <form method="post" action="${pageContext.request.contextPath}/admin/products/${p.status == 'ACTIVE' ? 'disable' : 'enable'}" style="margin:0;" onsubmit="return confirm('${p.status == 'ACTIVE' ? 'Are you sure you want to disable this product?' : 'Are you sure you want to enable this product?'}');">
                                     <input type="hidden" name="softwareId" value="${p.softwareId}" />
                                     <button type="submit" style="padding:6px 10px; border-radius:6px; border:none; background:${p.status == 'ACTIVE' ? '#f97316' : '#22c55e'}; color:#fff; font-weight:600;">
                                         ${p.status == 'ACTIVE' ? 'Disable' : 'Enable'}

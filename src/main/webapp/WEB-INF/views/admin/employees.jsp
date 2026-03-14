@@ -202,7 +202,7 @@
                                 <div style="display: flex; gap: 8px;">
                                     <a href="#edit-emp-${e.userId}" style="color: var(--accent); text-decoration: none; font-size: 13px; font-weight: 600;">Edit</a>
                                     <c:if test="${e.status == 'ACTIVE'}">
-                                        <a href="#disable-emp-${e.userId}" style="color: var(--danger); text-decoration: none; font-size: 13px; font-weight: 600;">Disable</a>
+                                        <a href="#disable-emp-${e.userId}" style="color: var(--danger); text-decoration: none; font-size: 13px; font-weight: 600;" onclick="return confirm('Are you sure you want to disable this employee?');">Disable</a>
                                     </c:if>
                                     <c:if test="${e.status == 'INACTIVE'}">
                                         <a href="#enable-emp-${e.userId}" style="color: #22c55e; text-decoration: none; font-size: 13px; font-weight: 600;">Enable</a>
