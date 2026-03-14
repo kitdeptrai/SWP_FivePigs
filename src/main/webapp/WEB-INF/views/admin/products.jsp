@@ -3,7 +3,7 @@
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Admin - Products</title>
@@ -145,30 +145,30 @@
 
     <main class="main">
         <h1 style="margin-top: 0;">Products Management</h1>
-        <p class="subtitle">Quản lý danh sách sản phẩm (active/inactive).</p>
+        <p class="subtitle">Manage the product list (active/inactive).</p>
 
         <div class="card" style="max-width: 100%;">
             <div style="display:flex; justify-content: space-between; align-items:center; gap: 16px;">
                 <div>
-                    <h2 style="margin:0; font-size: 18px; color: var(--dark-blue);">Danh sách Products</h2>
-                    <p style="margin:6px 0 0; color:#64748b; font-size: 13px;">Tất cả sản phẩm trong hệ thống</p>
+                    <h2 style="margin:0; font-size: 18px; color: var(--dark-blue);">Product list</h2>
+                    <p style="margin:6px 0 0; color:#64748b; font-size: 13px;">All products in the system</p>
                 </div>
             </div>
 
             <form method="get" action="${pageContext.request.contextPath}/admin/products" style="margin-top:16px; display:grid; grid-template-columns: 2fr 1fr auto auto; gap:10px; align-items:end;">
                 <div>
-                    <label style="display:block; font-size:12px; color:#64748b; margin-bottom:6px;">Tìm kiếm</label>
-                    <input type="text" name="keyword" value="${keyword}" placeholder="Tên sản phẩm, vendor, category..." style="width:100%; padding:10px 12px; border:1px solid #cbd5e1; border-radius:8px;" />
+                    <label style="display:block; font-size:12px; color:#64748b; margin-bottom:6px;">Search</label>
+                    <input type="text" name="keyword" value="${keyword}" placeholder="Product name, vendor, category..." style="width:100%; padding:10px 12px; border:1px solid #cbd5e1; border-radius:8px;" />
                 </div>
                 <div>
                     <label style="display:block; font-size:12px; color:#64748b; margin-bottom:6px;">Status</label>
                     <select name="status" style="width:100%; padding:10px 12px; border:1px solid #cbd5e1; border-radius:8px;">
-                        <option value="">Tất cả</option>
+                        <option value="">All</option>
                         <option value="ACTIVE" ${status == 'ACTIVE' ? 'selected' : ''}>ACTIVE</option>
                         <option value="INACTIVE" ${status == 'INACTIVE' ? 'selected' : ''}>INACTIVE</option>
                     </select>
                 </div>
-                <button type="submit" style="padding:10px 14px; border-radius:8px; border:none; background:#3b82f6; color:#fff; font-weight:600;">Lọc</button>
+                <button type="submit" style="padding:10px 14px; border-radius:8px; border:none; background:#3b82f6; color:#fff; font-weight:600;">Filter</button>
                 <a href="${pageContext.request.contextPath}/admin/products" style="padding:10px 14px; border-radius:8px; border:1px solid #cbd5e1; color:#334155; text-decoration:none; font-weight:600; text-align:center;">Reset</a>
             </form>
 
@@ -176,10 +176,10 @@
                 <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Tên sản phẩm</th>
+                    <th>Product name</th>
                     <th>Vendor</th>
                     <th>Category</th>
-                    <th>Giá</th>
+                    <th>Price</th>
                     <th>Status</th>
                     <th>Downloads</th>
                     <th>Rating</th>
@@ -236,7 +236,7 @@
 
                 <c:if test="${empty products}">
                     <tr>
-                        <td colspan="9" style="text-align:center; color:#94a3b8; padding: 16px;">Chưa có sản phẩm.</td>
+                        <td colspan="9" style="text-align:center; color:#94a3b8; padding: 16px;">No products found.</td>
                     </tr>
                 </c:if>
                 </tbody>

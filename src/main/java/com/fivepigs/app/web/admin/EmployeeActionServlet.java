@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 @WebServlet({
-        "/admin/employees/create",
         "/admin/employees/update",
         "/admin/employees/enable",
         "/admin/employees/disable"

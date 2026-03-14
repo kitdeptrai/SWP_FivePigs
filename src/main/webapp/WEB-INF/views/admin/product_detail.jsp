@@ -3,7 +3,7 @@
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Admin - Product Detail</title>
@@ -173,7 +173,7 @@
 
     <main class="main">
         <h1 style="margin-top:0;">Product Detail</h1>
-        <p class="subtitle">Chi tiết sản phẩm.</p>
+        <p class="subtitle">Product details.</p>
 
         <div class="card">
             <div style="display:flex; align-items:center; gap:16px;">
@@ -203,10 +203,10 @@
         </div>
 
         <div class="card">
-            <h3>Thông tin cơ bản</h3>
+            <h3>Basic information</h3>
             <div class="kv"><strong>ID</strong><span>#${product.softwareId}</span></div>
             <div class="kv"><strong>Version</strong><span>${product.versionName}</span></div>
-            <div class="kv"><strong>Giá</strong>
+            <div class="kv"><strong>Price</strong>
                 <span>
                     <c:choose>
                         <c:when test="${product.isFree == 1}">Free</c:when>

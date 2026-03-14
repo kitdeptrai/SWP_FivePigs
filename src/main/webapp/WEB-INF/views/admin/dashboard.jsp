@@ -3,7 +3,7 @@
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Admin Dashboard - FivePigs</title>
@@ -183,64 +183,64 @@
         <!-- 1️⃣ System Overview Cards -->
         <div class="kpi-grid">
             <div class="kpi-card">
-                <div class="kpi-title">Tổng doanh thu (PAID)</div>
+                <div class="kpi-title">Total revenue (PAID)</div>
                 <div class="kpi-value">
                     <fmt:formatNumber value="${totalRevenue}" type="currency" currencySymbol="₫" maxFractionDigits="0"/>
                 </div>
             </div>
             <div class="kpi-card">
-                <div class="kpi-title">Tổng số ứng dụng</div>
+                <div class="kpi-title">Total apps</div>
                 <div class="kpi-value"><c:out value="${totalApps}"/></div>
             </div>
             <div class="kpi-card">
-                <div class="kpi-title">Tổng số User</div>
+                <div class="kpi-title">Total users</div>
                 <div class="kpi-value"><c:out value="${totalUsers}"/></div>
             </div>
             <div class="kpi-card">
-                <div class="kpi-title">Report chưa xử lý</div>
+                <div class="kpi-title">Pending reports</div>
                 <div class="kpi-value" style="display: flex; justify-content: space-between; align-items: center;">
                     <c:out value="${pendingReports}"/>
-                    <a href="${pageContext.request.contextPath}/admin/reports" style="font-size: 12px; color: var(--accent); text-decoration: none;">Chi tiết →</a>
+                    <a href="${pageContext.request.contextPath}/admin/reports" style="font-size: 12px; color: var(--accent); text-decoration: none;">Details →</a>
                 </div>
             </div>
         </div>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
-            <!-- 2️⃣ Doanh thu theo tháng -->
+            <!-- 2️⃣ Monthly revenue -->
             <div class="section-card">
-                <h3>Doanh thu theo tháng</h3>
+                <h3>Monthly revenue</h3>
                 <table>
                     <thead>
                         <tr>
-                            <th>Tháng</th>
-                            <th class="text-right">Doanh thu</th>
+                            <th>Month</th>
+                            <th class="text-right">Revenue</th>
                         </tr>
                     </thead>
                     <tbody>
                         <c:forEach var="row" items="${revenueByMonth}">
                             <tr>
-                                <td>Tháng <c:out value="${row.month}"/></td>
+                                <td>Month <c:out value="${row.month}"/></td>
                                 <td class="text-right">
                                     <fmt:formatNumber value="${row.revenue}" type="currency" currencySymbol="₫" maxFractionDigits="0"/>
                                 </td>
                             </tr>
                         </c:forEach>
                         <c:if test="${empty revenueByMonth}">
-                            <tr><td colspan="2" style="text-align: center; color: #94a3b8;">Chưa có dữ liệu</td></tr>
+                            <tr><td colspan="2" style="text-align: center; color: #94a3b8;">No data available</td></tr>
                         </c:if>
                     </tbody>
                 </table>
             </div>
 
-            <!-- 3️⃣ Top 5 app bán chạy -->
+            <!-- 3️⃣ Top 5 best-selling apps -->
             <div class="section-card">
-                <h3>Top 5 ứng dụng bán chạy</h3>
+                <h3>Top 5 best-selling apps</h3>
                 <table>
                     <thead>
                         <tr>
-                            <th>Tên App</th>
-                            <th class="text-right">Lượt mua</th>
-                            <th class="text-right">Doanh thu</th>
+                            <th>App name</th>
+                            <th class="text-right">Purchases</th>
+                            <th class="text-right">Revenue</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -254,7 +254,7 @@
                             </tr>
                         </c:forEach>
                         <c:if test="${empty topAppsBestSeller}">
-                            <tr><td colspan="3" style="text-align: center; color: #94a3b8;">Chưa có dữ liệu</td></tr>
+                            <tr><td colspan="3" style="text-align: center; color: #94a3b8;">No data available</td></tr>
                         </c:if>
                     </tbody>
                 </table>
