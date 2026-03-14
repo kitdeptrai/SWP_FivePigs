@@ -93,7 +93,7 @@ public class SoftwareDao {
     // Pending reviews (đã sửa: lấy version từ Software_Version, bỏ language)
     public List<Software> getPendingSoftware() throws SQLException {
 
-    List<Software> list = new ArrayList<>();
+        List<Software> list = new ArrayList<>();
 
         String sql = """
         SELECT s.software_id,
@@ -152,10 +152,6 @@ public class SoftwareDao {
             ps.setInt(2, softwareId);
             return ps.executeUpdate() > 0;
         }
-    }
-
-    public boolean updateSoftwareStatus(int softwareId, String status) throws SQLException {
-        return updateStatus(softwareId, status);
     }
 
     // Search pending software (đã sửa: đúng table + đúng status)
@@ -311,7 +307,7 @@ public class SoftwareDao {
 
     // Top3RevenueByVendor: OK (không dùng cột bị xóa)
 
-    
+
     public List<Software> Top3RevenueByVendor(Integer vendorId) throws SQLException {
         List<Software> list = new ArrayList<>();
         String sql = """
@@ -320,7 +316,8 @@ public class SoftwareDao {
                    s.avg_rating AS rating,
                    s.status,
                    s.download_count,
-                   s.vendor_id
+                   s.vendor_id,
+                   s.software_id
             FROM Software s
             JOIN Order_Detail od ON s.software_id = od.software_id
             JOIN Orders o ON od.order_id = o.order_id
@@ -342,6 +339,7 @@ public class SoftwareDao {
                     sw.setAvgRating(rs.getDouble("rating"));
                     sw.setDownloadCount(rs.getInt("download_count"));
                     sw.setVendorId(rs.getInt("vendor_id"));
+                    sw.setSoftwareId(rs.getInt("software_id"));
                     list.add(sw);
                 }
             }
@@ -609,9 +607,6 @@ public class SoftwareDao {
         return null;
     }
 
-    public Software getSoftwareById(int softwareId) throws SQLException {
-        return getSoftwareDetailBySoftwareId(softwareId);
-    }
 
     //Upload Software
     public int createSoftware(Software software) throws Exception {
@@ -894,22 +889,6 @@ public class SoftwareDao {
         return list;
     }
 
-    public void changeStatusSoftware(int vendorId, int softwareId,String status) throws SQLException {
-
-        String sql = "UPDATE Software\n"
-                + "SET status = ?\n"
-                + "WHERE software_id = ?\n"
-                + "AND vendor_id = ?;";
-
-        try (Connection conn = Db.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setInt(3, vendorId);
-            ps.setInt(2, softwareId);
-            ps.setString(1, status);
-
-            ps.executeUpdate();
-        }
-    }
 
     public List<Software> getLibraryByUserIdWithIcon(int userId) throws SQLException {
         String sql =
@@ -1164,7 +1143,7 @@ public class SoftwareDao {
         }
     }
 
-    public void addSoftwareImage(int softwareId, String imageUrl, boolean isThumbnail) throws Exception {
+    public void addSoftwareImage(int softwareId, String imageUrl, boolean isThumbnail) throws SQLException {
 
         String sql = "INSERT INTO Software_Image(software_id, image_url, is_thumbnail) VALUES (?, ?, ?)";
 
@@ -1184,7 +1163,7 @@ public class SoftwareDao {
             String fileUrl,
             String releaseNote,
             long fileSize
-    ) throws Exception {
+    ) throws SQLException {
 
         String sql = "INSERT INTO Software_Version(software_id, version_name, file_url, release_note, file_size) "
                 + "VALUES (?, ?, ?, ?, ?)";
@@ -1200,6 +1179,91 @@ public class SoftwareDao {
             ps.executeUpdate();
         }
     }
+
+    public void changeStatusSoftware(int vendorId, int softwareId,String status) throws SQLException {
+
+        String sql = "UPDATE Software\n"
+                + "SET status = ?\n"
+                + "WHERE software_id = ?\n"
+                + "AND vendor_id = ?;";
+
+        try (Connection conn = Db.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(3, vendorId);
+            ps.setInt(2, softwareId);
+            ps.setString(1, status);
+
+            ps.executeUpdate();
+        }
+    }
+
+    public Software getSoftwareById(int softwareId) throws SQLException {
+        String sql = """
+        SELECT s.software_id,
+               s.name,
+               s.short_description,
+               s.price,
+               s.created_at,
+               c.category_name,
+               u.full_name AS vendor_name,
+               sv.version_name AS version,
+               si.image_url
+        FROM Software s
+        LEFT JOIN Category c
+               ON s.category_id = c.category_id
+        LEFT JOIN Users u
+               ON s.vendor_id = u.user_id
+        LEFT JOIN Software_Version sv
+               ON sv.software_id = s.software_id
+              AND sv.is_active = 1
+        LEFT JOIN Software_Image si
+               ON s.software_id = si.software_id
+              AND si.is_thumbnail = 1
+        WHERE s.software_id = ?
+        LIMIT 1
+    """;
+
+        try (Connection conn = Db.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, softwareId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Software s = new Software();
+                    s.setSoftwareId(rs.getInt("software_id"));
+                    s.setName(rs.getString("name"));
+                    s.setShortDescription(rs.getString("short_description"));
+                    s.setPrice(rs.getDouble("price"));
+                    s.setCategoryName(rs.getString("category_name"));
+                    s.setVersion(rs.getString("version"));
+                    s.setImageUrl(rs.getString("image_url"));
+
+                    Timestamp ts = rs.getTimestamp("created_at");
+                    if (ts != null) {
+                        s.setCreatedAt(ts.toLocalDateTime());
+                    }
+
+                    return s;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    // update status trong pending reviews
+    public void updateSoftwareStatus(int softwareId, String status) throws SQLException {
+        String sql = "UPDATE Software SET status = ? WHERE software_id = ?";
+
+        try (Connection conn = Db.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, status);
+            ps.setInt(2, softwareId);
+            ps.executeUpdate();
+        }
+    }
+
+
+
 }
 
 

@@ -9,36 +9,33 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-@WebServlet(name = "AdminEmployeesServlet", urlPatterns = {"/admin/employees"})
-public class AdminEmployeesServlet extends DashboardServlet {
+@WebServlet(name = "AdminVendorsServlet", urlPatterns = {"/admin/vendors"})
+public class AdminVendorsServlet extends DashboardServlet {
     private final AdminService adminService = new AdminService();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String keyword = req.getParameter("keyword");
-        String role = req.getParameter("role");
         String status = req.getParameter("status");
 
-        AdminService.PageResult<?> pageResult = adminService.getEmployeesPage(
+        AdminService.PageResult<?> pageResult = adminService.getVendorsPage(
                 req.getParameter("page"),
                 10,
                 keyword,
-                role,
                 status
         );
 
-        req.setAttribute("employees", pageResult.getItems());
+        req.setAttribute("users", pageResult.getItems());
         req.setAttribute("currentPage", pageResult.getCurrentPage());
         req.setAttribute("totalPages", pageResult.getTotalPages());
         req.setAttribute("keyword", keyword);
-        req.setAttribute("role", role);
         req.setAttribute("status", status);
         super.doGet(req, resp);
     }
 
     @Override
     protected String getDashboardPath() {
-        return "/WEB-INF/views/admin/employees.jsp";
+        return "/WEB-INF/views/admin/vendors.jsp";
     }
 
     @Override

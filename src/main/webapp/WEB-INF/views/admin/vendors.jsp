@@ -6,7 +6,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Admin - Users</title>
+    <title>Admin - Vendors</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css">
     <style>
         :root {
@@ -117,30 +117,30 @@
 <body>
 
 <div class="layout">
-    <c:set var="activeMenu" value="users"/>
+    <c:set var="activeMenu" value="vendors"/>
     <jsp:include page="sidebar.jsp"/>
 
     <main class="main">
-        <h1 style="margin-top: 0;">Users Management</h1>
-        <p class="subtitle">Quản lý danh sách user (Customer / Vendor).</p>
+        <h1 style="margin-top: 0;">Vendors Management</h1>
+        <p class="subtitle">Quản lý danh sách vendor.</p>
 
         <div class="card" style="max-width: 100%;">
             <div style="display:flex; justify-content: space-between; align-items:center; gap: 16px;">
                 <div>
-                    <h2 style="margin:0; font-size: 18px; color: var(--dark-blue);">Danh sách Users</h2>
-                    <p style="margin:6px 0 0; color:#64748b; font-size: 13px;">Role: Customer / Vendor</p>
+                    <h2 style="margin:0; font-size: 18px; color: var(--dark-blue);">Danh sách Vendors</h2>
+                    <p style="margin:6px 0 0; color:#64748b; font-size: 13px;">Role: Vendor</p>
                 </div>
-                <a href="#add-user" style="padding: 10px 14px; border-radius: 10px; background: var(--accent); color: #fff; text-decoration:none; font-weight: 600;">+ Add User</a>
+                <a href="#add-user" style="padding: 10px 14px; border-radius: 10px; background: var(--accent); color: #fff; text-decoration:none; font-weight: 600;">+ Add Vendor</a>
             </div>
 
             <c:if test="${param.success == '1'}">
-                <div class="alert success">Tạo user thành công. Mật khẩu mặc định đã được gửi qua email.</div>
+                <div class="alert success">Tạo vendor thành công. Mật khẩu mặc định đã được gửi qua email.</div>
             </c:if>
             <c:if test="${param.success == 'updated'}">
-                <div class="alert success">Cập nhật user thành công.</div>
+                <div class="alert success">Cập nhật vendor thành công.</div>
             </c:if>
             <c:if test="${param.success == 'disabled'}">
-                <div class="alert success">Khóa tài khoản user thành công.</div>
+                <div class="alert success">Khóa tài khoản vendor thành công.</div>
             </c:if>
 
             <c:if test="${param.error == 'email_exists'}">
@@ -153,7 +153,7 @@
                 <div class="alert danger">User ID không hợp lệ.</div>
             </c:if>
             <c:if test="${param.error == 'invalid_role'}">
-                <div class="alert danger">Role không hợp lệ (chỉ Customer/Vendor).</div>
+                <div class="alert danger">Role không hợp lệ (chỉ Vendor).</div>
             </c:if>
             <c:if test="${param.error == 'invalid_status'}">
                 <div class="alert danger">Status không hợp lệ (ACTIVE/INACTIVE).</div>
@@ -161,6 +161,26 @@
             <c:if test="${param.error == 'db_error'}">
                 <div class="alert danger">Có lỗi database. Vui lòng thử lại.</div>
             </c:if>
+            <c:if test="${param.success == 'deleted'}">
+                <div class="alert success">Xóa vendor thành công.</div>
+            </c:if>
+
+            <form method="get" action="${pageContext.request.contextPath}/admin/vendors" style="margin-top:16px; display:grid; grid-template-columns: 2fr 1fr auto auto; gap:10px; align-items:end;">
+                <div>
+                    <label style="display:block; font-size:12px; color:#64748b; margin-bottom:6px;">Tìm kiếm</label>
+                    <input type="text" name="keyword" value="${keyword}" placeholder="Tên, email, số điện thoại..." style="width:100%; padding:10px 12px; border:1px solid #cbd5e1; border-radius:8px;" />
+                </div>
+                <div>
+                    <label style="display:block; font-size:12px; color:#64748b; margin-bottom:6px;">Status</label>
+                    <select name="status" style="width:100%; padding:10px 12px; border:1px solid #cbd5e1; border-radius:8px;">
+                        <option value="">Tất cả</option>
+                        <option value="ACTIVE" ${status == 'ACTIVE' ? 'selected' : ''}>ACTIVE</option>
+                        <option value="INACTIVE" ${status == 'INACTIVE' ? 'selected' : ''}>INACTIVE</option>
+                    </select>
+                </div>
+                <button type="submit" style="padding:10px 14px; border-radius:8px; border:none; background:#3b82f6; color:#fff; font-weight:600;">Lọc</button>
+                <a href="${pageContext.request.contextPath}/admin/vendors" style="padding:10px 14px; border-radius:8px; border:1px solid #cbd5e1; color:#334155; text-decoration:none; font-weight:600; text-align:center;">Reset</a>
+            </form>
 
             <table>
                 <thead>
@@ -184,9 +204,18 @@
                         <td><c:out value="${u.phone}"/></td>
                         <td><c:out value="${u.roleName}"/></td>
                         <td>
-                            <span style="padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 600; background: ${u.status == 'ACTIVE' ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)'}; color: ${u.status == 'ACTIVE' ? '#22c55e' : '#ef4444'};">
-                                <c:out value="${u.status}"/>
-                            </span>
+                            <c:choose>
+                                <c:when test="${u.status == 'ACTIVE'}">
+                                    <span style="padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 600; background: rgba(34, 197, 94, 0.2); color: #22c55e;">
+                                        <c:out value="${u.status}"/>
+                                    </span>
+                                </c:when>
+                                <c:otherwise>
+                                    <span style="padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 600; background: rgba(239, 68, 68, 0.2); color: #ef4444;">
+                                        <c:out value="${u.status}"/>
+                                    </span>
+                                </c:otherwise>
+                            </c:choose>
                         </td>
                         <td><fmt:formatDate value="${u.createdAt}" pattern="dd/MM/yyyy HH:mm"/></td>
                         <td>
@@ -198,6 +227,7 @@
                                     <c:if test="${u.status == 'INACTIVE'}">
                                         <a href="#enable-user-${u.userId}" style="color: #22c55e; text-decoration: none; font-size: 13px; font-weight: 600;">Enable</a>
                                     </c:if>
+                                    <a href="#delete-user-${u.userId}" style="color: #ef4444; text-decoration: none; font-size: 13px; font-weight: 700;">Delete</a>
                                 </div>
 
                             <!-- Modal Edit User -->
@@ -205,9 +235,9 @@
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h2>Edit User #<c:out value="${u.userId}"/></h2>
-                                        <a class="close-modal" href="${pageContext.request.contextPath}/admin/users">×</a>
+                                        <a class="close-modal" href="${pageContext.request.contextPath}/admin/vendors">×</a>
                                     </div>
-                                    <form method="post" action="${pageContext.request.contextPath}/admin/users/update">
+                                    <form method="post" action="${pageContext.request.contextPath}/admin/vendors/update">
                                         <input type="hidden" name="userId" value="${u.userId}" />
                                         <div class="field">
                                             <label>Full name</label>
@@ -220,8 +250,7 @@
                                         <div class="field">
                                             <label>Role</label>
                                             <select name="roleName" required style="width:100%; padding:12px; border-radius:12px; border:1px solid var(--border); background: rgba(0,0,0,0.22); color: var(--text);">
-                                                <option value="Customer" ${u.roleName == 'Customer' ? 'selected' : ''}>Customer</option>
-                                                <option value="Vendor" ${u.roleName == 'Vendor' ? 'selected' : ''}>Vendor</option>
+                                                <option value="Vendor" selected>Vendor</option>
                                             </select>
                                         </div>
                                         <div class="field">
@@ -233,7 +262,7 @@
                                         </div>
                                         <div class="actions">
                                             <button type="submit">Update</button>
-                                            <a class="small" href="${pageContext.request.contextPath}/admin/users">Cancel</a>
+                                            <a class="small" href="${pageContext.request.contextPath}/admin/vendors">Cancel</a>
                                         </div>
                                     </form>
                                 </div>
@@ -244,14 +273,14 @@
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h2>Khóa tài khoản</h2>
-                                        <a class="close-modal" href="${pageContext.request.contextPath}/admin/users">×</a>
+                                        <a class="close-modal" href="${pageContext.request.contextPath}/admin/vendors">×</a>
                                     </div>
                                     <p>Bạn có chắc chắn muốn khóa tài khoản của <strong><c:out value="${u.fullName}"/></strong>?</p>
-                                    <form method="post" action="${pageContext.request.contextPath}/admin/users/disable">
+                                    <form method="post" action="${pageContext.request.contextPath}/admin/vendors/disable">
                                         <input type="hidden" name="userId" value="${u.userId}" />
                                         <div class="actions">
                                             <button type="submit" style="background: var(--danger);">Xác nhận khóa</button>
-                                            <a class="small" href="${pageContext.request.contextPath}/admin/users">Hủy</a>
+                                            <a class="small" href="${pageContext.request.contextPath}/admin/vendors">Hủy</a>
                                         </div>
                                     </form>
                                 </div>
@@ -262,14 +291,32 @@
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h2>Mở khóa tài khoản</h2>
-                                        <a class="close-modal" href="${pageContext.request.contextPath}/admin/users">×</a>
+                                        <a class="close-modal" href="${pageContext.request.contextPath}/admin/vendors">×</a>
                                     </div>
                                     <p>Bạn có chắc chắn muốn mở khóa tài khoản của <strong><c:out value="${u.fullName}"/></strong>?</p>
-                                    <form method="post" action="${pageContext.request.contextPath}/admin/users/enable">
+                                    <form method="post" action="${pageContext.request.contextPath}/admin/vendors/enable">
                                         <input type="hidden" name="userId" value="${u.userId}" />
                                         <div class="actions">
                                             <button type="submit" style="background: #22c55e;">Xác nhận mở khóa</button>
-                                            <a class="small" href="${pageContext.request.contextPath}/admin/users">Hủy</a>
+                                            <a class="small" href="${pageContext.request.contextPath}/admin/vendors">Hủy</a>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <!-- Modal Confirm Delete -->
+                            <div id="delete-user-${u.userId}" class="modal">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h2>Xóa vendor</h2>
+                                        <a class="close-modal" href="${pageContext.request.contextPath}/admin/vendors">×</a>
+                                    </div>
+                                    <p>Bạn có chắc chắn muốn xóa vendor <strong><c:out value="${u.fullName}"/></strong>? Hành động này không thể hoàn tác.</p>
+                                    <form method="post" action="${pageContext.request.contextPath}/admin/vendors/delete">
+                                        <input type="hidden" name="userId" value="${u.userId}" />
+                                        <div class="actions">
+                                            <button type="submit" style="background: #ef4444;">Xác nhận xóa</button>
+                                            <a class="small" href="${pageContext.request.contextPath}/admin/vendors">Hủy</a>
                                         </div>
                                     </form>
                                 </div>
@@ -285,17 +332,46 @@
                 </c:if>
                 </tbody>
             </table>
+
+            <c:if test="${totalPages > 1}">
+                <div style="display:flex; justify-content:center; align-items:center; gap:8px; margin-top:16px; flex-wrap:wrap;">
+                    <c:if test="${currentPage > 1}">
+                        <a href="${pageContext.request.contextPath}/admin/vendors?page=${currentPage - 1}&keyword=${keyword}&status=${status}" style="padding:8px 12px; border:1px solid #cbd5e1; border-radius:8px; text-decoration:none; color:#334155;">Previous</a>
+                    </c:if>
+
+                    <c:forEach var="i" begin="1" end="${totalPages}">
+                        <c:choose>
+                            <c:when test="${i == currentPage}">
+                                <a href="${pageContext.request.contextPath}/admin/vendors?page=${i}&keyword=${keyword}&status=${status}"
+                                   style="padding:8px 12px; border-radius:8px; text-decoration:none; border:1px solid #3b82f6; background:#3b82f6; color:#fff; font-weight:600;">
+                                        ${i}
+                                </a>
+                            </c:when>
+                            <c:otherwise>
+                                <a href="${pageContext.request.contextPath}/admin/vendors?page=${i}&keyword=${keyword}&status=${status}"
+                                   style="padding:8px 12px; border-radius:8px; text-decoration:none; border:1px solid #cbd5e1; background:#fff; color:#334155; font-weight:500;">
+                                        ${i}
+                                </a>
+                            </c:otherwise>
+                        </c:choose>
+                    </c:forEach>
+
+                    <c:if test="${currentPage < totalPages}">
+                        <a href="${pageContext.request.contextPath}/admin/vendors?page=${currentPage + 1}&keyword=${keyword}&status=${status}" style="padding:8px 12px; border:1px solid #cbd5e1; border-radius:8px; text-decoration:none; color:#334155;">Next</a>
+                    </c:if>
+                </div>
+            </c:if>
         </div>
 
-        <!-- Modal Add User (CSS-only :target) -->
+        <!-- Modal Add Vendor (CSS-only :target) -->
         <div id="add-user" class="modal">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h2>Add User</h2>
-                    <a class="close-modal" href="${pageContext.request.contextPath}/admin/users">×</a>
+                    <h2>Add Vendor</h2>
+                    <a class="close-modal" href="${pageContext.request.contextPath}/admin/vendors">×</a>
                 </div>
 
-                <form method="post" action="${pageContext.request.contextPath}/admin/users/create">
+                <form method="post" action="${pageContext.request.contextPath}/admin/vendors/create">
                     <div class="field">
                         <label>Full name</label>
                         <input name="fullName" type="text" required maxlength="100" />
@@ -311,8 +387,7 @@
                     <div class="field">
                         <label>Role</label>
                         <select name="roleName" required style="width:100%; padding:12px; border-radius:12px; border:1px solid var(--border); background: rgba(0,0,0,0.22); color: var(--text);">
-                            <option value="Customer">Customer</option>
-                            <option value="Vendor">Vendor</option>
+                            <option value="Vendor" selected>Vendor</option>
                         </select>
                     </div>
 
@@ -320,7 +395,7 @@
 
                     <div class="actions">
                         <button type="submit">Create</button>
-                        <a class="small" href="${pageContext.request.contextPath}/admin/users">Cancel</a>
+                        <a class="small" href="${pageContext.request.contextPath}/admin/vendors">Cancel</a>
                     </div>
                 </form>
             </div>

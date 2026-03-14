@@ -36,8 +36,10 @@
 
                 <div class="fixed-layout-grid">
                     <div class="left-column" style="height: var(--sidebar-total-height);">
+
                         <div class="featured-banner"
                              style="height:100%; background-image: url('https://wallpapers.com/images/hd/call-of-duty-black-ops-cold-war-key-art-4k-gaming-wallpaper-7c64b6w3a2a6z8y5.jpg'); padding:0;">
+
                             <div
                                 style="background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); height:100%; width:100%; display:flex; flex-direction:column; justify-content:flex-end; padding:30px;">
                                 <span

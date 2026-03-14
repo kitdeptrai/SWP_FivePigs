@@ -4,6 +4,7 @@ import com.fivepigs.app.dao.AdminDao;
 import com.fivepigs.app.util.EmailService;
 
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -58,6 +59,59 @@ public class AdminService {
 
         adminDao.setUserStatus(userId, normalizedStatus);
         return null;
+    }
+
+    public String deleteUser(String userIdStr) throws SQLException {
+        if (isBlank(userIdStr)) {
+            return "missing_id";
+        }
+
+        int userId;
+        try {
+            userId = Integer.parseInt(userIdStr.trim());
+        } catch (NumberFormatException e) {
+            return "invalid_id";
+        }
+
+        adminDao.deleteUser(userId);
+        return null;
+    }
+
+    public PageResult<AdminDao.UserRow> getEmployeesPage(String pageParam, int pageSize, String keyword, String role, String status) {
+        return getEmployeesPage(parsePage(pageParam), pageSize, keyword, role, status);
+    }
+
+    public PageResult<AdminDao.UserRow> getEmployeesPage(int page, int pageSize, String keyword, String role, String status) {
+        int safePageSize = pageSize <= 0 ? 10 : pageSize;
+        String normalizedKeyword = normalizeKeyword(keyword);
+        String normalizedRole = normalizeRoleFilter(role);
+        String normalizedStatus = normalizeStatusFilter(status);
+
+        int totalItems = adminDao.countEmployees(normalizedKeyword, normalizedRole, normalizedStatus);
+        int totalPages = Math.max(1, (int) Math.ceil((double) totalItems / safePageSize));
+        int currentPage = Math.max(1, Math.min(page, totalPages));
+        int offset = (currentPage - 1) * safePageSize;
+
+        List<AdminDao.UserRow> items = adminDao.listEmployeesPaged(safePageSize, offset, normalizedKeyword, normalizedRole, normalizedStatus);
+        return new PageResult<>(items, currentPage, safePageSize, totalItems, totalPages);
+    }
+
+    public PageResult<AdminDao.UserRow> getVendorsPage(String pageParam, int pageSize, String keyword, String status) {
+        return getVendorsPage(parsePage(pageParam), pageSize, keyword, status);
+    }
+
+    public PageResult<AdminDao.UserRow> getVendorsPage(int page, int pageSize, String keyword, String status) {
+        int safePageSize = pageSize <= 0 ? 10 : pageSize;
+        String normalizedKeyword = normalizeKeyword(keyword);
+        String normalizedStatus = normalizeStatusFilter(status);
+
+        int totalItems = adminDao.countVendors(normalizedKeyword, normalizedStatus);
+        int totalPages = Math.max(1, (int) Math.ceil((double) totalItems / safePageSize));
+        int currentPage = Math.max(1, Math.min(page, totalPages));
+        int offset = (currentPage - 1) * safePageSize;
+
+        List<AdminDao.UserRow> items = adminDao.listVendorsPaged(safePageSize, offset, normalizedKeyword, normalizedStatus);
+        return new PageResult<>(items, currentPage, safePageSize, totalItems, totalPages);
     }
 
     private String createUserByRoleScope(String fullName,
@@ -151,8 +205,85 @@ public class AdminService {
         return allowedRoles.contains(roleName.toLowerCase());
     }
 
+    private int parsePage(String pageParam) {
+        if (isBlank(pageParam)) {
+            return 1;
+        }
+        try {
+            int page = Integer.parseInt(pageParam.trim());
+            return Math.max(page, 1);
+        } catch (NumberFormatException e) {
+            return 1;
+        }
+    }
+
+    private String normalizeKeyword(String keyword) {
+        if (isBlank(keyword)) {
+            return null;
+        }
+        return keyword.trim();
+    }
+
+    private String normalizeRoleFilter(String role) {
+        if (isBlank(role)) {
+            return null;
+        }
+        String value = role.trim().toLowerCase();
+        if (!value.equals("reviewer") && !value.equals("approval") && !value.equals("aproval")) {
+            return null;
+        }
+        return value;
+    }
+
+    private String normalizeStatusFilter(String status) {
+        if (isBlank(status)) {
+            return null;
+        }
+        String value = status.trim().toUpperCase();
+        if (!ACTIVE_STATUSES.contains(value)) {
+            return null;
+        }
+        return value;
+    }
+
     private boolean isBlank(String value) {
         return value == null || value.isBlank();
+    }
+
+    public static class PageResult<T> {
+        private final List<T> items;
+        private final int currentPage;
+        private final int pageSize;
+        private final int totalItems;
+        private final int totalPages;
+
+        public PageResult(List<T> items, int currentPage, int pageSize, int totalItems, int totalPages) {
+            this.items = items;
+            this.currentPage = currentPage;
+            this.pageSize = pageSize;
+            this.totalItems = totalItems;
+            this.totalPages = totalPages;
+        }
+
+        public List<T> getItems() {
+            return items;
+        }
+
+        public int getCurrentPage() {
+            return currentPage;
+        }
+
+        public int getPageSize() {
+            return pageSize;
+        }
+
+        public int getTotalItems() {
+            return totalItems;
+        }
+
+        public int getTotalPages() {
+            return totalPages;
+        }
     }
 }
 

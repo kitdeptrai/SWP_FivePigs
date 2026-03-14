@@ -107,7 +107,8 @@
                         <p class="settings-desc">Security and account-level store preferences.</p>
 
                         <div class="settings-card">
-                            <h4>Change Password</h4>
+                            <h4 style="padding-bottom: 10px">Change Password</h4>
+
                             <form method="post" action="${pageContext.request.contextPath}/settings">
                                 <input type="hidden" name="tab" value="store_settings">
                                 <div class="field-grid">

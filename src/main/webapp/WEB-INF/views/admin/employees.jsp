@@ -145,6 +145,34 @@
             <c:if test="${param.error == 'db_error'}">
                 <div class="alert danger">Không thể tạo nhân viên (lỗi database).</div>
             </c:if>
+            <c:if test="${param.success == 'deleted'}">
+                <div class="alert success">Xóa nhân viên thành công.</div>
+            </c:if>
+
+            <form method="get" action="${pageContext.request.contextPath}/admin/employees" style="margin-top:16px; display:grid; grid-template-columns: 2fr 1fr 1fr auto auto; gap:10px; align-items:end;">
+                <div>
+                    <label style="display:block; font-size:12px; color:#64748b; margin-bottom:6px;">Tìm kiếm</label>
+                    <input type="text" name="keyword" value="${keyword}" placeholder="Tên, email, số điện thoại..." style="width:100%; padding:10px 12px; border:1px solid #cbd5e1; border-radius:8px;" />
+                </div>
+                <div>
+                    <label style="display:block; font-size:12px; color:#64748b; margin-bottom:6px;">Role</label>
+                    <select name="role" style="width:100%; padding:10px 12px; border:1px solid #cbd5e1; border-radius:8px;">
+                        <option value="">Tất cả</option>
+                        <option value="reviewer" ${role == 'reviewer' ? 'selected' : ''}>reviewer</option>
+                        <option value="approval" ${role == 'approval' || role == 'aproval' ? 'selected' : ''}>approval</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="display:block; font-size:12px; color:#64748b; margin-bottom:6px;">Status</label>
+                    <select name="status" style="width:100%; padding:10px 12px; border:1px solid #cbd5e1; border-radius:8px;">
+                        <option value="">Tất cả</option>
+                        <option value="ACTIVE" ${status == 'ACTIVE' ? 'selected' : ''}>ACTIVE</option>
+                        <option value="INACTIVE" ${status == 'INACTIVE' ? 'selected' : ''}>INACTIVE</option>
+                    </select>
+                </div>
+                <button type="submit" style="padding:10px 14px; border-radius:8px; border:none; background:#3b82f6; color:#fff; font-weight:600;">Lọc</button>
+                <a href="${pageContext.request.contextPath}/admin/employees" style="padding:10px 14px; border-radius:8px; border:1px solid #cbd5e1; color:#334155; text-decoration:none; font-weight:600; text-align:center;">Reset</a>
+            </form>
 
             <table>
                 <thead>
@@ -182,6 +210,7 @@
                                     <c:if test="${e.status == 'INACTIVE'}">
                                         <a href="#enable-emp-${e.userId}" style="color: #22c55e; text-decoration: none; font-size: 13px; font-weight: 600;">Enable</a>
                                     </c:if>
+                                    <a href="#delete-emp-${e.userId}" style="color: #ef4444; text-decoration: none; font-size: 13px; font-weight: 700;">Delete</a>
                                 </div>
 
                                 <!-- Modal Edit Employee -->
@@ -258,6 +287,24 @@
                                         </form>
                                     </div>
                                 </div>
+
+                                <!-- Modal Confirm Delete -->
+                                <div id="delete-emp-${e.userId}" class="modal">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h2>Xóa nhân viên</h2>
+                                            <a class="close-modal" href="${pageContext.request.contextPath}/admin/employees">×</a>
+                                        </div>
+                                        <p>Bạn có chắc chắn muốn xóa nhân viên <strong><c:out value="${e.fullName}"/></strong>? Hành động này không thể hoàn tác.</p>
+                                        <form method="post" action="${pageContext.request.contextPath}/admin/employees/delete">
+                                            <input type="hidden" name="userId" value="${e.userId}" />
+                                            <div class="actions">
+                                                <button type="submit" style="background: #ef4444;">Xác nhận xóa</button>
+                                                <a class="small" href="${pageContext.request.contextPath}/admin/employees">Hủy</a>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
                             </td>
                         </tr>
                     </c:forEach>
@@ -268,6 +315,25 @@
                     </c:if>
                 </tbody>
             </table>
+
+            <c:if test="${totalPages > 1}">
+                <div style="display:flex; justify-content:center; align-items:center; gap:8px; margin-top:16px; flex-wrap:wrap;">
+                    <c:if test="${currentPage > 1}">
+                        <a href="${pageContext.request.contextPath}/admin/employees?page=${currentPage - 1}&keyword=${keyword}&role=${role}&status=${status}" style="padding:8px 12px; border:1px solid #cbd5e1; border-radius:8px; text-decoration:none; color:#334155;">Previous</a>
+                    </c:if>
+
+                    <c:forEach var="i" begin="1" end="${totalPages}">
+                        <a href="${pageContext.request.contextPath}/admin/employees?page=${i}&keyword=${keyword}&role=${role}&status=${status}"
+                           style="padding:8px 12px; border-radius:8px; text-decoration:none; border:1px solid #cbd5e1; background:${i == currentPage ? '#3b82f6' : '#fff'}; color:${i == currentPage ? '#fff' : '#334155'}; font-weight:${i == currentPage ? '600' : '500'};">
+                                ${i}
+                        </a>
+                    </c:forEach>
+
+                    <c:if test="${currentPage < totalPages}">
+                        <a href="${pageContext.request.contextPath}/admin/employees?page=${currentPage + 1}&keyword=${keyword}&role=${role}&status=${status}" style="padding:8px 12px; border:1px solid #cbd5e1; border-radius:8px; text-decoration:none; color:#334155;">Next</a>
+                    </c:if>
+                </div>
+            </c:if>
         </div>
 
         <!-- Modal Add Employee (CSS-only :target) -->
