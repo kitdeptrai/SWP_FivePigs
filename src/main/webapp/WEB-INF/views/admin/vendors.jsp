@@ -130,12 +130,8 @@
                     <h2 style="margin:0; font-size: 18px; color: var(--dark-blue);">Danh sách Vendors</h2>
                     <p style="margin:6px 0 0; color:#64748b; font-size: 13px;">Role: Vendor</p>
                 </div>
-                <a href="#add-user" style="padding: 10px 14px; border-radius: 10px; background: var(--accent); color: #fff; text-decoration:none; font-weight: 600;">+ Add Vendor</a>
             </div>
 
-            <c:if test="${param.success == '1'}">
-                <div class="alert success">Tạo vendor thành công. Mật khẩu mặc định đã được gửi qua email.</div>
-            </c:if>
             <c:if test="${param.success == 'updated'}">
                 <div class="alert success">Cập nhật vendor thành công.</div>
             </c:if>
@@ -340,44 +336,6 @@
                     </c:if>
                 </div>
             </c:if>
-        </div>
-
-        <!-- Modal Add Vendor (CSS-only :target) -->
-        <div id="add-user" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2>Add Vendor</h2>
-                    <a class="close-modal" href="${pageContext.request.contextPath}/admin/vendors">×</a>
-                </div>
-
-                <form method="post" action="${pageContext.request.contextPath}/admin/vendors/create">
-                    <div class="field">
-                        <label>Full name</label>
-                        <input name="fullName" type="text" required maxlength="100" />
-                    </div>
-                    <div class="field">
-                        <label>Email</label>
-                        <input name="email" type="email" required maxlength="100" />
-                    </div>
-                    <div class="field">
-                        <label>Phone (optional)</label>
-                        <input name="phone" type="text" maxlength="20" />
-                    </div>
-                    <div class="field">
-                        <label>Role</label>
-                        <select name="roleName" required style="width:100%; padding:12px; border-radius:12px; border:1px solid var(--border); background: rgba(0,0,0,0.22); color: var(--text);">
-                            <option value="Vendor" selected>Vendor</option>
-                        </select>
-                    </div>
-
-                    <div class="alert" style="margin-top: 14px;">Mật khẩu mặc định: <b>123456</b> (sẽ gửi qua email)</div>
-
-                    <div class="actions">
-                        <button type="submit">Create</button>
-                        <a class="small" href="${pageContext.request.contextPath}/admin/vendors">Cancel</a>
-                    </div>
-                </form>
-            </div>
         </div>
 
     </main>

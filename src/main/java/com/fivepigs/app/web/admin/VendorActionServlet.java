@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 @WebServlet({
-        "/admin/vendors/create",
         "/admin/vendors/update",
         "/admin/vendors/enable",
         "/admin/vendors/disable"
@@ -26,7 +25,6 @@ public class VendorActionServlet extends HttpServlet {
         String servletPath = req.getServletPath();
         try {
             switch (servletPath) {
-                case "/admin/vendors/create" -> handleCreate(req, resp);
                 case "/admin/vendors/update" -> handleUpdate(req, resp);
                 case "/admin/vendors/enable" -> handleStatus(req, resp, "ACTIVE", "enabled");
                 case "/admin/vendors/disable" -> handleStatus(req, resp, "INACTIVE", "disabled");
@@ -38,20 +36,6 @@ public class VendorActionServlet extends HttpServlet {
         }
     }
 
-    private void handleCreate(HttpServletRequest req, HttpServletResponse resp) throws IOException, SQLException {
-        String fullName = req.getParameter("fullName");
-        String email = req.getParameter("email");
-        String phone = req.getParameter("phone");
-        String roleName = req.getParameter("roleName");
-
-        String error = adminService.createUser(fullName, email, phone, roleName);
-        if (error != null) {
-            resp.sendRedirect(req.getContextPath() + "/admin/vendors?error=" + error);
-            return;
-        }
-        resp.sendRedirect(req.getContextPath() + "/admin/vendors?success=1");
-    }
-
     private void handleUpdate(HttpServletRequest req, HttpServletResponse resp) throws IOException, SQLException {
         String userIdStr = req.getParameter("userId");
         String fullName = req.getParameter("fullName");
@@ -59,7 +43,7 @@ public class VendorActionServlet extends HttpServlet {
         String status = req.getParameter("status");
         String roleName = req.getParameter("roleName");
 
-        String error = adminService.updateUser(userIdStr, fullName, phone, status, roleName);
+        String error = adminService.updateVendor(userIdStr, fullName, phone, status, roleName);
         if (error != null) {
             resp.sendRedirect(req.getContextPath() + "/admin/vendors?error=" + error);
             return;

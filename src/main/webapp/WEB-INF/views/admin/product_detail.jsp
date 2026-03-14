@@ -199,8 +199,6 @@
 
             <div style="margin-top:20px;" class="actions">
                 <a class="btn secondary" href="${pageContext.request.contextPath}/admin/products">Back</a>
-                <a class="btn primary" href="${pageContext.request.contextPath}/admin/products#edit-product-${product.softwareId}">Edit</a>
-                <a class="btn secondary" href="${pageContext.request.contextPath}/admin/products#toggle-product-${product.softwareId}">Enable/Disable</a>
             </div>
         </div>
 

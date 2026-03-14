@@ -6,7 +6,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -147,40 +146,6 @@ public class AdminDao {
         // fix typo phổ biến
         if (r.equalsIgnoreCase("aproval")) return "Approval";
         return r;
-    }
-
-    public int createUser(String fullName, String email, String phone, String roleName) throws SQLException {
-        String normalizedRoleName = normalizeRoleName(roleName);
-        Integer roleId = getRoleIdByName(normalizedRoleName);
-        if (roleId == null) {
-            // Fallback thử tìm chính xác roleName nếu normalize không ra
-            roleId = getRoleIdByName(roleName);
-        }
-        
-        if (roleId == null) {
-            throw new SQLException("Role không tồn tại: " + roleName);
-        }
-
-        String sql = "INSERT INTO users(full_name, email, password, role_id, phone, status) VALUES (?,?,?,?,?,?)";
-        try (Connection conn = Db.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-
-            ps.setString(1, fullName);
-            ps.setString(2, email);
-            ps.setString(3, "123456");
-            ps.setInt(4, roleId);
-            ps.setString(5, phone);
-            ps.setString(6, "ACTIVE");
-
-            ps.executeUpdate();
-
-            try (ResultSet keys = ps.getGeneratedKeys()) {
-                if (keys.next()) {
-                    return keys.getInt(1);
-                }
-            }
-        }
-        return 0;
     }
 
     public List<UserRow> listEmployees() {

@@ -26,7 +26,6 @@ public class EmployeeActionServlet extends HttpServlet {
         String servletPath = req.getServletPath();
         try {
             switch (servletPath) {
-                case "/admin/employees/create" -> handleCreate(req, resp);
                 case "/admin/employees/update" -> handleUpdate(req, resp);
                 case "/admin/employees/enable" -> handleStatus(req, resp, "ACTIVE", "enabled");
                 case "/admin/employees/disable" -> handleStatus(req, resp, "INACTIVE", "disabled");
@@ -38,19 +37,7 @@ public class EmployeeActionServlet extends HttpServlet {
         }
     }
 
-    private void handleCreate(HttpServletRequest req, HttpServletResponse resp) throws IOException, SQLException {
-        String fullName = req.getParameter("fullName");
-        String email = req.getParameter("email");
-        String phone = req.getParameter("phone");
-        String roleName = req.getParameter("roleName");
 
-        String error = adminService.createEmployee(fullName, email, phone, roleName);
-        if (error != null) {
-            resp.sendRedirect(req.getContextPath() + "/admin/employees?error=" + error);
-            return;
-        }
-        resp.sendRedirect(req.getContextPath() + "/admin/employees?success=1");
-    }
 
     private void handleUpdate(HttpServletRequest req, HttpServletResponse resp) throws IOException, SQLException {
         String userIdStr = req.getParameter("userId");
