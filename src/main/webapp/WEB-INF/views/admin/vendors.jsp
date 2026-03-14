@@ -161,9 +161,6 @@
             <c:if test="${param.error == 'db_error'}">
                 <div class="alert danger">Có lỗi database. Vui lòng thử lại.</div>
             </c:if>
-            <c:if test="${param.success == 'deleted'}">
-                <div class="alert success">Xóa vendor thành công.</div>
-            </c:if>
 
             <form method="get" action="${pageContext.request.contextPath}/admin/vendors" style="margin-top:16px; display:grid; grid-template-columns: 2fr 1fr auto auto; gap:10px; align-items:end;">
                 <div>
@@ -227,7 +224,6 @@
                                     <c:if test="${u.status == 'INACTIVE'}">
                                         <a href="#enable-user-${u.userId}" style="color: #22c55e; text-decoration: none; font-size: 13px; font-weight: 600;">Enable</a>
                                     </c:if>
-                                    <a href="#delete-user-${u.userId}" style="color: #ef4444; text-decoration: none; font-size: 13px; font-weight: 700;">Delete</a>
                                 </div>
 
                             <!-- Modal Edit User -->
@@ -304,23 +300,6 @@
                                 </div>
                             </div>
 
-                            <!-- Modal Confirm Delete -->
-                            <div id="delete-user-${u.userId}" class="modal">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h2>Xóa vendor</h2>
-                                        <a class="close-modal" href="${pageContext.request.contextPath}/admin/vendors">×</a>
-                                    </div>
-                                    <p>Bạn có chắc chắn muốn xóa vendor <strong><c:out value="${u.fullName}"/></strong>? Hành động này không thể hoàn tác.</p>
-                                    <form method="post" action="${pageContext.request.contextPath}/admin/vendors/delete">
-                                        <input type="hidden" name="userId" value="${u.userId}" />
-                                        <div class="actions">
-                                            <button type="submit" style="background: #ef4444;">Xác nhận xóa</button>
-                                            <a class="small" href="${pageContext.request.contextPath}/admin/vendors">Hủy</a>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
                         </td>
                     </tr>
                 </c:forEach>

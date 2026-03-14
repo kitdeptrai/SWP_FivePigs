@@ -145,9 +145,6 @@
             <c:if test="${param.error == 'db_error'}">
                 <div class="alert danger">Không thể tạo nhân viên (lỗi database).</div>
             </c:if>
-            <c:if test="${param.success == 'deleted'}">
-                <div class="alert success">Xóa nhân viên thành công.</div>
-            </c:if>
 
             <form method="get" action="${pageContext.request.contextPath}/admin/employees" style="margin-top:16px; display:grid; grid-template-columns: 2fr 1fr 1fr auto auto; gap:10px; align-items:end;">
                 <div>
@@ -210,7 +207,6 @@
                                     <c:if test="${e.status == 'INACTIVE'}">
                                         <a href="#enable-emp-${e.userId}" style="color: #22c55e; text-decoration: none; font-size: 13px; font-weight: 600;">Enable</a>
                                     </c:if>
-                                    <a href="#delete-emp-${e.userId}" style="color: #ef4444; text-decoration: none; font-size: 13px; font-weight: 700;">Delete</a>
                                 </div>
 
                                 <!-- Modal Edit Employee -->
@@ -288,23 +284,6 @@
                                     </div>
                                 </div>
 
-                                <!-- Modal Confirm Delete -->
-                                <div id="delete-emp-${e.userId}" class="modal">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h2>Xóa nhân viên</h2>
-                                            <a class="close-modal" href="${pageContext.request.contextPath}/admin/employees">×</a>
-                                        </div>
-                                        <p>Bạn có chắc chắn muốn xóa nhân viên <strong><c:out value="${e.fullName}"/></strong>? Hành động này không thể hoàn tác.</p>
-                                        <form method="post" action="${pageContext.request.contextPath}/admin/employees/delete">
-                                            <input type="hidden" name="userId" value="${e.userId}" />
-                                            <div class="actions">
-                                                <button type="submit" style="background: #ef4444;">Xác nhận xóa</button>
-                                                <a class="small" href="${pageContext.request.contextPath}/admin/employees">Hủy</a>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
                             </td>
                         </tr>
                     </c:forEach>

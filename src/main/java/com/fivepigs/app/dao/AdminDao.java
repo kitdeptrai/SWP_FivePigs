@@ -435,6 +435,169 @@ public class AdminDao {
         return rows;
     }
 
+    // ===== Products Management =====
+
+    public int countProducts(String keyword, String status) {
+        StringBuilder sql = new StringBuilder(
+                "SELECT COUNT(*) " +
+                "FROM software s " +
+                "LEFT JOIN users u ON s.vendor_id = u.user_id " +
+                "LEFT JOIN category c ON s.category_id = c.category_id " +
+                "WHERE 1=1"
+        );
+        List<Object> params = new ArrayList<>();
+
+        if (status != null) {
+            sql.append(" AND s.status = ?");
+            params.add(status);
+        }
+        if (keyword != null) {
+            sql.append(" AND (LOWER(s.name) LIKE ? OR LOWER(COALESCE(u.full_name, '')) LIKE ? OR LOWER(COALESCE(c.category_name, '')) LIKE ?)");
+            String kw = "%" + keyword.toLowerCase() + "%";
+            params.add(kw);
+            params.add(kw);
+            params.add(kw);
+        }
+
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? rs.getInt(1) : 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    public List<AdminProductRow> listProductsPaged(int limit, int offset, String keyword, String status) {
+        StringBuilder sql = new StringBuilder(
+                "SELECT s.software_id, s.name, s.price, s.is_free, s.status, s.download_count, s.avg_rating, s.created_at, " +
+                "u.full_name AS vendor_name, c.category_name " +
+                "FROM software s " +
+                "LEFT JOIN users u ON s.vendor_id = u.user_id " +
+                "LEFT JOIN category c ON s.category_id = c.category_id " +
+                "WHERE 1=1"
+        );
+        List<Object> params = new ArrayList<>();
+
+        if (status != null) {
+            sql.append(" AND s.status = ?");
+            params.add(status);
+        }
+        if (keyword != null) {
+            sql.append(" AND (LOWER(s.name) LIKE ? OR LOWER(COALESCE(u.full_name, '')) LIKE ? OR LOWER(COALESCE(c.category_name, '')) LIKE ?)");
+            String kw = "%" + keyword.toLowerCase() + "%";
+            params.add(kw);
+            params.add(kw);
+            params.add(kw);
+        }
+
+        sql.append(" ORDER BY s.created_at DESC LIMIT ? OFFSET ?");
+        params.add(limit);
+        params.add(offset);
+
+        List<AdminProductRow> rows = new ArrayList<>();
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    rows.add(new AdminProductRow(
+                            rs.getInt("software_id"),
+                            rs.getString("name"),
+                            rs.getString("vendor_name"),
+                            rs.getString("category_name"),
+                            rs.getDouble("price"),
+                            rs.getInt("is_free"),
+                            rs.getString("status"),
+                            rs.getInt("download_count"),
+                            rs.getDouble("avg_rating"),
+                            rs.getTimestamp("created_at")
+                    ));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return rows;
+    }
+
+    public AdminProductDetailRow getProductDetail(int softwareId) {
+        String sql = "SELECT s.software_id, s.name, s.short_description, s.price, s.is_free, s.status, s.download_count, s.avg_rating, s.created_at, " +
+                "u.full_name AS vendor_name, c.category_name, sv.version_name, sd.description, sd.system_requirement, si.image_url " +
+                "FROM software s " +
+                "LEFT JOIN users u ON s.vendor_id = u.user_id " +
+                "LEFT JOIN category c ON s.category_id = c.category_id " +
+                "LEFT JOIN software_version sv ON sv.software_id = s.software_id AND sv.is_active = 1 " +
+                "LEFT JOIN software_detail sd ON sd.software_id = s.software_id " +
+                "LEFT JOIN software_image si ON si.software_id = s.software_id AND si.is_thumbnail = 1 " +
+                "WHERE s.software_id = ?";
+
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, softwareId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new AdminProductDetailRow(
+                            rs.getInt("software_id"),
+                            rs.getString("name"),
+                            rs.getString("short_description"),
+                            rs.getString("vendor_name"),
+                            rs.getString("category_name"),
+                            rs.getString("version_name"),
+                            rs.getString("description"),
+                            rs.getString("system_requirement"),
+                            rs.getDouble("price"),
+                            rs.getInt("is_free"),
+                            rs.getString("status"),
+                            rs.getInt("download_count"),
+                            rs.getDouble("avg_rating"),
+                            rs.getTimestamp("created_at"),
+                            rs.getString("image_url")
+                    );
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public void updateProductStatus(int softwareId, String status) throws SQLException {
+        String sql = "UPDATE software SET status = ? WHERE software_id = ?";
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, status);
+            ps.setInt(2, softwareId);
+            ps.executeUpdate();
+        }
+    }
+
+    public void updateProduct(int softwareId, String name, String shortDescription, Integer categoryId, double price, int isFree, String status) throws SQLException {
+        String sql = "UPDATE software SET name = ?, short_description = ?, category_id = ?, price = ?, is_free = ?, status = ? WHERE software_id = ?";
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, name);
+            ps.setString(2, shortDescription);
+            if (categoryId == null) {
+                ps.setNull(3, java.sql.Types.INTEGER);
+            } else {
+                ps.setInt(3, categoryId);
+            }
+            ps.setDouble(4, price);
+            ps.setInt(5, isFree);
+            ps.setString(6, status);
+            ps.setInt(7, softwareId);
+            ps.executeUpdate();
+        }
+    }
+
     // ===== CRUD =====
 
     public UserRow findUserById(int userId) {
@@ -469,15 +632,6 @@ public class AdminDao {
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, status);
             ps.setInt(2, userId);
-            ps.executeUpdate();
-        }
-    }
-
-    public void deleteUser(int userId) throws SQLException {
-        String sql = "DELETE FROM users WHERE user_id = ?";
-        try (Connection conn = Db.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, userId);
             ps.executeUpdate();
         }
     }
@@ -545,6 +699,168 @@ public class AdminDao {
 
         public double getTotalRevenue() {
             return totalRevenue;
+        }
+    }
+
+    public static class AdminProductRow {
+        private final int softwareId;
+        private final String name;
+        private final String vendorName;
+        private final String categoryName;
+        private final double price;
+        private final int isFree;
+        private final String status;
+        private final int downloadCount;
+        private final double avgRating;
+        private final java.sql.Timestamp createdAt;
+
+        public AdminProductRow(int softwareId, String name, String vendorName, String categoryName, double price, int isFree, String status, int downloadCount, double avgRating, java.sql.Timestamp createdAt) {
+            this.softwareId = softwareId;
+            this.name = name;
+            this.vendorName = vendorName;
+            this.categoryName = categoryName;
+            this.price = price;
+            this.isFree = isFree;
+            this.status = status;
+            this.downloadCount = downloadCount;
+            this.avgRating = avgRating;
+            this.createdAt = createdAt;
+        }
+
+        public int getSoftwareId() {
+            return softwareId;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getVendorName() {
+            return vendorName;
+        }
+
+        public String getCategoryName() {
+            return categoryName;
+        }
+
+        public double getPrice() {
+            return price;
+        }
+
+        public int getIsFree() {
+            return isFree;
+        }
+
+        public String getStatus() {
+            return status;
+        }
+
+        public int getDownloadCount() {
+            return downloadCount;
+        }
+
+        public double getAvgRating() {
+            return avgRating;
+        }
+
+        public java.sql.Timestamp getCreatedAt() {
+            return createdAt;
+        }
+    }
+
+    public static class AdminProductDetailRow {
+        private final int softwareId;
+        private final String name;
+        private final String shortDescription;
+        private final String vendorName;
+        private final String categoryName;
+        private final String versionName;
+        private final String description;
+        private final String systemRequirement;
+        private final double price;
+        private final int isFree;
+        private final String status;
+        private final int downloadCount;
+        private final double avgRating;
+        private final java.sql.Timestamp createdAt;
+        private final String imageUrl;
+
+        public AdminProductDetailRow(int softwareId, String name, String shortDescription, String vendorName, String categoryName, String versionName, String description, String systemRequirement, double price, int isFree, String status, int downloadCount, double avgRating, java.sql.Timestamp createdAt, String imageUrl) {
+            this.softwareId = softwareId;
+            this.name = name;
+            this.shortDescription = shortDescription;
+            this.vendorName = vendorName;
+            this.categoryName = categoryName;
+            this.versionName = versionName;
+            this.description = description;
+            this.systemRequirement = systemRequirement;
+            this.price = price;
+            this.isFree = isFree;
+            this.status = status;
+            this.downloadCount = downloadCount;
+            this.avgRating = avgRating;
+            this.createdAt = createdAt;
+            this.imageUrl = imageUrl;
+        }
+
+        public int getSoftwareId() {
+            return softwareId;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getShortDescription() {
+            return shortDescription;
+        }
+
+        public String getVendorName() {
+            return vendorName;
+        }
+
+        public String getCategoryName() {
+            return categoryName;
+        }
+
+        public String getVersionName() {
+            return versionName;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public String getSystemRequirement() {
+            return systemRequirement;
+        }
+
+        public double getPrice() {
+            return price;
+        }
+
+        public int getIsFree() {
+            return isFree;
+        }
+
+        public String getStatus() {
+            return status;
+        }
+
+        public int getDownloadCount() {
+            return downloadCount;
+        }
+
+        public double getAvgRating() {
+            return avgRating;
+        }
+
+        public java.sql.Timestamp getCreatedAt() {
+            return createdAt;
+        }
+
+        public String getImageUrl() {
+            return imageUrl;
         }
     }
 

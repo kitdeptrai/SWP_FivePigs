@@ -14,8 +14,7 @@ import java.sql.SQLException;
         "/admin/vendors/create",
         "/admin/vendors/update",
         "/admin/vendors/enable",
-        "/admin/vendors/disable",
-        "/admin/vendors/delete"
+        "/admin/vendors/disable"
 })
 public class VendorActionServlet extends HttpServlet {
     private final AdminService adminService = new AdminService();
@@ -31,7 +30,6 @@ public class VendorActionServlet extends HttpServlet {
                 case "/admin/vendors/update" -> handleUpdate(req, resp);
                 case "/admin/vendors/enable" -> handleStatus(req, resp, "ACTIVE", "enabled");
                 case "/admin/vendors/disable" -> handleStatus(req, resp, "INACTIVE", "disabled");
-                case "/admin/vendors/delete" -> handleDelete(req, resp);
                 default -> resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
         } catch (SQLException e) {
@@ -78,16 +76,5 @@ public class VendorActionServlet extends HttpServlet {
             return;
         }
         resp.sendRedirect(req.getContextPath() + "/admin/vendors?success=" + success);
-    }
-
-    private void handleDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException, SQLException {
-        String userIdStr = req.getParameter("userId");
-
-        String error = adminService.deleteUser(userIdStr);
-        if (error != null) {
-            resp.sendRedirect(req.getContextPath() + "/admin/vendors?error=" + error);
-            return;
-        }
-        resp.sendRedirect(req.getContextPath() + "/admin/vendors?success=deleted");
     }
 }

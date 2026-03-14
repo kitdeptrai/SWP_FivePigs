@@ -61,22 +61,6 @@ public class AdminService {
         return null;
     }
 
-    public String deleteUser(String userIdStr) throws SQLException {
-        if (isBlank(userIdStr)) {
-            return "missing_id";
-        }
-
-        int userId;
-        try {
-            userId = Integer.parseInt(userIdStr.trim());
-        } catch (NumberFormatException e) {
-            return "invalid_id";
-        }
-
-        adminDao.deleteUser(userId);
-        return null;
-    }
-
     public PageResult<AdminDao.UserRow> getEmployeesPage(String pageParam, int pageSize, String keyword, String role, String status) {
         return getEmployeesPage(parsePage(pageParam), pageSize, keyword, role, status);
     }
@@ -112,6 +96,64 @@ public class AdminService {
 
         List<AdminDao.UserRow> items = adminDao.listVendorsPaged(safePageSize, offset, normalizedKeyword, normalizedStatus);
         return new PageResult<>(items, currentPage, safePageSize, totalItems, totalPages);
+    }
+
+    public PageResult<AdminDao.AdminProductRow> getProductsPage(String pageParam, int pageSize, String keyword, String status) {
+        return getProductsPage(parsePage(pageParam), pageSize, keyword, status);
+    }
+
+    public PageResult<AdminDao.AdminProductRow> getProductsPage(int page, int pageSize, String keyword, String status) {
+        int safePageSize = pageSize <= 0 ? 10 : pageSize;
+        String normalizedKeyword = normalizeKeyword(keyword);
+        String normalizedStatus = normalizeProductStatusFilter(status);
+
+        int totalItems = adminDao.countProducts(normalizedKeyword, normalizedStatus);
+        int totalPages = Math.max(1, (int) Math.ceil((double) totalItems / safePageSize));
+        int currentPage = Math.max(1, Math.min(page, totalPages));
+        int offset = (currentPage - 1) * safePageSize;
+
+        List<AdminDao.AdminProductRow> items = adminDao.listProductsPaged(safePageSize, offset, normalizedKeyword, normalizedStatus);
+        return new PageResult<>(items, currentPage, safePageSize, totalItems, totalPages);
+    }
+
+    public AdminDao.AdminProductDetailRow getProductDetail(String softwareIdStr) {
+        Integer softwareId = parseId(softwareIdStr);
+        if (softwareId == null) {
+            return null;
+        }
+        return adminDao.getProductDetail(softwareId);
+    }
+
+    public String updateProductStatus(String softwareIdStr, String status) throws SQLException {
+        Integer softwareId = parseId(softwareIdStr);
+        if (softwareId == null) {
+            return "invalid_id";
+        }
+        if (isBlank(status)) {
+            return "invalid_status";
+        }
+        adminDao.updateProductStatus(softwareId, status.trim().toUpperCase());
+        return null;
+    }
+
+    public String updateProduct(String softwareIdStr, String name, String shortDescription, String categoryIdStr, String priceStr, String isFreeStr, String status) throws SQLException {
+        Integer softwareId = parseId(softwareIdStr);
+        if (softwareId == null || isBlank(name)) {
+            return "invalid_id";
+        }
+
+        Integer categoryId = parseOptionalId(categoryIdStr);
+        double price;
+        try {
+            price = Double.parseDouble(priceStr);
+        } catch (NumberFormatException e) {
+            return "invalid_price";
+        }
+        int isFree = "1".equals(isFreeStr) ? 1 : 0;
+        String normalizedStatus = isBlank(status) ? "ACTIVE" : status.trim().toUpperCase();
+
+        adminDao.updateProduct(softwareId, name.trim(), shortDescription, categoryId, price, isFree, normalizedStatus);
+        return null;
     }
 
     private String createUserByRoleScope(String fullName,
@@ -217,6 +259,24 @@ public class AdminService {
         }
     }
 
+    private Integer parseId(String value) {
+        if (isBlank(value)) {
+            return null;
+        }
+        try {
+            return Integer.parseInt(value.trim());
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    private Integer parseOptionalId(String value) {
+        if (isBlank(value)) {
+            return null;
+        }
+        return parseId(value);
+    }
+
     private String normalizeKeyword(String keyword) {
         if (isBlank(keyword)) {
             return null;
@@ -244,6 +304,13 @@ public class AdminService {
             return null;
         }
         return value;
+    }
+
+    private String normalizeProductStatusFilter(String status) {
+        if (isBlank(status)) {
+            return null;
+        }
+        return status.trim().toUpperCase();
     }
 
     private boolean isBlank(String value) {
