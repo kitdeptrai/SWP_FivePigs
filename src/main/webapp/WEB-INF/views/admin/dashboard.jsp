@@ -9,7 +9,7 @@
     <title>Admin Dashboard - FivePigs</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css">
     <style>
-        /* UI màu: Xám – Trắng – Dark Blue */
+        /* UI colors: Gray – White – Dark Blue */
         :root {
             --dark-blue: #1e293b;
             --sidebar-bg: #0f172a;

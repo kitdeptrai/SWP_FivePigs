@@ -162,7 +162,7 @@
                 <div>
                     <label style="display:block; font-size:12px; color:#64748b; margin-bottom:6px;">Status</label>
                     <select name="status" style="width:100%; padding:10px 12px; border:1px solid #cbd5e1; border-radius:8px;">
-                        <option value="">Tất cả</option>
+                        <option value="">All</option>
                         <option value="ACTIVE" ${status == 'ACTIVE' ? 'selected' : ''}>ACTIVE</option>
                         <option value="INACTIVE" ${status == 'INACTIVE' ? 'selected' : ''}>INACTIVE</option>
                     </select>
