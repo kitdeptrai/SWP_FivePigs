@@ -23,34 +23,62 @@ public class AppServlet extends HttpServlet {
             throws ServletException, IOException {
         request.setAttribute("activePage", "apps");
         SoftwareDao sdao = new SoftwareDao();
+        String selectedGenre = normalizeGenre(request.getParameter("genre"));
 
         try {
             List<Software> softwareList = sdao.getSoftwareByCategoryWithIcon("2");
             Map<String, List<Software>> sections = new LinkedHashMap<>();
+            List<String> genres = new ArrayList<>();
+            List<Software> genreResults = new ArrayList<>();
 
             try {
-                List<String> genres = sdao.getGenresByCategory(2); // category 2 = apps
-                for (String genre : genres) {
-                    List<Software> list = sdao.getSoftwareByCategoryAndGenre(2, genre);
-                    sections.put(genre, list);
+                genres = sdao.getGenresByCategory(2);
+                if (selectedGenre == null) {
+                    for (String genre : genres) {
+                        List<Software> list = sdao.getSoftwareByCategoryAndGenre(2, genre);
+                        sections.put(genre, list);
+                    }
+                } else {
+                    genreResults = sdao.getSoftwareByCategoryAndGenre(2, selectedGenre);
                 }
             } catch (SQLException ignored) {
-                sections.put("All Apps", softwareList);
                 request.setAttribute("appWarning", "Thieu bang genre/software_genre, dang hien thi danh sach app mac dinh.");
+                selectedGenre = null;
             }
 
-            if (sections.isEmpty()) {
+            if (selectedGenre == null && sections.isEmpty()) {
                 sections.put("All Apps", softwareList != null ? softwareList : new ArrayList<>());
             }
 
+            if (selectedGenre != null && genreResults.isEmpty()) {
+                request.setAttribute("appWarning", "Khong tim thay app thuoc genre '" + selectedGenre + "'. Dang hien thi ket qua rong.");
+            }
+
+            request.setAttribute("genres", genres);
+            request.setAttribute("selectedGenre", selectedGenre);
+            request.setAttribute("genreResults", genreResults);
             request.setAttribute("sections", sections);
             request.setAttribute("softwareToShow", softwareList);
         } catch (SQLException e) {
+            request.setAttribute("genres", new ArrayList<String>());
+            request.setAttribute("selectedGenre", selectedGenre);
+            request.setAttribute("genreResults", new ArrayList<Software>());
             request.setAttribute("sections", new LinkedHashMap<String, List<Software>>());
-            request.setAttribute("softwareToShow", new ArrayList<>());
+            request.setAttribute("softwareToShow", new ArrayList<Software>());
             request.setAttribute("appWarning", "Khong tai duoc du lieu app tu database.");
         }
 
         request.getRequestDispatcher("/WEB-INF/views/customer/app.jsp").forward(request, response);
+    }
+
+    private String normalizeGenre(String genre) {
+        if (genre == null) {
+            return null;
+        }
+        String trimmed = genre.trim();
+        if (trimmed.isEmpty() || "all".equalsIgnoreCase(trimmed)) {
+            return null;
+        }
+        return trimmed;
     }
 }

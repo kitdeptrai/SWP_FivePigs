@@ -19,18 +19,10 @@ import java.util.Map;
 @WebServlet(name="GameServlet", urlPatterns={"/game"})
 public class GameServlet extends HttpServlet {
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
@@ -43,70 +35,78 @@ public class GameServlet extends HttpServlet {
         }
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         request.setAttribute("activePage", "games");
         SoftwareDao sdao = new SoftwareDao();
+        String selectedGenre = normalizeGenre(request.getParameter("genre"));
 
         try {
             List<Software> softwareList = sdao.getSoftwareByCategoryWithIcon("3");
             Map<String, List<Software>> sections = new LinkedHashMap<>();
+            List<String> genres = new ArrayList<>();
+            List<Software> genreResults = new ArrayList<>();
 
             try {
-                List<String> genres = sdao.getGenresByCategory(3); // category 3 = games
-                for (String genre : genres) {
-                    List<Software> list = sdao.getSoftwareByCategoryAndGenre(3, genre);
-                    sections.put(genre, list);
+                genres = sdao.getGenresByCategory(3);
+                if (selectedGenre == null) {
+                    for (String genre : genres) {
+                        List<Software> list = sdao.getSoftwareByCategoryAndGenre(3, genre);
+                        sections.put(genre, list);
+                    }
+                } else {
+                    genreResults = sdao.getSoftwareByCategoryAndGenre(3, selectedGenre);
                 }
             } catch (SQLException ignored) {
-                sections.put("All Games", softwareList);
                 request.setAttribute("gameWarning", "Thieu bang genre/software_genre, dang hien thi danh sach game mac dinh.");
+                selectedGenre = null;
             }
 
-            if (sections.isEmpty()) {
+            if (selectedGenre == null && sections.isEmpty()) {
                 sections.put("All Games", softwareList != null ? softwareList : new ArrayList<>());
             }
 
+            if (selectedGenre != null && genreResults.isEmpty()) {
+                request.setAttribute("gameWarning", "Khong tim thay game thuoc genre '" + selectedGenre + "'. Dang hien thi ket qua rong.");
+            }
+
+            request.setAttribute("genres", genres);
+            request.setAttribute("selectedGenre", selectedGenre);
+            request.setAttribute("genreResults", genreResults);
             request.setAttribute("sections", sections);
             request.setAttribute("softwareToShow", softwareList);
         } catch (SQLException e) {
+            request.setAttribute("genres", new ArrayList<String>());
+            request.setAttribute("selectedGenre", selectedGenre);
+            request.setAttribute("genreResults", new ArrayList<Software>());
             request.setAttribute("sections", new LinkedHashMap<String, List<Software>>());
-            request.setAttribute("softwareToShow", new ArrayList<>());
+            request.setAttribute("softwareToShow", new ArrayList<Software>());
             request.setAttribute("gameWarning", "Khong tai duoc du lieu game tu database.");
         }
 
         request.getRequestDispatcher("/WEB-INF/views/customer/game.jsp").forward(request, response);
     }
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
     }
 
-    /**
-     * Returns a short description of the servlet.
-     * @return a String containing servlet description
-     */
+    private String normalizeGenre(String genre) {
+        if (genre == null) {
+            return null;
+        }
+        String trimmed = genre.trim();
+        if (trimmed.isEmpty() || "all".equalsIgnoreCase(trimmed)) {
+            return null;
+        }
+        return trimmed;
+    }
+
     @Override
     public String getServletInfo() {
         return "Short description";
-    }// </editor-fold>
-
+    }
 }

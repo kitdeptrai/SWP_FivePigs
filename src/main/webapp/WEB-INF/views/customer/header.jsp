@@ -3,6 +3,15 @@
 <%@ page import="com.fivepigs.app.model.User" %>
 <%
     User currentUser = (User) session.getAttribute("user");
+    String avatarSrc = null;
+    if (currentUser != null) {
+        String avatar = currentUser.getAvatar();
+        if (avatar != null && !avatar.isBlank()) {
+            avatarSrc = request.getContextPath() + "/assets/" + avatar;
+        } else {
+            avatarSrc = "https://ui-avatars.com/api/?name=" + currentUser.getFullName() + "&background=6c5ce7&color=fff";
+        }
+    }
 %>
 
 <div class="header">
@@ -60,7 +69,7 @@
             <div class="user-profile-container" onclick="toggleUserDropdown()">
                 <div class="user-info">
                     <div class="avatar">
-                        <img src="https://ui-avatars.com/api/?name=<%= currentUser.getFullName() %>&background=6c5ce7&color=fff" alt="User">
+                        <img src="<%= avatarSrc %>" alt="User">
                     </div>
                     <span class="user-name"><%= currentUser.getFullName() %></span>
                     <i class="fa-solid fa-caret-down" style="font-size: 12px; color: #636e72;"></i>
@@ -70,7 +79,7 @@
                     <div class="ms-account-header">
                         <div class="ms-account-row">
                             <div class="avatar ms-account-avatar">
-                                <img src="https://ui-avatars.com/api/?name=<%= currentUser.getFullName() %>&background=6c5ce7&color=fff" alt="User">
+                                <img src="<%= avatarSrc %>" alt="User">
                             </div>
                             <div class="ms-account-meta">
                                 <div class="ms-account-name"><%= currentUser.getFullName() %></div>
@@ -81,11 +90,8 @@
                     </div>
 
                     <a href="${pageContext.request.contextPath}/profile" class="dropdown-item"><i class="fa-regular fa-user"></i> My Profile</a>
-                    <a href="${pageContext.request.contextPath}/settings?tab=payment_methods" class="dropdown-item"><i class="fa-regular fa-credit-card"></i> Payment methods</a>
                     <a href="${pageContext.request.contextPath}/settings?tab=redeem_code" class="dropdown-item"><i class="fa-solid fa-gift"></i> Redeem code or gift cards</a>
-                    <a href="${pageContext.request.contextPath}/settings?tab=payment_help" class="dropdown-item"><i class="fa-regular fa-circle-question"></i> Help with payment and refunds</a>
                     <div class="divider"></div>
-                    <a href="${pageContext.request.contextPath}/settings?tab=devices" class="dropdown-item"><i class="fa-solid fa-laptop"></i> Manage account and devices</a>
                     <a href="${pageContext.request.contextPath}/settings?tab=feedback" class="dropdown-item"><i class="fa-regular fa-message"></i> Send feedback</a>
                     <a href="${pageContext.request.contextPath}/settings?tab=store_settings" class="dropdown-item"><i class="fa-solid fa-gear"></i> Store settings</a>
                 </div>
@@ -93,3 +99,4 @@
         <% } %>
     </div>
 </div>
+

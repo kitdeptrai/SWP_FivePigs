@@ -1,6 +1,7 @@
 package com.fivepigs.app.web.customer;
 
 import com.fivepigs.app.dao.CartDao;
+import com.fivepigs.app.dao.NotificationDao;
 import com.fivepigs.app.model.Software;
 import com.fivepigs.app.model.User;
 import jakarta.servlet.ServletException;
@@ -18,6 +19,7 @@ import java.util.List;
 public class CartServlet extends HttpServlet {
 
     private final CartDao cartDao = new CartDao();
+    private final NotificationDao notificationDao = new NotificationDao();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -88,6 +90,19 @@ public class CartServlet extends HttpServlet {
                 }
 
                 double total = cartDao.getCartTotal(userId);
+                if (total <= 0) {
+                    int count = cartDao.checkout(userId);
+                    if (count > 0) {
+                        notificationDao.insertNotification(
+                                userId,
+                                "Purchase completed",
+                                count + " free item(s) have been added to your Library."
+                        );
+                    }
+                    response.sendRedirect(request.getContextPath() + "/library?msg=checkout_success");
+                    return;
+                }
+
                 session.setAttribute("checkout_total", total);
                 session.setAttribute("checkout_pending_user_id", userId);
                 response.sendRedirect(request.getContextPath() + "/create-payment");
