@@ -15,11 +15,21 @@ public class AdminDao {
     // ===== Dashboard =====
 
     public double getTotalRevenue() {
-        String sql = "SELECT COALESCE(SUM(total_amount), 0) FROM orders WHERE payment_status_id = 1";
+        String sql = "SELECT " +
+                "COALESCE((SELECT COUNT(*) * 5.0 " +
+                "          FROM users u " +
+                "          JOIN role r ON u.role_id = r.role_id " +
+                "          WHERE LOWER(r.role_name) = 'vendor'), 0) " +
+                "+ " +
+                "COALESCE((SELECT SUM(od.price * 0.10) " +
+                "          FROM order_detail od " +
+                "          JOIN orders o ON o.order_id = od.order_id " +
+                "          JOIN payment_status ps ON o.payment_status_id = ps.payment_status_id " +
+                "          WHERE UPPER(ps.status_name) = 'PAID'), 0) AS total_revenue";
         try (Connection conn = Db.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
-            return rs.next() ? rs.getDouble(1) : 0;
+            return rs.next() ? rs.getDouble("total_revenue") : 0;
         } catch (SQLException e) {
             e.printStackTrace();
             return 0;
@@ -40,6 +50,30 @@ public class AdminDao {
 
     public int getTotalUsers() {
         String sql = "SELECT COUNT(*) FROM users";
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            return rs.next() ? rs.getInt(1) : 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    public int getNewUsersToday() {
+        String sql = "SELECT COUNT(*) FROM users WHERE DATE(created_at) = CURDATE()";
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            return rs.next() ? rs.getInt(1) : 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    public int getTotalDownloads() {
+        String sql = "SELECT COALESCE(SUM(download_count), 0) FROM software";
         try (Connection conn = Db.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -100,6 +134,36 @@ public class AdminDao {
                         rs.getInt("purchase_count"),
                         rs.getDouble("total_revenue")
                 ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return rows;
+    }
+
+    public List<ActivityRow> getRecentActivities(int limit) {
+        String sql = "SELECT u.full_name AS user_name, r.reason, r.created_at " +
+                "FROM report r " +
+                "JOIN users u ON r.reporter_id = u.user_id " +
+                "ORDER BY r.created_at DESC " +
+                "LIMIT ?";
+        List<ActivityRow> rows = new ArrayList<>();
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, limit);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    String reason = rs.getString("reason");
+                    String action = "submitted a report";
+                    if (reason != null && !reason.isBlank()) {
+                        action = "submitted a report: " + reason;
+                    }
+                    rows.add(new ActivityRow(
+                            rs.getString("user_name"),
+                            action,
+                            rs.getTimestamp("created_at")
+                    ));
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -785,10 +849,12 @@ public class AdminDao {
     public static class RevenueByMonthRow {
         private final int month;
         private final double revenue;
+        private int percent;
 
         public RevenueByMonthRow(int month, double revenue) {
             this.month = month;
             this.revenue = revenue;
+            this.percent = 0;
         }
 
         public int getMonth() {
@@ -797,6 +863,14 @@ public class AdminDao {
 
         public double getRevenue() {
             return revenue;
+        }
+
+        public int getPercent() {
+            return percent;
+        }
+
+        public void setPercent(int percent) {
+            this.percent = percent;
         }
     }
 
@@ -821,6 +895,30 @@ public class AdminDao {
 
         public double getTotalRevenue() {
             return totalRevenue;
+        }
+    }
+
+    public static class ActivityRow {
+        private final String user;
+        private final String action;
+        private final java.sql.Timestamp time;
+
+        public ActivityRow(String user, String action, java.sql.Timestamp time) {
+            this.user = user;
+            this.action = action;
+            this.time = time;
+        }
+
+        public String getUser() {
+            return user;
+        }
+
+        public String getAction() {
+            return action;
+        }
+
+        public java.sql.Timestamp getTime() {
+            return time;
         }
     }
 

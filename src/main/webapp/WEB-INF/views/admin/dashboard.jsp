@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<fmt:setLocale value="en_US" />
 
 <!DOCTYPE html>
 <html lang="en">
@@ -180,84 +181,110 @@
     <main class="main">
         <h1>Dashboard Overview</h1>
 
-        <!-- 1️⃣ System Overview Cards -->
+        <c:if test="${pendingReports > 0}">
+            <div class="alert">
+                ⚠️ You have <b>${pendingReports}</b> pending reports
+            </div>
+        </c:if>
+
         <div class="kpi-grid">
             <div class="kpi-card">
-                <div class="kpi-title">Total revenue (PAID)</div>
+                <div class="kpi-title">Total revenue</div>
                 <div class="kpi-value">
-                    <fmt:formatNumber value="${totalRevenue}" type="currency" currencySymbol="₫" maxFractionDigits="0"/>
+                    <fmt:formatNumber value="${totalRevenue}" type="currency" currencySymbol="$" maxFractionDigits="0"/>
                 </div>
+                <div class="kpi-trend up">↑ this month</div>
             </div>
+
             <div class="kpi-card">
-                <div class="kpi-title">Total apps</div>
+                <div class="kpi-title">Users</div>
+                <div class="kpi-value"><c:out value="${totalUsers}"/></div>
+                <div class="kpi-sub">+<c:out value="${newUsers}"/> today</div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-title">Apps</div>
                 <div class="kpi-value"><c:out value="${totalApps}"/></div>
             </div>
+
             <div class="kpi-card">
-                <div class="kpi-title">Total users</div>
-                <div class="kpi-value"><c:out value="${totalUsers}"/></div>
-            </div>
-            <div class="kpi-card">
-                <div class="kpi-title">Pending reports</div>
-                <div class="kpi-value" style="display: flex; justify-content: space-between; align-items: center;">
-                    <c:out value="${pendingReports}"/>
-                    <a href="${pageContext.request.contextPath}/admin/reports" style="font-size: 12px; color: var(--accent); text-decoration: none;">Details →</a>
-                </div>
+                <div class="kpi-title">Downloads</div>
+                <div class="kpi-value"><c:out value="${totalDownloads}"/></div>
             </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
-            <!-- 2️⃣ Monthly revenue -->
-            <div class="section-card">
-                <h3>Monthly revenue</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Month</th>
-                            <th class="text-right">Revenue</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <c:forEach var="row" items="${revenueByMonth}">
-                            <tr>
-                                <td>Month <c:out value="${row.month}"/></td>
-                                <td class="text-right">
-                                    <fmt:formatNumber value="${row.revenue}" type="currency" currencySymbol="₫" maxFractionDigits="0"/>
-                                </td>
-                            </tr>
-                        </c:forEach>
-                        <c:if test="${empty revenueByMonth}">
-                            <tr><td colspan="2" style="text-align: center; color: #94a3b8;">No data available</td></tr>
-                        </c:if>
-                    </tbody>
-                </table>
+        <div class="grid-2">
+            <div>
+                <div class="section-card">
+                    <h3>Monthly revenue</h3>
+
+                    <c:forEach var="row" items="${revenueByMonth}">
+                        <div class="bar-row">
+                            <span>Month ${row.month}</span>
+
+                            <div class="bar">
+                                <div class="bar-fill" style="width: ${row.percent}%"></div>
+                            </div>
+
+                            <span class="text-right">
+                                <fmt:formatNumber value="${row.revenue}" type="currency" currencySymbol="$" maxFractionDigits="0"/>
+                            </span>
+                        </div>
+                    </c:forEach>
+                    <c:if test="${empty revenueByMonth}">
+                        <div class="empty">No data available</div>
+                    </c:if>
+                </div>
             </div>
 
-            <!-- 3️⃣ Top 5 best-selling apps -->
-            <div class="section-card">
-                <h3>Top 5 best-selling apps</h3>
-                <table>
-                    <thead>
+            <div>
+                <div class="section-card">
+                    <h3>Top 5 Apps</h3>
+
+                    <table>
+                        <thead>
                         <tr>
-                            <th>App name</th>
-                            <th class="text-right">Purchases</th>
+                            <th>App</th>
+                            <th class="text-right">Sales</th>
                             <th class="text-right">Revenue</th>
                         </tr>
-                    </thead>
-                    <tbody>
+                        </thead>
+
+                        <tbody>
                         <c:forEach var="app" items="${topAppsBestSeller}">
                             <tr>
-                                <td style="font-weight: 500;"><c:out value="${app.appName}"/></td>
+                                <td><b><c:out value="${app.appName}"/></b></td>
                                 <td class="text-right"><c:out value="${app.purchaseCount}"/></td>
                                 <td class="text-right">
-                                    <fmt:formatNumber value="${app.totalRevenue}" type="currency" currencySymbol="₫" maxFractionDigits="0"/>
+                                    <fmt:formatNumber value="${app.totalRevenue}" type="currency" currencySymbol="$"/>
                                 </td>
                             </tr>
                         </c:forEach>
                         <c:if test="${empty topAppsBestSeller}">
-                            <tr><td colspan="3" style="text-align: center; color: #94a3b8;">No data available</td></tr>
+                            <tr><td colspan="3" class="empty">No data available</td></tr>
                         </c:if>
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="section-card">
+                    <h3>Recent Activities</h3>
+
+                    <c:forEach var="log" items="${recentActivities}">
+                        <div class="activity-item">
+                            <div class="dot"></div>
+
+                            <div>
+                                <b><c:out value="${log.user}"/></b> <c:out value="${log.action}"/>
+                                <div class="time"><fmt:formatDate value="${log.time}" pattern="dd/MM/yyyy HH:mm"/></div>
+                            </div>
+                        </div>
+                    </c:forEach>
+
+                    <c:if test="${empty recentActivities}">
+                        <div class="empty">No recent activity</div>
+                    </c:if>
+                </div>
             </div>
         </div>
 

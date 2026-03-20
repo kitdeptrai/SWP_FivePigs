@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<fmt:setLocale value="en_US" />
 
 <!DOCTYPE html>
 <html lang="en">
@@ -200,7 +201,7 @@
                                     Free
                                 </c:when>
                                 <c:otherwise>
-                                    <fmt:formatNumber value="${p.price}" type="currency" currencySymbol="₫"/>
+                                    <fmt:formatNumber value="${p.price}" type="currency" currencySymbol="$"/>
                                 </c:otherwise>
                             </c:choose>
                         </td>

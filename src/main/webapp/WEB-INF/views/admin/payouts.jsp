@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<fmt:setLocale value="en_US" />
 
 <!DOCTYPE html>
 <html lang="en">
@@ -253,7 +254,7 @@
                             <div><strong><c:out value="${p.vendorName}"/></strong></div>
                             <div style="color:#64748b;"><c:out value="${p.vendorEmail}"/></div>
                         </td>
-                        <td>$${p.amount}</td>
+                        <td><fmt:formatNumber value="${p.amount}" type="currency" currencySymbol="$" minFractionDigits="2" maxFractionDigits="2"/></td>
                         <td><c:out value="${p.paymentMethod}"/></td>
                         <td><c:out value="${p.paymentAccount}"/></td>
                         <td><fmt:formatDate value="${p.createdAt}" pattern="dd/MM/yyyy HH:mm"/></td>

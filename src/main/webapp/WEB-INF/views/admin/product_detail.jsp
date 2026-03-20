@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<fmt:setLocale value="en_US" />
 
 <!DOCTYPE html>
 <html lang="en">
@@ -210,7 +211,7 @@
                 <span>
                     <c:choose>
                         <c:when test="${product.isFree == 1}">Free</c:when>
-                        <c:otherwise><fmt:formatNumber value="${product.price}" type="currency" currencySymbol="₫"/></c:otherwise>
+                        <c:otherwise><fmt:formatNumber value="${product.price}" type="currency" currencySymbol="$"/></c:otherwise>
                     </c:choose>
                 </span>
             </div>

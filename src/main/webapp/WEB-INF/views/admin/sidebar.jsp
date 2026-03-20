@@ -1,7 +1,10 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
 <aside class="sidebar">
-    <h2>FivePigs Admin</h2>
+    <div style="display:flex; flex-direction:column; align-items:flex-start; gap:8px; padding: 0 12px; margin-bottom: 20px;">
+        <img src="${pageContext.request.contextPath}/assets/css/images/logo.png" alt="FivePigs Logo" style="width:72px; height:72px; object-fit:contain; border-radius:10px;" />
+        <h2 style="margin:0; font-size:24px;">FivePigs Admin</h2>
+    </div>
     <nav>
         <a href="${pageContext.request.contextPath}/admin/dashboard" class="menu-item ${activeMenu == 'dashboard' ? 'active' : ''}">
             <i class="fa-solid fa-gauge"></i>
