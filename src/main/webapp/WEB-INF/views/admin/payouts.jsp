@@ -271,7 +271,7 @@
                         <td>
                             <c:choose>
                                 <c:when test="${p.status == 'PENDING'}">
-                                    <form method="post" action="${pageContext.request.contextPath}/admin/payouts" style="margin:0;" onsubmit="this.querySelector('button[type=\'submit\']').disabled=true; this.querySelector('button[type=\'submit\']').innerText='Approving...';">
+                                    <form method="post" action="${pageContext.request.contextPath}/admin/payouts" style="margin:0;" onsubmit="if(!confirm('Are you sure you want to approve this payout request?')){return false;} this.querySelector('button[type=\'submit\']').disabled=true; this.querySelector('button[type=\'submit\']').innerText='Approving...';">
                                         <input type="hidden" name="payoutId" value="${p.payoutId}"/>
                                         <input type="hidden" name="approveToken" value="${approveToken}"/>
                                         <button type="submit" class="btn btn-inline">Approve</button>
