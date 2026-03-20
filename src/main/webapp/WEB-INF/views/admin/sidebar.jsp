@@ -20,6 +20,9 @@
         <a href="${pageContext.request.contextPath}/admin/orders" class="menu-item ${activeMenu == 'orders' ? 'active' : ''}">
             <span>Orders</span>
         </a>
+        <a href="${pageContext.request.contextPath}/admin/payouts" class="menu-item ${activeMenu == 'payouts' ? 'active' : ''}">
+            <span>Payouts</span>
+        </a>
         <a href="${pageContext.request.contextPath}/admin/reports" class="menu-item ${activeMenu == 'reports' ? 'active' : ''}">
             <span>Reports</span>
         </a>
