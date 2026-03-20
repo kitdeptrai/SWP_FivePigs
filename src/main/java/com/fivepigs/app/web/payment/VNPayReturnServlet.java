@@ -2,6 +2,7 @@ package com.fivepigs.app.web.payment;
 
 import com.fivepigs.app.dao.CartDao;
 import com.fivepigs.app.dao.NotificationDao;
+import com.fivepigs.app.dao.UserDao;
 import com.fivepigs.app.model.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -18,6 +19,7 @@ public class VNPayReturnServlet extends HttpServlet {
 
     private final CartDao cartDao = new CartDao();
     private final NotificationDao notificationDao = new NotificationDao();
+    private final UserDao userDao = new UserDao();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -37,8 +39,34 @@ public class VNPayReturnServlet extends HttpServlet {
                 && "00".equals(responseCode)
                 && "00".equals(transactionStatus);
 
+        boolean vendorApplyFlow = session != null && session.getAttribute("vendor_apply_pending_user_id") != null;
+
         if (success) {
             try {
+                if (vendorApplyFlow) {
+                    Integer vendorRoleId = userDao.getRoleIdByName("Vendor");
+                    if (vendorRoleId == null) {
+                        throw new ServletException("Role Vendor not found");
+                    }
+
+                    userDao.updateRoleByUserId(user.getUserId(), vendorRoleId);
+                    user.setRoleId(vendorRoleId);
+                    if (session != null) {
+                        session.setAttribute("user", user);
+                        session.setAttribute("roleName", "Vendor");
+                    }
+
+                    notificationDao.insertNotification(
+                            user.getUserId(),
+                            "Become Vendor successful",
+                            "Your account has been upgraded to Vendor."
+                    );
+
+                    response.sendRedirect(request.getContextPath() + "/vendor/dashboard");
+                    clearCheckoutSession(session);
+                    return;
+                }
+
                 int count = cartDao.checkout(user.getUserId());
                 if (count > 0) {
                     notificationDao.insertNotification(
@@ -72,6 +100,8 @@ public class VNPayReturnServlet extends HttpServlet {
         }
         session.removeAttribute("checkout_total");
         session.removeAttribute("checkout_pending_user_id");
+        session.removeAttribute("vendor_apply_total");
+        session.removeAttribute("vendor_apply_pending_user_id");
         session.removeAttribute("vnp_txn_ref");
     }
 }

@@ -127,13 +127,34 @@ CREATE TABLE Order_Detail (
 CREATE TABLE License (
     license_id INT AUTO_INCREMENT PRIMARY KEY,
     license_key VARCHAR(100) UNIQUE,
+
     software_id INT,
-    customer_id INT,
+
+    owner_id INT, -- người mua license (company/admin)
+    
+    max_users INT DEFAULT 1, -- giới hạn user
+    current_users INT DEFAULT 0, -- số user đang dùng
+
     purchase_date DATETIME,
     expire_date DATETIME,
     status VARCHAR(20),
+
     FOREIGN KEY (software_id) REFERENCES Software(software_id),
-    FOREIGN KEY (customer_id) REFERENCES Users(user_id)
+    FOREIGN KEY (owner_id) REFERENCES Users(user_id)
+);
+
+CREATE TABLE License_User (
+    license_user_id INT AUTO_INCREMENT PRIMARY KEY,
+    license_id INT,
+    user_id INT,
+
+    assigned_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    status VARCHAR(20) DEFAULT 'ACTIVE',
+
+    UNIQUE KEY uq_license_user (license_id, user_id),
+
+    FOREIGN KEY (license_id) REFERENCES License(license_id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE
 );
 
 -- 14. Software Review Process
@@ -197,13 +218,28 @@ CREATE TABLE Notification (
 -- 19. Vendor Payout
 CREATE TABLE Vendor_Payout (
     payout_id INT AUTO_INCREMENT PRIMARY KEY,
-    vendor_id INT,
-    amount DECIMAL(12,2),
-    period_start DATE,
-    period_end DATE,
-    status VARCHAR(20),
+    vendor_id INT NOT NULL,
+    amount DECIMAL(12,2) NOT NULL,
+    payment_method VARCHAR(50),       -- BANK / MOMO / PAYPAL
+    payment_account VARCHAR(255),     -- số TK hoặc email paypal
+    status VARCHAR(20) DEFAULT 'PENDING',
+    processed_at DATETIME,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (vendor_id) REFERENCES Users(user_id)
+);
+
+CREATE TABLE Vendor_Earning (
+    earning_id INT AUTO_INCREMENT PRIMARY KEY,
+    vendor_id INT NOT NULL,
+    software_id INT,
+    order_id INT,
+    amount DECIMAL(12,2), -- tiền vendor nhận được (sau fee)
+
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (vendor_id) REFERENCES Users(user_id),
+    FOREIGN KEY (software_id) REFERENCES Software(software_id),
+    FOREIGN KEY (order_id) REFERENCES Orders(order_id)
 );
 
 
@@ -312,4 +348,29 @@ CREATE TABLE Review_Guideline_Item (
 CREATE INDEX idx_guideline_category ON Review_Guideline(category);
 CREATE INDEX idx_guideline_title ON Review_Guideline(title);
 CREATE INDEX idx_item_guideline ON Review_Guideline_Item(guideline_id);
+
+
+-- ====     27.   Tảo bảng assignment cho phần My reviews======
+
+USE fivepigs;
+
+CREATE TABLE Reviewer_Assignment (
+    assignment_id INT AUTO_INCREMENT PRIMARY KEY,
+    software_id INT NOT NULL,
+    reviewer_id INT NOT NULL,
+
+    status VARCHAR(20) DEFAULT 'ASSIGNED',  -- ASSIGNED / IN_PROGRESS / COMPLETED / CANCELLED
+    assigned_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    due_at DATETIME NULL,
+    note LONGTEXT NULL,
+
+    UNIQUE KEY uq_assignment_active (software_id, reviewer_id, status),
+
+    FOREIGN KEY (software_id) REFERENCES Software(software_id) ON DELETE CASCADE,
+    FOREIGN KEY (reviewer_id) REFERENCES Users(user_id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_assignment_reviewer ON Reviewer_Assignment(reviewer_id, status, assigned_at);
+CREATE INDEX idx_assignment_software ON Reviewer_Assignment(software_id, status);
+
 

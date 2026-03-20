@@ -98,4 +98,14 @@ public class UserDao {
             ps.executeUpdate();
         }
     }
+
+    public void updateRoleByUserId(int userId, int roleId) throws SQLException {
+        String sql = "UPDATE Users SET role_id = ? WHERE user_id = ?";
+        try (Connection c = Db.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, roleId);
+            ps.setInt(2, userId);
+            ps.executeUpdate();
+        }
+    }
 }
