@@ -9,6 +9,7 @@ import java.util.Set;
 public class AdminService {
     private static final Set<String> EMPLOYEE_ROLES = Set.of("reviewer", "approval", "aproval");
     private static final Set<String> ACTIVE_STATUSES = Set.of("ACTIVE", "INACTIVE");
+    private static final Set<String> PAYOUT_STATUSES = Set.of("PENDING", "PAID");
 
     private final AdminDao adminDao;
 
@@ -84,6 +85,66 @@ public class AdminService {
 
     public PageResult<AdminDao.AdminProductRow> getProductsPage(String pageParam, int pageSize, String keyword, String status) {
         return getProductsPage(parsePage(pageParam), pageSize, keyword, status);
+    }
+
+    public PageResult<AdminDao.VendorPayoutRow> getVendorPayoutsPage(String pageParam,
+                                                                      int pageSize,
+                                                                      String status,
+                                                                      String keyword,
+                                                                      String fromDate,
+                                                                      String toDate,
+                                                                      String sortById) {
+        return getVendorPayoutsPage(parsePage(pageParam), pageSize, status, keyword, fromDate, toDate, sortById);
+    }
+
+    public PageResult<AdminDao.VendorPayoutRow> getVendorPayoutsPage(int page,
+                                                                      int pageSize,
+                                                                      String status,
+                                                                      String keyword,
+                                                                      String fromDate,
+                                                                      String toDate,
+                                                                      String sortById) {
+        int safePageSize = pageSize <= 0 ? 10 : pageSize;
+        String normalizedStatus = normalizePayoutStatusFilter(status);
+        String normalizedKeyword = normalizeKeyword(keyword);
+        java.sql.Date normalizedFromDate = parseSqlDate(fromDate);
+        java.sql.Date normalizedToDate = parseSqlDate(toDate);
+        if (normalizedFromDate != null && normalizedToDate != null && normalizedFromDate.after(normalizedToDate)) {
+            java.sql.Date tmp = normalizedFromDate;
+            normalizedFromDate = normalizedToDate;
+            normalizedToDate = tmp;
+        }
+        String normalizedSortById = normalizePayoutSort(sortById);
+
+        int totalItems = adminDao.countVendorPayouts(normalizedStatus, normalizedKeyword, normalizedFromDate, normalizedToDate);
+        int totalPages = Math.max(1, (int) Math.ceil((double) totalItems / safePageSize));
+        int currentPage = Math.max(1, Math.min(page, totalPages));
+        int offset = (currentPage - 1) * safePageSize;
+
+        List<AdminDao.VendorPayoutRow> items = adminDao.listVendorPayoutsPaged(
+                safePageSize,
+                offset,
+                normalizedStatus,
+                normalizedKeyword,
+                normalizedFromDate,
+                normalizedToDate,
+                normalizedSortById
+        );
+        return new PageResult<>(items, currentPage, safePageSize, totalItems, totalPages);
+    }
+
+    public String approveVendorPayout(String payoutIdStr, Integer adminUserId) throws SQLException {
+        Integer payoutId = parseId(payoutIdStr);
+        if (payoutId == null) {
+            return "invalid_id";
+        }
+
+        AdminDao.ApprovePayoutResult result = adminDao.approveVendorPayout(payoutId, adminUserId);
+        if (!result.isApproved()) {
+            return result.getErrorCode() == null ? "invalid_state" : result.getErrorCode();
+        }
+
+        return null;
     }
 
     public PageResult<AdminDao.AdminProductRow> getProductsPage(int page, int pageSize, String keyword, String status) {
@@ -244,6 +305,35 @@ public class AdminService {
             return null;
         }
         return status.trim().toUpperCase();
+    }
+
+    private String normalizePayoutStatusFilter(String status) {
+        if (isBlank(status)) {
+            return null;
+        }
+        String value = status.trim().toUpperCase();
+        if (!PAYOUT_STATUSES.contains(value)) {
+            return null;
+        }
+        return value;
+    }
+
+    private String normalizePayoutSort(String sortById) {
+        if ("asc".equalsIgnoreCase(sortById)) {
+            return "asc";
+        }
+        return "desc";
+    }
+
+    private java.sql.Date parseSqlDate(String value) {
+        if (isBlank(value)) {
+            return null;
+        }
+        try {
+            return java.sql.Date.valueOf(value.trim());
+        } catch (IllegalArgumentException ex) {
+            return null;
+        }
     }
 
     private boolean isBlank(String value) {

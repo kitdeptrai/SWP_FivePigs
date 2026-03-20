@@ -6,6 +6,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,11 +15,21 @@ public class AdminDao {
     // ===== Dashboard =====
 
     public double getTotalRevenue() {
-        String sql = "SELECT COALESCE(SUM(total_amount), 0) FROM orders WHERE payment_status_id = 1";
+        String sql = "SELECT " +
+                "COALESCE((SELECT COUNT(*) * 5.0 " +
+                "          FROM users u " +
+                "          JOIN role r ON u.role_id = r.role_id " +
+                "          WHERE LOWER(r.role_name) = 'vendor'), 0) " +
+                "+ " +
+                "COALESCE((SELECT SUM(od.price * 0.10) " +
+                "          FROM order_detail od " +
+                "          JOIN orders o ON o.order_id = od.order_id " +
+                "          JOIN payment_status ps ON o.payment_status_id = ps.payment_status_id " +
+                "          WHERE UPPER(ps.status_name) = 'PAID'), 0) AS total_revenue";
         try (Connection conn = Db.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
-            return rs.next() ? rs.getDouble(1) : 0;
+            return rs.next() ? rs.getDouble("total_revenue") : 0;
         } catch (SQLException e) {
             e.printStackTrace();
             return 0;
@@ -39,6 +50,30 @@ public class AdminDao {
 
     public int getTotalUsers() {
         String sql = "SELECT COUNT(*) FROM users";
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            return rs.next() ? rs.getInt(1) : 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    public int getNewUsersToday() {
+        String sql = "SELECT COUNT(*) FROM users WHERE DATE(created_at) = CURDATE()";
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            return rs.next() ? rs.getInt(1) : 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    public int getTotalDownloads() {
+        String sql = "SELECT COALESCE(SUM(download_count), 0) FROM software";
         try (Connection conn = Db.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -99,6 +134,36 @@ public class AdminDao {
                         rs.getInt("purchase_count"),
                         rs.getDouble("total_revenue")
                 ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return rows;
+    }
+
+    public List<ActivityRow> getRecentActivities(int limit) {
+        String sql = "SELECT u.full_name AS user_name, r.reason, r.created_at " +
+                "FROM report r " +
+                "JOIN users u ON r.reporter_id = u.user_id " +
+                "ORDER BY r.created_at DESC " +
+                "LIMIT ?";
+        List<ActivityRow> rows = new ArrayList<>();
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, limit);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    String reason = rs.getString("reason");
+                    String action = "submitted a report";
+                    if (reason != null && !reason.isBlank()) {
+                        action = "submitted a report: " + reason;
+                    }
+                    rows.add(new ActivityRow(
+                            rs.getString("user_name"),
+                            action,
+                            rs.getTimestamp("created_at")
+                    ));
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -563,6 +628,162 @@ public class AdminDao {
         }
     }
 
+    // ===== Payout Management =====
+
+    public int countVendorPayouts(String status, String keyword, java.sql.Date fromDate, java.sql.Date toDate) {
+        StringBuilder sql = new StringBuilder(
+                "SELECT COUNT(*) FROM vendor_payout vp JOIN users u ON vp.vendor_id = u.user_id WHERE 1=1"
+        );
+        List<Object> params = new ArrayList<>();
+
+        if (status != null) {
+            sql.append(" AND UPPER(vp.status) = ?");
+            params.add(status.toUpperCase());
+        }
+        if (keyword != null) {
+            sql.append(" AND (CAST(vp.payout_id AS CHAR) LIKE ? OR LOWER(u.full_name) LIKE ? OR LOWER(u.email) LIKE ?)");
+            String kw = "%" + keyword.toLowerCase() + "%";
+            params.add(kw);
+            params.add(kw);
+            params.add(kw);
+        }
+        if (fromDate != null) {
+            sql.append(" AND DATE(vp.created_at) >= ?");
+            params.add(fromDate);
+        }
+        if (toDate != null) {
+            sql.append(" AND DATE(vp.created_at) <= ?");
+            params.add(toDate);
+        }
+
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? rs.getInt(1) : 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    public List<VendorPayoutRow> listVendorPayoutsPaged(int limit, int offset, String status, String keyword, java.sql.Date fromDate, java.sql.Date toDate, String sortById) {
+        StringBuilder sql = new StringBuilder(
+                "SELECT vp.payout_id, vp.vendor_id, u.full_name AS vendor_name, u.email AS vendor_email, " +
+                "vp.amount, vp.payment_method, vp.payment_account, vp.status, vp.created_at, vp.processed_at " +
+                "FROM vendor_payout vp " +
+                "JOIN users u ON vp.vendor_id = u.user_id " +
+                "WHERE 1=1"
+        );
+        List<Object> params = new ArrayList<>();
+
+        if (status != null) {
+            sql.append(" AND UPPER(vp.status) = ?");
+            params.add(status.toUpperCase());
+        }
+        if (keyword != null) {
+            sql.append(" AND (CAST(vp.payout_id AS CHAR) LIKE ? OR LOWER(u.full_name) LIKE ? OR LOWER(u.email) LIKE ?)");
+            String kw = "%" + keyword.toLowerCase() + "%";
+            params.add(kw);
+            params.add(kw);
+            params.add(kw);
+        }
+        if (fromDate != null) {
+            sql.append(" AND DATE(vp.created_at) >= ?");
+            params.add(fromDate);
+        }
+        if (toDate != null) {
+            sql.append(" AND DATE(vp.created_at) <= ?");
+            params.add(toDate);
+        }
+
+        String safeSort = "asc".equalsIgnoreCase(sortById) ? "ASC" : "DESC";
+        sql.append(" ORDER BY vp.payout_id ").append(safeSort).append(" LIMIT ? OFFSET ?");
+        params.add(limit);
+        params.add(offset);
+
+        List<VendorPayoutRow> rows = new ArrayList<>();
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    rows.add(new VendorPayoutRow(
+                            rs.getInt("payout_id"),
+                            rs.getInt("vendor_id"),
+                            rs.getString("vendor_name"),
+                            rs.getString("vendor_email"),
+                            rs.getDouble("amount"),
+                            rs.getString("payment_method"),
+                            rs.getString("payment_account"),
+                            rs.getString("status"),
+                            rs.getTimestamp("created_at"),
+                            rs.getTimestamp("processed_at")
+                    ));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return rows;
+    }
+
+    public ApprovePayoutResult approveVendorPayout(int payoutId, Integer adminUserId) throws SQLException {
+        String selectSql = "SELECT UPPER(status) AS status FROM vendor_payout WHERE payout_id = ?";
+        String updateSql = "UPDATE vendor_payout SET status = 'PAID', processed_at = ? WHERE payout_id = ? AND UPPER(status) = 'PENDING'";
+
+        try (Connection conn = Db.getConnection()) {
+            conn.setAutoCommit(false);
+            try {
+                String currentStatus = null;
+                try (PreparedStatement selectPs = conn.prepareStatement(selectSql)) {
+                    selectPs.setInt(1, payoutId);
+                    try (ResultSet rs = selectPs.executeQuery()) {
+                        if (rs.next()) {
+                            currentStatus = rs.getString("status");
+                        }
+                    }
+                }
+
+                if (currentStatus == null) {
+                    conn.rollback();
+                    return new ApprovePayoutResult(false, "not_found", null);
+                }
+
+                if (!"PENDING".equalsIgnoreCase(currentStatus)) {
+                    conn.rollback();
+                    return new ApprovePayoutResult(false, "invalid_state", null);
+                }
+
+                Timestamp processedAt = new Timestamp(System.currentTimeMillis());
+                int updatedRows;
+                try (PreparedStatement updatePs = conn.prepareStatement(updateSql)) {
+                    updatePs.setTimestamp(1, processedAt);
+                    updatePs.setInt(2, payoutId);
+                    updatedRows = updatePs.executeUpdate();
+                }
+
+                if (updatedRows <= 0) {
+                    conn.rollback();
+                    return new ApprovePayoutResult(false, "invalid_state", null);
+                }
+
+                conn.commit();
+                return new ApprovePayoutResult(true, null, processedAt);
+            } catch (SQLException ex) {
+                conn.rollback();
+                throw ex;
+            } finally {
+                conn.setAutoCommit(true);
+            }
+        }
+    }
+
     // ===== CRUD =====
 
     public UserRow findUserById(int userId) {
@@ -628,10 +849,12 @@ public class AdminDao {
     public static class RevenueByMonthRow {
         private final int month;
         private final double revenue;
+        private int percent;
 
         public RevenueByMonthRow(int month, double revenue) {
             this.month = month;
             this.revenue = revenue;
+            this.percent = 0;
         }
 
         public int getMonth() {
@@ -640,6 +863,14 @@ public class AdminDao {
 
         public double getRevenue() {
             return revenue;
+        }
+
+        public int getPercent() {
+            return percent;
+        }
+
+        public void setPercent(int percent) {
+            this.percent = percent;
         }
     }
 
@@ -664,6 +895,30 @@ public class AdminDao {
 
         public double getTotalRevenue() {
             return totalRevenue;
+        }
+    }
+
+    public static class ActivityRow {
+        private final String user;
+        private final String action;
+        private final java.sql.Timestamp time;
+
+        public ActivityRow(String user, String action, java.sql.Timestamp time) {
+            this.user = user;
+            this.action = action;
+            this.time = time;
+        }
+
+        public String getUser() {
+            return user;
+        }
+
+        public String getAction() {
+            return action;
+        }
+
+        public java.sql.Timestamp getTime() {
+            return time;
         }
     }
 
@@ -826,6 +1081,96 @@ public class AdminDao {
 
         public String getImageUrl() {
             return imageUrl;
+        }
+    }
+
+    public static class ApprovePayoutResult {
+        private final boolean approved;
+        private final String errorCode;
+        private final java.sql.Timestamp processedAt;
+
+        public ApprovePayoutResult(boolean approved, String errorCode, java.sql.Timestamp processedAt) {
+            this.approved = approved;
+            this.errorCode = errorCode;
+            this.processedAt = processedAt;
+        }
+
+        public boolean isApproved() {
+            return approved;
+        }
+
+        public String getErrorCode() {
+            return errorCode;
+        }
+
+        public java.sql.Timestamp getProcessedAt() {
+            return processedAt;
+        }
+    }
+
+    public static class VendorPayoutRow {
+        private final int payoutId;
+        private final int vendorId;
+        private final String vendorName;
+        private final String vendorEmail;
+        private final double amount;
+        private final String paymentMethod;
+        private final String paymentAccount;
+        private final String status;
+        private final java.sql.Timestamp createdAt;
+        private final java.sql.Timestamp processedAt;
+
+        public VendorPayoutRow(int payoutId, int vendorId, String vendorName, String vendorEmail, double amount, String paymentMethod, String paymentAccount, String status, java.sql.Timestamp createdAt, java.sql.Timestamp processedAt) {
+            this.payoutId = payoutId;
+            this.vendorId = vendorId;
+            this.vendorName = vendorName;
+            this.vendorEmail = vendorEmail;
+            this.amount = amount;
+            this.paymentMethod = paymentMethod;
+            this.paymentAccount = paymentAccount;
+            this.status = status;
+            this.createdAt = createdAt;
+            this.processedAt = processedAt;
+        }
+
+        public int getPayoutId() {
+            return payoutId;
+        }
+
+        public int getVendorId() {
+            return vendorId;
+        }
+
+        public String getVendorName() {
+            return vendorName;
+        }
+
+        public String getVendorEmail() {
+            return vendorEmail;
+        }
+
+        public double getAmount() {
+            return amount;
+        }
+
+        public String getPaymentMethod() {
+            return paymentMethod;
+        }
+
+        public String getPaymentAccount() {
+            return paymentAccount;
+        }
+
+        public String getStatus() {
+            return status;
+        }
+
+        public java.sql.Timestamp getCreatedAt() {
+            return createdAt;
+        }
+
+        public java.sql.Timestamp getProcessedAt() {
+            return processedAt;
         }
     }
 

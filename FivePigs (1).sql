@@ -228,6 +228,20 @@ CREATE TABLE Vendor_Payout (
     FOREIGN KEY (vendor_id) REFERENCES Users(user_id)
 );
 
+-- 19.1 Vendor Payout Audit Log
+CREATE TABLE Admin_Payout_Audit (
+    audit_id INT AUTO_INCREMENT PRIMARY KEY,
+    payout_id INT NOT NULL,
+    admin_user_id INT NOT NULL,
+    action VARCHAR(30) NOT NULL, -- APPROVE / REJECT / CANCEL
+    from_status VARCHAR(20),
+    to_status VARCHAR(20),
+    note VARCHAR(255),
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (payout_id) REFERENCES Vendor_Payout(payout_id),
+    FOREIGN KEY (admin_user_id) REFERENCES Users(user_id)
+);
+
 CREATE TABLE Vendor_Earning (
     earning_id INT AUTO_INCREMENT PRIMARY KEY,
     vendor_id INT NOT NULL,
@@ -242,6 +256,14 @@ CREATE TABLE Vendor_Earning (
     FOREIGN KEY (order_id) REFERENCES Orders(order_id)
 );
 
+CREATE TABLE Vendor_Payment (
+    payment_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    amount DECIMAL(10,2),
+    status VARCHAR(20), -- PENDING / SUCCESS / FAILED
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id)
+);
 
 -- 20. Wallet
 CREATE TABLE Wallet (
