@@ -226,3 +226,27 @@ SELECT
         WHEN ROW_COUNT() > 0 THEN 'Admin account created successfully!'
         ELSE 'Admin account already exists or role "Admin" not found.'
         END AS message;
+CREATE TABLE IF NOT EXISTS redeem_code (
+    redeem_code_id INT PRIMARY KEY AUTO_INCREMENT,
+    software_id INT NOT NULL,
+    code VARCHAR(100) NOT NULL UNIQUE,
+    source_type VARCHAR(30) NOT NULL DEFAULT 'ADMIN_GIFT',
+    status VARCHAR(20) NOT NULL DEFAULT 'UNUSED',
+    created_by INT NULL,
+    redeemed_by INT NULL,
+    redeemed_at DATETIME NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (software_id) REFERENCES Software(software_id),
+    FOREIGN KEY (created_by) REFERENCES Users(user_id),
+    FOREIGN KEY (redeemed_by) REFERENCES Users(user_id)
+);
+
+CREATE TABLE IF NOT EXISTS user_feedback (
+    feedback_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    subject VARCHAR(150) NOT NULL,
+    message TEXT NOT NULL,
+    status VARCHAR(20) DEFAULT 'NEW',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id)
+);

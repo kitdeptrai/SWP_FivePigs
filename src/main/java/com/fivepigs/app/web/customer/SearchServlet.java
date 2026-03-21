@@ -22,13 +22,14 @@ public class SearchServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String keyword = normalize(request.getParameter("q"));
         String dept = normalizeDept(request.getParameter("dept"));
+        String genre = normalize(request.getParameter("genre"));
         Integer categoryId = mapCategoryId(dept);
 
         List<Software> results = new ArrayList<>();
 
-        if (!keyword.isEmpty()) {
+        if (!keyword.isEmpty() || !genre.isEmpty()) {
             try {
-                results = softwareDao.searchSoftwareWithIcon(keyword, categoryId, 80);
+                results = softwareDao.searchSoftwareWithIcon(keyword, categoryId, genre.isEmpty() ? null : genre, 80);
             } catch (SQLException e) {
                 throw new ServletException(e);
             }
@@ -37,6 +38,7 @@ public class SearchServlet extends HttpServlet {
         request.setAttribute("activePage", "");
         request.setAttribute("searchKeyword", keyword);
         request.setAttribute("searchDept", dept);
+        request.setAttribute("searchGenre", genre);
         request.setAttribute("searchResults", results);
         request.setAttribute("resultCount", results.size());
         request.getRequestDispatcher("/WEB-INF/views/customer/search.jsp").forward(request, response);

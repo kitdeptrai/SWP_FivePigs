@@ -1,5 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@page pageEncoding="UTF-8"%>
+<%@ page pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -23,14 +23,17 @@
 
         <c:url var="allUrl" value="/search">
             <c:param name="q" value="${searchKeyword}"/>
+            <c:param name="genre" value="${searchGenre}"/>
             <c:param name="dept" value="all"/>
         </c:url>
         <c:url var="appsUrl" value="/search">
             <c:param name="q" value="${searchKeyword}"/>
+            <c:param name="genre" value="${searchGenre}"/>
             <c:param name="dept" value="apps"/>
         </c:url>
         <c:url var="gamesUrl" value="/search">
             <c:param name="q" value="${searchKeyword}"/>
+            <c:param name="genre" value="${searchGenre}"/>
             <c:param name="dept" value="games"/>
         </c:url>
 
@@ -40,18 +43,25 @@
             <a href="${gamesUrl}" style="text-decoration:none;padding:7px 14px;border-radius:999px;border:1px solid ${searchDept == 'games' ? '#6b70ff' : '#d6dbe9'};background:${searchDept == 'games' ? '#eef1ff' : '#fff'};color:${searchDept == 'games' ? '#4e56e8' : '#555'};font-weight:700;">Games</a>
         </div>
 
+        <c:if test="${not empty searchGenre}">
+            <div style="margin-bottom:14px; display:flex; align-items:center; gap:8px; color:#5a6478;">
+                <span style="padding:6px 12px; background:#eef1ff; color:#4e56e8; border-radius:999px; font-weight:700;">Genre: ${searchGenre}</span>
+            </div>
+        </c:if>
+
         <c:choose>
-            <c:when test="${empty searchKeyword}">
+            <c:when test="${empty searchKeyword and empty searchGenre}">
                 <div class="library-empty">
                     <i class="fa-solid fa-magnifying-glass"></i>
-                    <h3>Type a keyword to search</h3>
-                    <p>Try app name, game name, or feature keyword.</p>
+                    <h3>Type a keyword or open a genre</h3>
+                    <p>Try app name, game name, or click a genre section from Apps/Games.</p>
                 </div>
             </c:when>
             <c:otherwise>
                 <p style="margin-bottom:14px; color:#5a6478;">
-                    Found <strong>${resultCount}</strong> result(s) for
-                    <strong>"${searchKeyword}"</strong>
+                    Found <strong>${resultCount}</strong> result(s)
+                    <c:if test="${not empty searchKeyword}">for <strong>"${searchKeyword}"</strong></c:if>
+                    <c:if test="${not empty searchGenre}">in genre <strong>${searchGenre}</strong></c:if>
                 </p>
 
                 <c:if test="${empty searchResults}">

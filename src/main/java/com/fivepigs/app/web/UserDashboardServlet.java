@@ -43,7 +43,7 @@ public class UserDashboardServlet extends HttpServlet {
         } catch (SQLException e) {
             request.setAttribute("trendList", new ArrayList<Software>());
             request.setAttribute("bestSellingList", new ArrayList<Software>());
-            request.setAttribute("homeWarning", "Khong tai duoc du lieu Trending/Best Selling.");
+            request.setAttribute("homeWarning", "Khong tai duoc du lieu top downloads/best selling.");
         }
     }
 }

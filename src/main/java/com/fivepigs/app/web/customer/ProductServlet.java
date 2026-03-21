@@ -1,109 +1,177 @@
 package com.fivepigs.app.web.customer;
 
-import com.fivepigs.app.dao.CategoryDao;
+import com.fivepigs.app.dao.ReviewDao;
 import com.fivepigs.app.dao.SoftwareDao;
+import com.fivepigs.app.dao.SoftwareDemoDao;
+import com.fivepigs.app.model.Review;
 import com.fivepigs.app.model.Software;
-import com.fivepigs.app.model.Category;
+import com.fivepigs.app.model.SoftwareDemoVersion;
+import com.fivepigs.app.model.SoftwareDetail;
 import com.fivepigs.app.model.SoftwareImage;
+import com.fivepigs.app.model.SoftwareVersion;
+import com.fivepigs.app.model.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
 
-@WebServlet(name="ProductServlet", urlPatterns={"/product"})
+@WebServlet(name = "ProductServlet", urlPatterns = {"/product"})
 public class ProductServlet extends HttpServlet {
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet ProductController</title>");
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet ProductController at " + request.getContextPath () + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
-        }
-    }
+    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("MMM dd, yyyy", Locale.ENGLISH);
+    private final SoftwareDao softwareDao = new SoftwareDao();
+    private final SoftwareDemoDao softwareDemoDao = new SoftwareDemoDao();
+    private final ReviewDao reviewDao = new ReviewDao();
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String id = request.getParameter("pid");
-
-        SoftwareDao sdao = new SoftwareDao();
-        CategoryDao cdao = new CategoryDao();
-
-        try {
-            Software p = sdao.GETALLSOFTWAREBYID(id);
-            SoftwareImage picon = sdao.getThumbnailBySoftwareId(id);
-
-            List<Software> softwareToShow = new ArrayList<>();
-            List<Category> listCate = new ArrayList<>();
-            List<SoftwareImage> screenshots = sdao.getScreenshotsBySoftwareId(id);
-
-            listCate = cdao.GETALLCATEGORY();
-            softwareToShow = sdao.GET_ALL_SOFTWARE();
-
-            request.setAttribute("softwareToShow", softwareToShow);
-            request.setAttribute("listCate", listCate);
-            request.setAttribute("detail", p);
-            request.setAttribute("icon", picon);
-            request.setAttribute("screenshots", screenshots);
-            request.getRequestDispatcher("/WEB-INF/views/customer/single-product.jsp").forward(request, response);
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        Integer softwareId = parseInt(request.getParameter("pid"));
+        if (softwareId == null) {
+            response.sendRedirect(request.getContextPath() + "/customer_dashboard");
+            return;
         }
 
+        try {
+            Software detail = softwareDao.getSoftwareDetailBySoftwareId(softwareId);
+            if (detail == null) {
+                response.sendRedirect(request.getContextPath() + "/customer_dashboard");
+                return;
+            }
+
+            SoftwareImage icon = softwareDao.getThumbnailBySoftwareId(String.valueOf(softwareId));
+            List<SoftwareImage> screenshots = softwareDao.getScreenshotsBySoftwareId(String.valueOf(softwareId));
+            List<Review> reviews = reviewDao.getReviewListBySoftwareId(softwareId);
+            Map<Integer, Integer> ratingBreakdown = reviewDao.getRatingBreakdown(softwareId);
+            SoftwareDemoVersion demoVersion = softwareDemoDao.getActiveDemoBySoftwareId(softwareId);
+
+            HttpSession session = request.getSession(false);
+            User user = session == null ? null : (User) session.getAttribute("user");
+            boolean canReview = false;
+            boolean alreadyReviewed = false;
+            if (user != null && user.getUserId() != null) {
+                canReview = reviewDao.hasOwnedLicense(user.getUserId(), softwareId);
+                alreadyReviewed = reviewDao.hasUserReviewed(user.getUserId(), softwareId);
+            }
+
+            request.setAttribute("detail", detail);
+            request.setAttribute("icon", icon);
+            request.setAttribute("screenshots", screenshots);
+            request.setAttribute("reviews", reviews);
+            request.setAttribute("reviewCount", reviews.size());
+            request.setAttribute("ratingBreakdown", ratingBreakdown);
+            request.setAttribute("canReview", canReview);
+            request.setAttribute("alreadyReviewed", alreadyReviewed);
+            request.setAttribute("reviewMsg", request.getParameter("reviewMsg"));
+            request.setAttribute("demoMsg", request.getParameter("demoMsg"));
+            request.setAttribute("demoVersion", demoVersion);
+            request.setAttribute("hasDemo", demoVersion != null && demoVersion.getDemoFileUrl() != null && !demoVersion.getDemoFileUrl().isBlank());
+            request.setAttribute("avgRatingLabel", formatRating(detail.getAvgRating()));
+            request.setAttribute("downloadCountLabel", formatDownloadCount(detail.getDownloadCount()));
+            request.setAttribute("updateDateLabel", formatDate(resolveUpdateDate(detail)));
+            request.setAttribute("fileSizeLabel", formatFileSize(resolveFileSize(detail)));
+            request.setAttribute("featureLines", splitFeatureLines(detail));
+            request.getRequestDispatcher("/WEB-INF/views/customer/single-product.jsp").forward(request, response);
+        } catch (SQLException e) {
+            throw new ServletException("Unable to load product detail", e);
+        }
     }
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        processRequest(request, response);
+    private Integer parseInt(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        try {
+            return Integer.parseInt(value.trim());
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 
-    /**
-     * Returns a short description of the servlet.
-     * @return a String containing servlet description
-     */
-    @Override
-    public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
+    private LocalDateTime resolveUpdateDate(Software detail) {
+        SoftwareVersion version = detail.getSoftwareVersion();
+        if (version != null && version.getCreatedAt() != null) {
+            return version.getCreatedAt();
+        }
+        return detail.getCreatedAt();
+    }
+
+    private Integer resolveFileSize(Software detail) {
+        SoftwareVersion version = detail.getSoftwareVersion();
+        return version == null ? null : version.getFileSize();
+    }
+
+    private String formatRating(Double rating) {
+        if (rating == null || rating <= 0) {
+            return "No rating yet";
+        }
+        return new DecimalFormat("0.0").format(rating);
+    }
+
+    private String formatDownloadCount(Integer downloadCount) {
+        if (downloadCount == null || downloadCount <= 0) {
+            return "New";
+        }
+        if (downloadCount >= 1_000_000) {
+            return (downloadCount / 1_000_000) + "M+";
+        }
+        if (downloadCount >= 1_000) {
+            return (downloadCount / 1_000) + "K+";
+        }
+        return downloadCount.toString();
+    }
+
+    private String formatDate(LocalDateTime dateTime) {
+        if (dateTime == null) {
+            return "Updating";
+        }
+        return dateTime.format(DATE_FORMAT);
+    }
+
+    private String formatFileSize(Integer fileSize) {
+        if (fileSize == null || fileSize <= 0) {
+            return "Updating";
+        }
+        double value = fileSize;
+        String[] units = {"B", "KB", "MB", "GB"};
+        int index = 0;
+        while (value >= 1024 && index < units.length - 1) {
+            value /= 1024;
+            index++;
+        }
+        return new DecimalFormat(value >= 10 ? "0" : "0.0").format(value) + " " + units[index];
+    }
+
+    private List<String> splitFeatureLines(Software detail) {
+        SoftwareDetail softwareDetail = detail.getSoftwareDetail();
+        if (softwareDetail == null) {
+            return Collections.emptyList();
+        }
+
+        String raw = softwareDetail.getReleaseNote();
+        if (raw == null || raw.isBlank()) {
+            return Collections.emptyList();
+        }
+
+        return Arrays.stream(raw.split("\\r?\\n|;|\\|"))
+                .map(String::trim)
+                .filter(s -> !s.isBlank())
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
 
 }

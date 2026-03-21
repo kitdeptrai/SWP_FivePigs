@@ -35,7 +35,7 @@
             <div class="fixed-layout-grid">
                 <div class="left-column" style="height: var(--sidebar-total-height);">
                     <div class="featured-banner"
-                         style="height:100%; background-image: url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2070&auto=format&fit=crop'); padding:0;">
+                         style="height:100%; background-image: url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2070&auto=format&fit=crop'); padding:0; background-size:cover; background-position:center; background-repeat:no-repeat; overflow:hidden;">
                         <div style="background: linear-gradient(to top, #4a148c, transparent); height:100%; width:100%; display:flex; flex-direction:column; justify-content:flex-end; padding:30px;">
                             <h1 style="font-size: 40px; margin-bottom: 10px;">Top Productivity Apps</h1>
                             <p style="opacity: 0.9; max-width: 500px; margin-bottom: 20px;">Upgrade your workflow with best tools.</p>
@@ -48,49 +48,115 @@
                     <p style="font-size:12px; opacity:0.8; margin-bottom:20px;">Most downloaded this week</p>
                     <div style="margin-top:auto; background:rgba(255,255,255,0.15); padding:15px; border-radius:12px;">
                         <h4 style="margin-bottom:5px;">Microsoft 365</h4>
-                        <p style="font-size:12px; opacity:0.8;">Productivity â€¢ Office</p>
+                        <p style="font-size:12px; opacity:0.8;">Productivity • Office</p>
                     </div>
                 </div>
             </div>
 
-            <c:forEach var="entry" items="${sections}">
-                <div class="section-header">
-                        ${entry.key} <i class="fa-solid fa-chevron-right"></i>
-                </div>
+            <div class="genre-chip-row">
+                <c:url var="allAppsUrl" value="/app" />
+                <a href="${allAppsUrl}" class="genre-chip ${empty selectedGenre ? 'active' : ''}">All</a>
+                <c:forEach var="genre" items="${genres}">
+                    <c:url var="genreFilterUrl" value="/app">
+                        <c:param name="genre" value="${genre}"/>
+                    </c:url>
+                    <a href="${genreFilterUrl}" class="genre-chip ${selectedGenre eq genre ? 'active' : ''}">${genre}</a>
+                </c:forEach>
+            </div>
 
-                <div class="app-list-grid">
-                    <c:forEach var="sw" items="${entry.value}">
-                        <a href="${pageContext.request.contextPath}/product?pid=${sw.softwareId}" class="app-list-item">
-                            <c:choose>
-                                <c:when test="${not empty sw.iconUrl}">
-                                    <img src="${pageContext.request.contextPath}/assets/${sw.iconUrl}" class="app-icon-lg">
-                                </c:when>
-                                <c:otherwise>
-                                    <img src="${pageContext.request.contextPath}/assets/images/default_icon.png" class="app-icon-lg">
-                                </c:otherwise>
-                            </c:choose>
+            <c:choose>
+                <c:when test="${not empty selectedGenre}">
+                    <div class="section-header section-header-tight">
+                        ${selectedGenre} <span class="section-header-sub">Filtered apps</span>
+                    </div>
 
-                            <div class="app-details">
-                                <div class="app-name">${sw.name}</div>
-                                <div class="app-meta">
-                                    <i class="fa-solid fa-star"></i> ${sw.avgRating} |
+                    <c:choose>
+                        <c:when test="${empty genreResults}">
+                            <div class="genre-empty-state">No apps found for this genre.</div>
+                        </c:when>
+                        <c:otherwise>
+                            <div class="filtered-app-grid">
+                                <c:forEach var="sw" items="${genreResults}">
+                                    <a href="${pageContext.request.contextPath}/product?pid=${sw.softwareId}" class="app-list-item filtered-app-card">
+                                        <c:choose>
+                                            <c:when test="${not empty sw.iconUrl}">
+                                                <img src="${pageContext.request.contextPath}/assets/${sw.iconUrl}" class="app-icon-lg">
+                                            </c:when>
+                                            <c:otherwise>
+                                                <img src="${pageContext.request.contextPath}/assets/images/default_icon.png" class="app-icon-lg">
+                                            </c:otherwise>
+                                        </c:choose>
+
+                                        <div class="app-details">
+                                            <div class="app-name">${sw.name}</div>
+                                            <div class="app-meta">
+                                                <i class="fa-solid fa-star"></i> ${sw.avgRating} |
+                                                <c:choose>
+                                                    <c:when test="${sw.isFree == 1}">Free</c:when>
+                                                    <c:otherwise>${sw.price} VND</c:otherwise>
+                                                </c:choose>
+                                            </div>
+                                        </div>
+
+                                        <div class="app-price">
+                                            <c:choose>
+                                                <c:when test="${sw.isFree == 1}">Free</c:when>
+                                                <c:otherwise>${sw.price} VND</c:otherwise>
+                                            </c:choose>
+                                        </div>
+                                    </a>
+                                </c:forEach>
+                            </div>
+                        </c:otherwise>
+                    </c:choose>
+                </c:when>
+                <c:otherwise>
+                    <c:forEach var="entry" items="${sections}">
+                        <c:url var="genreSearchUrl" value="/search">
+                            <c:param name="genre" value="${entry.key}"/>
+                            <c:param name="dept" value="apps"/>
+                        </c:url>
+                        <div class="section-header">
+                            <a href="${genreSearchUrl}" style="text-decoration:none;color:inherit;display:inline-flex;align-items:center;gap:10px;">
+                                ${entry.key} <i class="fa-solid fa-chevron-right"></i>
+                            </a>
+                        </div>
+
+                        <div class="app-list-grid">
+                            <c:forEach var="sw" items="${entry.value}">
+                                <a href="${pageContext.request.contextPath}/product?pid=${sw.softwareId}" class="app-list-item">
                                     <c:choose>
-                                        <c:when test="${sw.isFree == 1}">Free</c:when>
-
+                                        <c:when test="${not empty sw.iconUrl}">
+                                            <img src="${pageContext.request.contextPath}/assets/${sw.iconUrl}" class="app-icon-lg">
+                                        </c:when>
+                                        <c:otherwise>
+                                            <img src="${pageContext.request.contextPath}/assets/images/default_icon.png" class="app-icon-lg">
+                                        </c:otherwise>
                                     </c:choose>
-                                </div>
-                            </div>
 
-                            <div class="app-price">
-                                <c:choose>
-                                    <c:when test="${sw.isFree == 1}">Free</c:when>
-                                    <c:otherwise>${sw.price} VND</c:otherwise>
-                                </c:choose>
-                            </div>
-                        </a>
+                                    <div class="app-details">
+                                        <div class="app-name">${sw.name}</div>
+                                        <div class="app-meta">
+                                            <i class="fa-solid fa-star"></i> ${sw.avgRating} |
+                                            <c:choose>
+                                                <c:when test="${sw.isFree == 1}">Free</c:when>
+                                                <c:otherwise>${sw.price} VND</c:otherwise>
+                                            </c:choose>
+                                        </div>
+                                    </div>
+
+                                    <div class="app-price">
+                                        <c:choose>
+                                            <c:when test="${sw.isFree == 1}">Free</c:when>
+                                            <c:otherwise>${sw.price} VND</c:otherwise>
+                                        </c:choose>
+                                    </div>
+                                </a>
+                            </c:forEach>
+                        </div>
                     </c:forEach>
-                </div>
-            </c:forEach>
+                </c:otherwise>
+            </c:choose>
         </div>
     </div>
 </div>
