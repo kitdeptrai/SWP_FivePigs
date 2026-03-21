@@ -64,7 +64,7 @@ public class AppServlet extends HttpServlet {
             request.setAttribute("selectedGenre", selectedGenre);
             request.setAttribute("genreResults", new ArrayList<Software>());
             request.setAttribute("sections", new LinkedHashMap<String, List<Software>>());
-            request.setAttribute("softwareToShow", new ArrayList<Software>());
+            request.setAttribute("softwareToShow", new ArrayList<>());
             request.setAttribute("appWarning", "Khong tai duoc du lieu app tu database.");
         }
 

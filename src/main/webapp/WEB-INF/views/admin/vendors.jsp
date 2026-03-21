@@ -3,7 +3,7 @@
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Admin - Vendors</title>
@@ -122,63 +122,56 @@
 
     <main class="main">
         <h1 style="margin-top: 0;">Vendors Management</h1>
-        <p class="subtitle">Quản lý danh sách vendor.</p>
+        <p class="subtitle">Manage the vendor list.</p>
 
         <div class="card" style="max-width: 100%;">
             <div style="display:flex; justify-content: space-between; align-items:center; gap: 16px;">
                 <div>
-                    <h2 style="margin:0; font-size: 18px; color: var(--dark-blue);">Danh sách Vendors</h2>
+                    <h2 style="margin:0; font-size: 18px; color: var(--dark-blue);">Vendor list</h2>
                     <p style="margin:6px 0 0; color:#64748b; font-size: 13px;">Role: Vendor</p>
                 </div>
-                <a href="#add-user" style="padding: 10px 14px; border-radius: 10px; background: var(--accent); color: #fff; text-decoration:none; font-weight: 600;">+ Add Vendor</a>
             </div>
 
-            <c:if test="${param.success == '1'}">
-                <div class="alert success">Tạo vendor thành công. Mật khẩu mặc định đã được gửi qua email.</div>
-            </c:if>
             <c:if test="${param.success == 'updated'}">
-                <div class="alert success">Cập nhật vendor thành công.</div>
+                <div class="alert success">Vendor updated successfully.</div>
             </c:if>
             <c:if test="${param.success == 'disabled'}">
-                <div class="alert success">Khóa tài khoản vendor thành công.</div>
+                <div class="alert success">Vendor account locked successfully.</div>
             </c:if>
 
             <c:if test="${param.error == 'email_exists'}">
-                <div class="alert danger">Email đã tồn tại trong hệ thống.</div>
+                <div class="alert danger">Email already exists in the system.</div>
             </c:if>
             <c:if test="${param.error == 'missing_fields'}">
-                <div class="alert danger">Vui lòng nhập đầy đủ Họ tên, Email và Role.</div>
+                <div class="alert danger">Please fill in full name, email, and role.</div>
             </c:if>
             <c:if test="${param.error == 'invalid_id'}">
-                <div class="alert danger">User ID không hợp lệ.</div>
+                <div class="alert danger">Invalid user ID.</div>
             </c:if>
             <c:if test="${param.error == 'invalid_role'}">
-                <div class="alert danger">Role không hợp lệ (chỉ Vendor).</div>
+                <div class="alert danger">Invalid role (vendor only).</div>
             </c:if>
             <c:if test="${param.error == 'invalid_status'}">
-                <div class="alert danger">Status không hợp lệ (ACTIVE/INACTIVE).</div>
+                <div class="alert danger">Invalid status (ACTIVE/INACTIVE).</div>
             </c:if>
             <c:if test="${param.error == 'db_error'}">
-                <div class="alert danger">Có lỗi database. Vui lòng thử lại.</div>
-            </c:if>
-            <c:if test="${param.success == 'deleted'}">
-                <div class="alert success">Xóa vendor thành công.</div>
+                <div class="alert danger">Database error. Please try again.</div>
             </c:if>
 
             <form method="get" action="${pageContext.request.contextPath}/admin/vendors" style="margin-top:16px; display:grid; grid-template-columns: 2fr 1fr auto auto; gap:10px; align-items:end;">
                 <div>
-                    <label style="display:block; font-size:12px; color:#64748b; margin-bottom:6px;">Tìm kiếm</label>
-                    <input type="text" name="keyword" value="${keyword}" placeholder="Tên, email, số điện thoại..." style="width:100%; padding:10px 12px; border:1px solid #cbd5e1; border-radius:8px;" />
+                    <label style="display:block; font-size:12px; color:#64748b; margin-bottom:6px;">Search</label>
+                    <input type="text" name="keyword" value="${keyword}" placeholder="Name, email, phone..." style="width:100%; padding:10px 12px; border:1px solid #cbd5e1; border-radius:8px;" />
                 </div>
                 <div>
                     <label style="display:block; font-size:12px; color:#64748b; margin-bottom:6px;">Status</label>
                     <select name="status" style="width:100%; padding:10px 12px; border:1px solid #cbd5e1; border-radius:8px;">
-                        <option value="">Tất cả</option>
+                        <option value="">All</option>
                         <option value="ACTIVE" ${status == 'ACTIVE' ? 'selected' : ''}>ACTIVE</option>
                         <option value="INACTIVE" ${status == 'INACTIVE' ? 'selected' : ''}>INACTIVE</option>
                     </select>
                 </div>
-                <button type="submit" style="padding:10px 14px; border-radius:8px; border:none; background:#3b82f6; color:#fff; font-weight:600;">Lọc</button>
+                <button type="submit" style="padding:10px 14px; border-radius:8px; border:none; background:#3b82f6; color:#fff; font-weight:600;">Filter</button>
                 <a href="${pageContext.request.contextPath}/admin/vendors" style="padding:10px 14px; border-radius:8px; border:1px solid #cbd5e1; color:#334155; text-decoration:none; font-weight:600; text-align:center;">Reset</a>
             </form>
 
@@ -222,12 +215,11 @@
                                 <div style="display:flex; gap: 8px;">
                                     <a href="#edit-user-${u.userId}" style="color: var(--accent); text-decoration: none; font-size: 13px; font-weight: 600;">Edit</a>
                                     <c:if test="${u.status == 'ACTIVE'}">
-                                        <a href="#disable-user-${u.userId}" style="color: var(--danger); text-decoration: none; font-size: 13px; font-weight: 600;">Disable</a>
+                                        <a href="#disable-user-${u.userId}" style="color: var(--danger); text-decoration: none; font-size: 13px; font-weight: 600;" onclick="return confirm('Are you sure you want to disable this vendor?');">Disable</a>
                                     </c:if>
                                     <c:if test="${u.status == 'INACTIVE'}">
                                         <a href="#enable-user-${u.userId}" style="color: #22c55e; text-decoration: none; font-size: 13px; font-weight: 600;">Enable</a>
                                     </c:if>
-                                    <a href="#delete-user-${u.userId}" style="color: #ef4444; text-decoration: none; font-size: 13px; font-weight: 700;">Delete</a>
                                 </div>
 
                             <!-- Modal Edit User -->
@@ -272,15 +264,15 @@
                             <div id="disable-user-${u.userId}" class="modal">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <h2>Khóa tài khoản</h2>
+                                        <h2>Lock account</h2>
                                         <a class="close-modal" href="${pageContext.request.contextPath}/admin/vendors">×</a>
                                     </div>
-                                    <p>Bạn có chắc chắn muốn khóa tài khoản của <strong><c:out value="${u.fullName}"/></strong>?</p>
+                                    <p>Are you sure you want to lock the account of <strong><c:out value="${u.fullName}"/></strong>?</p>
                                     <form method="post" action="${pageContext.request.contextPath}/admin/vendors/disable">
                                         <input type="hidden" name="userId" value="${u.userId}" />
                                         <div class="actions">
-                                            <button type="submit" style="background: var(--danger);">Xác nhận khóa</button>
-                                            <a class="small" href="${pageContext.request.contextPath}/admin/vendors">Hủy</a>
+                                            <button type="submit" style="background: var(--danger);">Confirm lock</button>
+                                            <a class="small" href="${pageContext.request.contextPath}/admin/vendors">Cancel</a>
                                         </div>
                                     </form>
                                 </div>
@@ -290,44 +282,27 @@
                             <div id="enable-user-${u.userId}" class="modal">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <h2>Mở khóa tài khoản</h2>
+                                        <h2>Unlock account</h2>
                                         <a class="close-modal" href="${pageContext.request.contextPath}/admin/vendors">×</a>
                                     </div>
-                                    <p>Bạn có chắc chắn muốn mở khóa tài khoản của <strong><c:out value="${u.fullName}"/></strong>?</p>
+                                    <p>Are you sure you want to unlock the account of <strong><c:out value="${u.fullName}"/></strong>?</p>
                                     <form method="post" action="${pageContext.request.contextPath}/admin/vendors/enable">
                                         <input type="hidden" name="userId" value="${u.userId}" />
                                         <div class="actions">
-                                            <button type="submit" style="background: #22c55e;">Xác nhận mở khóa</button>
-                                            <a class="small" href="${pageContext.request.contextPath}/admin/vendors">Hủy</a>
+                                            <button type="submit" style="background: #22c55e;">Confirm unlock</button>
+                                            <a class="small" href="${pageContext.request.contextPath}/admin/vendors">Cancel</a>
                                         </div>
                                     </form>
                                 </div>
                             </div>
 
-                            <!-- Modal Confirm Delete -->
-                            <div id="delete-user-${u.userId}" class="modal">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h2>Xóa vendor</h2>
-                                        <a class="close-modal" href="${pageContext.request.contextPath}/admin/vendors">×</a>
-                                    </div>
-                                    <p>Bạn có chắc chắn muốn xóa vendor <strong><c:out value="${u.fullName}"/></strong>? Hành động này không thể hoàn tác.</p>
-                                    <form method="post" action="${pageContext.request.contextPath}/admin/vendors/delete">
-                                        <input type="hidden" name="userId" value="${u.userId}" />
-                                        <div class="actions">
-                                            <button type="submit" style="background: #ef4444;">Xác nhận xóa</button>
-                                            <a class="small" href="${pageContext.request.contextPath}/admin/vendors">Hủy</a>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
                         </td>
                     </tr>
                 </c:forEach>
 
                 <c:if test="${empty users}">
                     <tr>
-                        <td colspan="8" style="text-align:center; color:#94a3b8; padding: 16px;">Chưa có user.</td>
+                        <td colspan="8" style="text-align:center; color:#94a3b8; padding: 16px;">No users found.</td>
                     </tr>
                 </c:if>
                 </tbody>
@@ -361,44 +336,6 @@
                     </c:if>
                 </div>
             </c:if>
-        </div>
-
-        <!-- Modal Add Vendor (CSS-only :target) -->
-        <div id="add-user" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2>Add Vendor</h2>
-                    <a class="close-modal" href="${pageContext.request.contextPath}/admin/vendors">×</a>
-                </div>
-
-                <form method="post" action="${pageContext.request.contextPath}/admin/vendors/create">
-                    <div class="field">
-                        <label>Full name</label>
-                        <input name="fullName" type="text" required maxlength="100" />
-                    </div>
-                    <div class="field">
-                        <label>Email</label>
-                        <input name="email" type="email" required maxlength="100" />
-                    </div>
-                    <div class="field">
-                        <label>Phone (optional)</label>
-                        <input name="phone" type="text" maxlength="20" />
-                    </div>
-                    <div class="field">
-                        <label>Role</label>
-                        <select name="roleName" required style="width:100%; padding:12px; border-radius:12px; border:1px solid var(--border); background: rgba(0,0,0,0.22); color: var(--text);">
-                            <option value="Vendor" selected>Vendor</option>
-                        </select>
-                    </div>
-
-                    <div class="alert" style="margin-top: 14px;">Mật khẩu mặc định: <b>123456</b> (sẽ gửi qua email)</div>
-
-                    <div class="actions">
-                        <button type="submit">Create</button>
-                        <a class="small" href="${pageContext.request.contextPath}/admin/vendors">Cancel</a>
-                    </div>
-                </form>
-            </div>
         </div>
 
     </main>

@@ -11,11 +11,9 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 @WebServlet({
-        "/admin/vendors/create",
         "/admin/vendors/update",
         "/admin/vendors/enable",
-        "/admin/vendors/disable",
-        "/admin/vendors/delete"
+        "/admin/vendors/disable"
 })
 public class VendorActionServlet extends HttpServlet {
     private final AdminService adminService = new AdminService();
@@ -27,31 +25,15 @@ public class VendorActionServlet extends HttpServlet {
         String servletPath = req.getServletPath();
         try {
             switch (servletPath) {
-                case "/admin/vendors/create" -> handleCreate(req, resp);
                 case "/admin/vendors/update" -> handleUpdate(req, resp);
                 case "/admin/vendors/enable" -> handleStatus(req, resp, "ACTIVE", "enabled");
                 case "/admin/vendors/disable" -> handleStatus(req, resp, "INACTIVE", "disabled");
-                case "/admin/vendors/delete" -> handleDelete(req, resp);
                 default -> resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
         } catch (SQLException e) {
             e.printStackTrace();
             resp.sendRedirect(req.getContextPath() + "/admin/vendors?error=db_error");
         }
-    }
-
-    private void handleCreate(HttpServletRequest req, HttpServletResponse resp) throws IOException, SQLException {
-        String fullName = req.getParameter("fullName");
-        String email = req.getParameter("email");
-        String phone = req.getParameter("phone");
-        String roleName = req.getParameter("roleName");
-
-        String error = adminService.createUser(fullName, email, phone, roleName);
-        if (error != null) {
-            resp.sendRedirect(req.getContextPath() + "/admin/vendors?error=" + error);
-            return;
-        }
-        resp.sendRedirect(req.getContextPath() + "/admin/vendors?success=1");
     }
 
     private void handleUpdate(HttpServletRequest req, HttpServletResponse resp) throws IOException, SQLException {
@@ -61,7 +43,7 @@ public class VendorActionServlet extends HttpServlet {
         String status = req.getParameter("status");
         String roleName = req.getParameter("roleName");
 
-        String error = adminService.updateUser(userIdStr, fullName, phone, status, roleName);
+        String error = adminService.updateVendor(userIdStr, fullName, phone, status, roleName);
         if (error != null) {
             resp.sendRedirect(req.getContextPath() + "/admin/vendors?error=" + error);
             return;
@@ -78,16 +60,5 @@ public class VendorActionServlet extends HttpServlet {
             return;
         }
         resp.sendRedirect(req.getContextPath() + "/admin/vendors?success=" + success);
-    }
-
-    private void handleDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException, SQLException {
-        String userIdStr = req.getParameter("userId");
-
-        String error = adminService.deleteUser(userIdStr);
-        if (error != null) {
-            resp.sendRedirect(req.getContextPath() + "/admin/vendors?error=" + error);
-            return;
-        }
-        resp.sendRedirect(req.getContextPath() + "/admin/vendors?success=deleted");
     }
 }

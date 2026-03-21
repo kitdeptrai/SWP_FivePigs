@@ -722,6 +722,7 @@ body {
 
 /* --- SINGLE PRODUCT PAGE STYLES --- */
 
+/* 1. NÃºt quay láº¡i */
 .back-btn {
     display: inline-flex; align-items: center; gap: 10px;
     font-weight: 600; color: var(--text-sub); margin-bottom: 20px;
@@ -729,10 +730,12 @@ body {
 }
 .back-btn:hover { color: var(--primary-color); transform: translateX(-5px); }
 
+/* 2. Hero Section (Pháº§n Ä‘áº§u trang) */
 .product-hero {
     background: var(--bg-white);
     border-radius: 20px;
     padding: 30px;
+    display: flex; gap: 30px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.03);
     margin-bottom: 30px;
     align-items: center;

@@ -346,7 +346,7 @@ public class ApprovalDao {
         return null;
     }
 
-    public void submitDecision(int softwareId, int approverId, String decision, String note) throws SQLException {
+    public void submitDecision(int softwareId, int approverId, String decision, String note,String status) throws SQLException {
 
         Connection c = Db.getConnection();
         try {
@@ -378,7 +378,7 @@ public class ApprovalDao {
         """;
 
             try (PreparedStatement ps = c.prepareStatement(statusSql)) {
-                ps.setString(1, decision); // APPROVED hoặc REJECTED
+                ps.setString(1, status); // APPROVED hoặc REJECTED
                 ps.setInt(2, softwareId);
                 ps.executeUpdate();
             }

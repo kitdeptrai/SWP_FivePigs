@@ -27,21 +27,27 @@ public class VNPayPaymentServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession(false);
-        Object pendingUser = session == null ? null : session.getAttribute("checkout_pending_user_id");
-        if (session == null || pendingUser == null) {
+        Object checkoutPendingUser = session == null ? null : session.getAttribute("checkout_pending_user_id");
+        Object vendorApplyPendingUser = session == null ? null : session.getAttribute("vendor_apply_pending_user_id");
+
+        if (session == null || (checkoutPendingUser == null && vendorApplyPendingUser == null)) {
             response.sendRedirect(request.getContextPath() + "/cart?msg=empty");
             return;
         }
 
-        Object totalAttr = session.getAttribute("checkout_total");
+        boolean isVendorApplyFlow = vendorApplyPendingUser != null;
+        Object totalAttr = isVendorApplyFlow
+                ? session.getAttribute("vendor_apply_total")
+                : session.getAttribute("checkout_total");
+
         Double total = totalAttr instanceof Double ? (Double) totalAttr : null;
         if (total == null || total <= 0) {
-            response.sendRedirect(request.getContextPath() + "/cart?msg=empty");
+            response.sendRedirect(request.getContextPath() + (isVendorApplyFlow ? "/vendor-apply?msg=invalid_amount" : "/cart?msg=empty"));
             return;
         }
 
         long amount = Math.round(total * 24000 * 100);
-        String txnRef = String.valueOf(System.currentTimeMillis());
+        String txnRef = String.valueOf(System.currentTimeMillis());  //dung thoi gian hien tai lam ma giao dich
         session.setAttribute("vnp_txn_ref", txnRef);
 
         Map<String, String> params = new HashMap<>();
@@ -51,7 +57,7 @@ public class VNPayPaymentServlet extends HttpServlet {
         params.put("vnp_Amount", String.valueOf(amount));
         params.put("vnp_CurrCode", "VND");
         params.put("vnp_TxnRef", txnRef);
-        params.put("vnp_OrderInfo", "FIVEPIGS checkout " + txnRef);
+        params.put("vnp_OrderInfo", (isVendorApplyFlow ? "FIVEPIGS vendor apply " : "FIVEPIGS checkout ") + txnRef);
         params.put("vnp_OrderType", "other");
         params.put("vnp_Locale", "vn");
         params.put("vnp_ReturnUrl", buildReturnUrl(request));

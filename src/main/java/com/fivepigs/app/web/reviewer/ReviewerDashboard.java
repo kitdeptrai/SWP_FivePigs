@@ -67,8 +67,14 @@ public class ReviewerDashboard extends HttpServlet {
             SoftwareDao sDao = new SoftwareDao();
             ReviewScoreDao reviewScoreDao = new ReviewScoreDao();
 
-            HttpSession session = request.getSession(false);
+//            HttpSession session = request.getSession(false);
+//            User user = (User) session.getAttribute("user");
+            HttpSession session = request.getSession();
             User user = (User) session.getAttribute("user");
+            if (user == null) {
+                request.getRequestDispatcher("/login").forward(request, response);
+                return;
+            }
             int reviewerId = user.getUserId();
 
             Integer pendingReviewApp = sDao.pendingReviewApp();
@@ -92,7 +98,8 @@ public class ReviewerDashboard extends HttpServlet {
 
         } catch (SQLException e) {
             e.printStackTrace();
-            response.sendRedirect(request.getContextPath() + "/login");
+            response.setContentType("text/plain");
+            e.printStackTrace(response.getWriter());
         }
     }
 

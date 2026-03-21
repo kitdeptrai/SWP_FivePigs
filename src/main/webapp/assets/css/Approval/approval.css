@@ -67,7 +67,7 @@ body {
     cursor: pointer;
     margin-bottom: 6px;
     color: #bbb;
-    text-decoration: none; 
+    text-decoration: none;
 }
 
 .menu li a.active,
@@ -135,15 +135,31 @@ body {
     font-size: 20px;
 }
 
-.yellow { color: #f5c542; }
-.green { color: #3ddc97; }
-.red { color: #ff6b6b; }
-.blue { color: #4f6cff; }
+.yellow {
+    color: #f5c542;
+}
+.green {
+    color: #3ddc97;
+}
+.red {
+    color: #ff6b6b;
+}
+.blue {
+    color: #4f6cff;
+}
 
-.warn { color: #f5c542; }
-.ok { color: #3ddc97; }
-.danger { color: #ff6b6b; }
-.info { color: #4f6cff; }
+.warn {
+    color: #f5c542;
+}
+.ok {
+    color: #3ddc97;
+}
+.danger {
+    color: #ff6b6b;
+}
+.info {
+    color: #4f6cff;
+}
 
 /* PANEL */
 .panel {
@@ -909,9 +925,15 @@ textarea {
     margin-top: 5px;
 }
 
-.dot.blue { background: #4f6cff; }
-.dot.yellow { background: #f59e0b; }
-.dot.green { background: #22c55e; }
+.dot.blue {
+    background: #4f6cff;
+}
+.dot.yellow {
+    background: #f59e0b;
+}
+.dot.green {
+    background: #22c55e;
+}
 
 .timeline-item b {
     font-size: 14px;
@@ -1016,8 +1038,12 @@ textarea {
     border-radius: 999px;
 }
 
-.progress.green { background: #22c55e; }
-.progress.yellow { background: #f59e0b; }
+.progress.green {
+    background: #22c55e;
+}
+.progress.yellow {
+    background: #f59e0b;
+}
 
 .progress-item span {
     font-weight: 800;
@@ -1047,29 +1073,81 @@ textarea {
     margin-bottom: 14px;
 }
 
-.pagination{
-    margin-top:20px;
+/* filter bar */
+.history-filters{
     display:flex;
-    justify-content: center;
-    gap:8px;
+    gap:15px;
+    align-items:center;
+    margin-bottom:25px;
+    flex-wrap:wrap;
+}
+
+/* input + select */
+.history-filters input,
+.history-filters select{
+    background:#1e293b;
+    border:1px solid #334155;
+    color:#e2e8f0;
+    padding:8px 12px;
+    border-radius:8px;
+    outline:none;
+    transition:0.2s;
+}
+
+/* focus effect */
+.history-filters input:focus,
+.history-filters select:focus{
+    border-color:#4f46e5;
+}
+
+/* placeholder */
+.history-filters input::placeholder{
+    color:#94a3b8;
+}
+
+/* pagination */
+
+.pagination{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    margin-top:30px;
 }
 
 .pagination button{
-    width:36px;
-    height:36px;
+    padding:6px 14px;
     border:none;
-    border-radius:8px;
-    background:transparent;
-    color:#ffffff;
+    background:#1e293b;
+    color:#e2e8f0;
+    border-radius:6px;
     cursor:pointer;
-    font-size:14px;
+    transition:0.2s;
 }
 
 .pagination button:hover{
-    background:#1f3a5f;
+    background:#334155;
 }
 
 .pagination button.active{
-    background:#3b82f6;
+    background:#4f46e5;
     color:white;
+}
+.pending-filters{
+    display:flex;
+    gap:12px;
+    margin-bottom:20px;
+    flex-wrap:wrap;
+}
+
+.pending-filters input,
+.pending-filters select{
+    background:#1e293b;
+    border:1px solid #334155;
+    color:#e2e8f0;
+    padding:8px 12px;
+    border-radius:8px;
+}
+
+.pending-filters input::placeholder{
+    color:#94a3b8;
 }

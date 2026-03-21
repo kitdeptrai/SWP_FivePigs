@@ -127,7 +127,6 @@ public class SoftwareDao {
                     s.setCreatedAt(ts.toLocalDateTime());
                 }
                 s.setVersion(rs.getString("version"));
-                s.setLanguage(rs.getString("language"));
                 s.setCategoryName(rs.getString("category_name")); // QUAN TRỌNG
 
                 list.add(s);

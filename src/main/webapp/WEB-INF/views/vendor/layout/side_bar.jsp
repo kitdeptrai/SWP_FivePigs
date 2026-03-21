@@ -42,6 +42,12 @@
                 <i class="fa-regular fa-star"></i> Notification
             </a>
         </li>
+
+        <li>
+            <a href="${pageContext.request.contextPath}/customer_dashboard">
+                <i class="fa-solid fa-arrow-left"></i> CustomerDashboard
+            </a>
+        </li>
     </ul>
 
     <div class="user-box">
