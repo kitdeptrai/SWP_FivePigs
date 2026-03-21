@@ -722,7 +722,6 @@ body {
 
 /* --- SINGLE PRODUCT PAGE STYLES --- */
 
-/* 1. NÃºt quay láº¡i */
 .back-btn {
     display: inline-flex; align-items: center; gap: 10px;
     font-weight: 600; color: var(--text-sub); margin-bottom: 20px;
@@ -730,12 +729,10 @@ body {
 }
 .back-btn:hover { color: var(--primary-color); transform: translateX(-5px); }
 
-/* 2. Hero Section (Pháº§n Ä‘áº§u trang) */
 .product-hero {
     background: var(--bg-white);
     border-radius: 20px;
     padding: 30px;
-    display: flex; gap: 30px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.03);
     margin-bottom: 30px;
     align-items: center;
@@ -763,6 +760,16 @@ body {
     transition: 0.2s;
 }
 .install-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(107, 112, 255, 0.6); }
+
+.report-btn {
+  background: var(--primary-color); color: white;
+  border: none; padding: 12px 40px;
+  font-size: 16px; font-weight: 700;
+  border-radius: 10px; cursor: pointer;
+  box-shadow: 0 5px 15px rgba(107, 112, 255, 0.4);
+  transition: 0.2s;
+}
+.report-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(107, 112, 255, 0.6); }
 
 /* 3. Screenshots (áº¢nh trÆ°á»£t ngang) */
 .screenshot-scroller {
@@ -1813,3 +1820,5 @@ body {
 .profile-field-span-2 {
   grid-column: 1 / -1;
 }
+
+

@@ -25,7 +25,6 @@
         <div class="settings-shell">
             <div class="settings-nav">
                 <a href="${pageContext.request.contextPath}/settings?tab=payment_methods" class="settings-nav-item ${currentTab == 'payment_methods' ? 'active' : ''}"><i class="fa-regular fa-credit-card"></i>Payment methods</a>
-                <a href="${pageContext.request.contextPath}/settings?tab=redeem_code" class="settings-nav-item ${currentTab == 'redeem_code' ? 'active' : ''}"><i class="fa-solid fa-gift"></i>Redeem code or gift cards</a>
                 <a href="${pageContext.request.contextPath}/settings?tab=feedback" class="settings-nav-item ${currentTab == 'feedback' ? 'active' : ''}"><i class="fa-regular fa-message"></i>Send feedback</a>
                 <a href="${pageContext.request.contextPath}/settings?tab=store_settings" class="settings-nav-item ${currentTab == 'store_settings' ? 'active' : ''}"><i class="fa-solid fa-gear"></i>Store settings</a>
             </div>
@@ -35,10 +34,6 @@
                 <c:if test="${param.msg == 'wrong_current_password'}"><div class="msg-box msg-error">Current password is incorrect.</div></c:if>
                 <c:if test="${param.msg == 'confirm_not_match'}"><div class="msg-box msg-error">Confirm password does not match.</div></c:if>
                 <c:if test="${param.msg == 'invalid_password'}"><div class="msg-box msg-error">New password must be 6-72 characters.</div></c:if>
-                <c:if test="${param.msg == 'invalid_code'}"><div class="msg-box msg-error">The redeem code is invalid.</div></c:if>
-                <c:if test="${param.msg == 'code_used'}"><div class="msg-box msg-error">This redeem code has already been used.</div></c:if>
-                <c:if test="${param.msg == 'already_owned'}"><div class="msg-box msg-error">You already own this product in your Library.</div></c:if>
-                <c:if test="${param.msg == 'redeem_failed'}"><div class="msg-box msg-error">Cannot redeem this code right now.</div></c:if>
                 <c:if test="${param.msg == 'feedback_sent'}"><div class="msg-box msg-success">Thanks. Your feedback has been sent.</div></c:if>
                 <c:if test="${param.msg == 'invalid_feedback_subject'}"><div class="msg-box msg-error">Feedback subject must be 3-150 characters.</div></c:if>
                 <c:if test="${param.msg == 'invalid_feedback_message'}"><div class="msg-box msg-error">Feedback message must be 10-2000 characters.</div></c:if>
@@ -47,25 +42,6 @@
                 </c:if>
 
                 <c:choose>
-                    <c:when test="${currentTab == 'redeem_code'}">
-                        <h3 class="settings-title">Redeem code or gift cards</h3>
-                        <p class="settings-desc">Enter a product code to unlock a game or app in your Library.</p>
-                        <div class="settings-card">
-                            <form method="post" action="${pageContext.request.contextPath}/settings">
-                                <input type="hidden" name="tab" value="redeem_code">
-                                <div class="field-grid">
-                                    <div>
-                                        <label class="field-label" for="redeemCode">Code</label>
-                                        <input id="redeemCode" name="redeemCode" type="text" class="text-input" placeholder="XXXXX-XXXXX-XXXXX" maxlength="100">
-                                    </div>
-                                    <div class="settings-actions">
-                                        <button type="submit" class="install-btn settings-btn">Redeem</button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </c:when>
-
                     <c:when test="${currentTab == 'feedback'}">
                         <h3 class="settings-title">Send feedback</h3>
                         <p class="settings-desc">Tell us what to improve in FIVEPIGS Store.</p>

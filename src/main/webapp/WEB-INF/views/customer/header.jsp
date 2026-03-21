@@ -90,7 +90,6 @@
                     </div>
 
                     <a href="${pageContext.request.contextPath}/profile" class="dropdown-item"><i class="fa-regular fa-user"></i> My Profile</a>
-                    <a href="${pageContext.request.contextPath}/settings?tab=redeem_code" class="dropdown-item"><i class="fa-solid fa-gift"></i> Redeem code or gift cards</a>
                     <div class="divider"></div>
                     <a href="${pageContext.request.contextPath}/settings?tab=feedback" class="dropdown-item"><i class="fa-regular fa-message"></i> Send feedback</a>
                     <a href="${pageContext.request.contextPath}/settings?tab=store_settings" class="dropdown-item"><i class="fa-solid fa-gear"></i> Store settings</a>
@@ -99,4 +98,3 @@
         <% } %>
     </div>
 </div>
-

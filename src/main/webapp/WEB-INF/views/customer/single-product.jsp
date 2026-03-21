@@ -106,6 +106,10 @@
                     </a>
                 </c:if>
             </div>
+
+<%--            <div class="hero-report">--%>
+<%--                <button type="submit" class="report-btn">Report </button>--%>
+<%--            </div>--%>
         </div>
 
         <h3 style="margin-bottom: 15px; font-size: 20px;">Screenshots</h3>

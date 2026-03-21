@@ -2,7 +2,6 @@ package com.fivepigs.app.web.customer;
 
 import com.fivepigs.app.dao.FeedbackDao;
 import com.fivepigs.app.dao.NotificationDao;
-import com.fivepigs.app.dao.RedeemCodeDao;
 import com.fivepigs.app.dao.UserDao;
 import com.fivepigs.app.model.User;
 import jakarta.servlet.ServletException;
@@ -19,7 +18,6 @@ import java.sql.SQLException;
 public class SettingsServlet extends HttpServlet {
 
     private final UserDao userDao = new UserDao();
-    private final RedeemCodeDao redeemCodeDao = new RedeemCodeDao();
     private final FeedbackDao feedbackDao = new FeedbackDao();
     private final NotificationDao notificationDao = new NotificationDao();
 
@@ -49,38 +47,12 @@ public class SettingsServlet extends HttpServlet {
 
         try {
             switch (tab) {
-                case "redeem_code" -> handleRedeemCode(request, response, sessionUser, redirectBase);
                 case "feedback" -> handleFeedback(request, response, sessionUser, redirectBase);
                 case "store_settings" -> handlePasswordChange(request, response, sessionUser, redirectBase);
                 default -> response.sendRedirect(redirectBase);
             }
         } catch (SQLException e) {
             throw new ServletException(e);
-        }
-    }
-
-    private void handleRedeemCode(HttpServletRequest request, HttpServletResponse response, User sessionUser, String redirectBase)
-            throws IOException, SQLException {
-        String code = trim(request.getParameter("redeemCode"));
-        if (code == null || code.length() < 8) {
-            response.sendRedirect(redirectBase + "&msg=invalid_code");
-            return;
-        }
-
-        RedeemCodeDao.RedeemResult result = redeemCodeDao.redeem(sessionUser.getUserId(), code);
-        switch (result) {
-            case SUCCESS -> {
-                notificationDao.insertNotification(
-                        sessionUser.getUserId(),
-                        "Redeem successful",
-                        "A product code has been redeemed and added to your Library."
-                );
-                response.sendRedirect(request.getContextPath() + "/library?msg=redeemed");
-            }
-            case INVALID_CODE -> response.sendRedirect(redirectBase + "&msg=invalid_code");
-            case ALREADY_REDEEMED -> response.sendRedirect(redirectBase + "&msg=code_used");
-            case ALREADY_OWNED -> response.sendRedirect(redirectBase + "&msg=already_owned");
-            default -> response.sendRedirect(redirectBase + "&msg=redeem_failed");
         }
     }
 
@@ -158,7 +130,7 @@ public class SettingsServlet extends HttpServlet {
         }
 
         return switch (tab) {
-            case "payment_methods", "redeem_code", "feedback", "store_settings" -> tab;
+            case "payment_methods", "feedback", "store_settings" -> tab;
             default -> "store_settings";
         };
     }

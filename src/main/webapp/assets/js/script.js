@@ -47,3 +47,29 @@ window.onclick = function (event) {
         }
     }
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".library-report-trigger").forEach(function (trigger) {
+        trigger.addEventListener("click", function () {
+            const card = trigger.closest(".lib-card");
+            if (!card) return;
+
+            const reportBox = card.querySelector(".library-report-box");
+            if (!reportBox) return;
+
+            reportBox.classList.toggle("is-open");
+        });
+    });
+
+    document.querySelectorAll(".library-report-cancel").forEach(function (cancelBtn) {
+        cancelBtn.addEventListener("click", function () {
+            const card = cancelBtn.closest(".lib-card");
+            if (!card) return;
+
+            const reportBox = card.querySelector(".library-report-box");
+            if (!reportBox) return;
+
+            reportBox.classList.remove("is-open");
+        });
+    });
+});

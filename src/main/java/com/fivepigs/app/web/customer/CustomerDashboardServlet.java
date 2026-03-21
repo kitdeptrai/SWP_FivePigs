@@ -37,13 +37,14 @@ public class CustomerDashboardServlet extends HttpServlet {
         SoftwareDao dao = new SoftwareDao();
         try {
             List<Software> trendList = dao.getTopDownloadWithIcon(12);
+
             List<Software> bestSellingList = dao.getBestSellingWithIcon(12);
             request.setAttribute("trendList", trendList);
             request.setAttribute("bestSellingList", bestSellingList);
         } catch (SQLException e) {
             request.setAttribute("trendList", new ArrayList<Software>());
             request.setAttribute("bestSellingList", new ArrayList<Software>());
-
+            request.setAttribute("homeWarning", "Khong tai duoc du lieu top downloads/best selling.");
         }
     }
 }

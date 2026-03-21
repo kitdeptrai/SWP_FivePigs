@@ -27,6 +27,15 @@
         <c:if test="${param.msg == 'not_owned'}">
             <div style="background:#ffecec;color:#9a2c2c;border-radius:10px;padding:10px 12px;margin-bottom:14px;">You do not own this software.</div>
         </c:if>
+        <c:if test="${param.reportMsg == 'submitted'}">
+            <div style="background:#ecfdf3;color:#166534;border-radius:10px;padding:10px 12px;margin-bottom:14px;">Your report has been sent successfully.</div>
+        </c:if>
+        <c:if test="${param.reportMsg == 'invalid_reason'}">
+            <div style="background:#ffecec;color:#9a2c2c;border-radius:10px;padding:10px 12px;margin-bottom:14px;">Please describe the issue before sending your report.</div>
+        </c:if>
+        <c:if test="${param.reportMsg == 'invalid_software' || param.reportMsg == 'failed'}">
+            <div style="background:#ffecec;color:#9a2c2c;border-radius:10px;padding:10px 12px;margin-bottom:14px;">We could not send your report right now.</div>
+        </c:if>
 
         <c:choose>
             <c:when test="${empty libraryList}">
@@ -78,6 +87,27 @@
                                    style="padding:8px 14px; font-size:14px; box-shadow:none; background:#eceff7; color:#2d3748; text-decoration:none;">
                                     Detail
                                 </a>
+                            </div>
+
+                            <div class="library-card-support">
+                                <button type="button" class="library-report-trigger">
+                                    Report an issue
+                                </button>
+
+                                <div class="library-report-box">
+                                    <form method="post" action="${pageContext.request.contextPath}/report-product">
+                                        <input type="hidden" name="softwareId" value="${sw.softwareId}">
+                                        <input type="hidden" name="source" value="library">
+
+                                        <label>Reason</label>
+                                        <textarea name="reason" rows="4" placeholder="Describe the problem..."></textarea>
+
+                                        <div class="library-report-actions">
+                                            <button type="submit">Send report</button>
+                                            <button type="button" class="library-report-cancel">Cancel</button>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     </c:forEach>

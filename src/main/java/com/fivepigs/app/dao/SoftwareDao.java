@@ -607,6 +607,7 @@ public class SoftwareDao {
 
         try (Connection c = Db.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, softwareId);
+
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     Software sw = new Software();
@@ -897,7 +898,6 @@ public class SoftwareDao {
         List<Software> list = new ArrayList<>();
         try (Connection c = Db.getConnection();
              PreparedStatement st = c.prepareStatement(sql)) {
-
             st.setInt(1, limit);
             try (ResultSet rs = st.executeQuery()) {
                 while (rs.next()) {
@@ -905,6 +905,7 @@ public class SoftwareDao {
                     sw.setSoftwareId(rs.getInt("software_id"));
                     sw.setName(rs.getString("name"));
                     sw.setAvgRating(rs.getDouble("avg_rating"));
+                    sw.setDownloadCount(rs.getInt("download_count"));
                     sw.setIsFree(rs.getInt("is_free"));
                     sw.setPrice(rs.getDouble("price"));
                     sw.setIconUrl(rs.getString("icon_url"));
@@ -945,6 +946,34 @@ public class SoftwareDao {
                     sw.setAvgRating(rs.getDouble("avg_rating"));
                     sw.setIsFree(rs.getInt("is_free"));
                     sw.setPrice(rs.getDouble("price"));
+                    sw.setIconUrl(rs.getString("icon_url"));
+                    list.add(sw);
+                }
+            }
+        }
+        return list;
+    }
+
+    public List<Software> GetDownloadDemo(int a, int b) throws SQLException {
+        String sql =
+                "SELECT * FROM fivepigs.software\n" +
+                        "Where download_count between ? and ?";
+
+        List<Software> list = new ArrayList<>();
+        try (Connection c = Db.getConnection();
+             PreparedStatement st = c.prepareStatement(sql)) {
+
+            st.setInt(1, a);
+            st.setInt(1, b);
+            try (ResultSet rs = st.executeQuery()) {
+                while (rs.next()) {
+                    Software sw = new Software();
+                    sw.setSoftwareId(rs.getInt("software_id"));
+                    sw.setName(rs.getString("name"));
+                    sw.setIsFree(rs.getInt("is_free"));
+                    sw.setPrice(rs.getDouble("price"));
+                    sw.setDownloadCount(rs.getInt("downloadCount"));
+                    sw.setAvgRating(rs.getDouble("avg_rating"));
                     sw.setIconUrl(rs.getString("icon_url"));
                     list.add(sw);
                 }

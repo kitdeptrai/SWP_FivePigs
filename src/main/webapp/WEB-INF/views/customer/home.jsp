@@ -58,13 +58,13 @@
 
             <div class="right-column-box">
                 <div class="toggle-container">
-                    <div id="home-trend" class="toggle-btn active" onclick="toggleList('home', 'trend')">TRENDING</div>
+                    <div id="home-trend" class="toggle-btn active" onclick="toggleList('home', 'trend')">TOP DOWNLOADS</div>
                     <div id="home-best" class="toggle-btn" onclick="toggleList('home', 'best')">BEST SELLING</div>
                 </div>
 
                 <div class="scrollable-list" id="home-list-trend">
                     <c:if test="${empty trendList}">
-                        <p style="color:#6b7280; font-size:14px;">No trending data.</p>
+                        <p style="color:#6b7280; font-size:14px;">No download ranking data.</p>
                     </c:if>
                     <c:forEach var="sw" items="${trendList}">
                         <a href="${pageContext.request.contextPath}/product?pid=${sw.softwareId}" class="trend-item" style="text-decoration:none; color:inherit;">
