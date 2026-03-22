@@ -12,7 +12,7 @@ public class Software {
     private Integer vendorId;
     private Integer categoryId;
     private Double price;
-    private Integer isFree;
+    private Long isFree;
     private String status;
     private Integer downloadCount;
     private Double avgRating;
@@ -39,7 +39,7 @@ public class Software {
     }
 
     public Software(Integer softwareId, String name, String short_description, Integer vendorId,
-            Integer categoryId, Double price, Integer isFree, String status,
+            Integer categoryId, Double price, Long isFree, String status,
             Integer downloadCount, Double avgRating, LocalDateTime createdAt,
             Double revenue, String appName, ApprovalProcess ap, ReviewerProcess rp) {
         this.softwareId = softwareId;
@@ -107,11 +107,11 @@ public class Software {
         this.price = price;
     }
 
-    public Integer getIsFree() {
+    public Long getIsFree() {
         return isFree;
     }
 
-    public void setIsFree(Integer isFree) {
+    public void setIsFree(Long isFree) {
         this.isFree = isFree;
     }
 

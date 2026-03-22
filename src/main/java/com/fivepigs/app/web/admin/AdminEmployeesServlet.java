@@ -1,6 +1,6 @@
 package com.fivepigs.app.web.admin;
 
-import com.fivepigs.app.dao.AdminDao;
+import com.fivepigs.app.service.AdminService;
 import com.fivepigs.app.web.DashboardServlet;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -8,16 +8,31 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.util.List;
 
 @WebServlet(name = "AdminEmployeesServlet", urlPatterns = {"/admin/employees"})
 public class AdminEmployeesServlet extends DashboardServlet {
-    private final AdminDao adminDao = new AdminDao();
+    private final AdminService adminService = new AdminService();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        List<AdminDao.UserRow> employees = adminDao.listEmployees();
-        req.setAttribute("employees", employees);
+        String keyword = req.getParameter("keyword");
+        String role = req.getParameter("role");
+        String status = req.getParameter("status");
+
+        AdminService.PageResult<?> pageResult = adminService.getEmployeesPage(
+                req.getParameter("page"),
+                10,
+                keyword,
+                role,
+                status
+        );
+
+        req.setAttribute("employees", pageResult.getItems());
+        req.setAttribute("currentPage", pageResult.getCurrentPage());
+        req.setAttribute("totalPages", pageResult.getTotalPages());
+        req.setAttribute("keyword", keyword);
+        req.setAttribute("role", role);
+        req.setAttribute("status", status);
         super.doGet(req, resp);
     }
 

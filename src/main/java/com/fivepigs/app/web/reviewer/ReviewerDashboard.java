@@ -83,7 +83,8 @@ public class ReviewerDashboard extends HttpServlet {
 
         } catch (SQLException e) {
             e.printStackTrace();
-            response.sendRedirect(request.getContextPath() + "/login");
+            response.setContentType("text/plain");
+            e.printStackTrace(response.getWriter());
         }
     }
 

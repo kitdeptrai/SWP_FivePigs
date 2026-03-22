@@ -129,13 +129,13 @@ public class ApprovalDao {
                 SELECT
                     s.name,
                     s.status,
-                    sa.approval_date,
+                    s.created_at,
                     sa.approval_note
                 FROM Software s
                 LEFT JOIN Software_Approval sa
                     ON s.software_id = sa.software_id
-                WHERE s.status = 'PENDING'
-                ORDER BY sa.approval_date DESC;
+                WHERE s.status = 'PENDING_APPROVAL'
+                ORDER BY s.created_at DESC;
     """;
 
         try (Connection c = Db.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
@@ -145,11 +145,10 @@ public class ApprovalDao {
             while (rs.next()) {
                 Software s = new Software();
                 ApprovalProcess ap = new ApprovalProcess();
-                ReviewerProcess rp = new ReviewerProcess();
                 s.setAppName(rs.getString("name"));
                 s.setStatus(rs.getString("status"));
-                if (rs.getTimestamp("approval_date") != null) {
-                    ap.setApproval_date(rs.getTimestamp("approval_date").toLocalDateTime());
+                if (rs.getTimestamp("created_at") != null) {
+                    ap.setApproval_date(rs.getTimestamp("created_at").toLocalDateTime());
                 }
 
                 ap.setApproval_note(rs.getString("approval_note"));
@@ -165,7 +164,7 @@ public class ApprovalDao {
 
         String sql = """
         SELECT
-          (SELECT COUNT(*) FROM Software WHERE status = 'PENDING') AS pending_count,
+          (SELECT COUNT(*) FROM Software WHERE status = 'PENDING_APPROVAL') AS pending_count,
           (SELECT COUNT(*) FROM Software_Approval WHERE decision = 'APPROVED') AS approved_count,
           (SELECT COUNT(*) FROM Software_Approval WHERE decision = 'REJECTED') AS rejected_count
     """;
@@ -212,7 +211,7 @@ public class ApprovalDao {
            AND rp.reviewed_at = last_rp.max_reviewed_at
           LEFT JOIN Users u ON u.user_id = rp.reviewer_id
           LEFT JOIN Category c ON c.category_id = s.category_id
-          WHERE s.status = 'PENDING'
+          WHERE s.status = 'PENDING_APPROVAL'
           ORDER BY rp.reviewed_at DESC, s.created_at DESC;        
     """;
 
@@ -347,7 +346,7 @@ public class ApprovalDao {
         return null;
     }
 
-    public void submitDecision(int softwareId, int approverId, String decision, String note) throws SQLException {
+    public void submitDecision(int softwareId, int approverId, String decision, String note,String status) throws SQLException {
 
         Connection c = Db.getConnection();
         try {
@@ -379,7 +378,7 @@ public class ApprovalDao {
         """;
 
             try (PreparedStatement ps = c.prepareStatement(statusSql)) {
-                ps.setString(1, decision); // APPROVED hoặc REJECTED
+                ps.setString(1, status); // APPROVED hoặc REJECTED
                 ps.setInt(2, softwareId);
                 ps.executeUpdate();
             }
