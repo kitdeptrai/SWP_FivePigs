@@ -55,16 +55,8 @@ public class Software {
     private String language;
     
     private String imageUrl;
-    private Double qualityScore;
-    private String iconUrl;
-
-    public String getIconUrl() {
-        return iconUrl;
-    }
-
-    public void setIconUrl(String iconUrl) {
-        this.iconUrl = iconUrl;
-    }
+     private Double qualityScore;
+  
 
     public String getImageUrl() {
         return imageUrl;
@@ -114,10 +106,7 @@ public void setCategoryName(String categoryName) {
     public Software() {
     }
 
-    public Software(Integer softwareId, String name, String short_description, String IconUrl, Integer vendorId,
-            Integer categoryId, Double price, Integer isFree, String status,
-            Integer downloadCount, Double avgRating, LocalDateTime createdAt,
-            Double revenue, String appName, ApprovalProcess ap, ReviewerProcess rp, SoftwareImage sImage) {
+    public Software(Integer softwareId, String name, String short_description, Integer vendorId, Integer categoryId, Double price, Integer isFree, String status, Integer downloadCount, Double avgRating, LocalDateTime createdAt, Double revenue, String appName, ApprovalProcess ap, ReviewerProcess rp) {
         this.softwareId = softwareId;
         this.name = name;
         this.shortDescription = shortDescription;
@@ -133,10 +122,17 @@ public void setCategoryName(String categoryName) {
         this.appName = appName;
         this.approvalProcess = ap;
         this.reviewerProcess = rp;
-        this.iconUrl=iconUrl;
         
         
     }
+
+    public SoftwareImage getSoftwareImage() {
+    return softwareImage;
+}
+
+public void setSoftwareImage(SoftwareImage softwareImage) {
+    this.softwareImage = softwareImage;
+}
 
     public SoftwareDetail getSoftwareDetail() {
         return softwareDetail;
@@ -186,15 +182,6 @@ public void setCategoryName(String categoryName) {
         this.reviewerProcess = rp;
     }
 
-    public SoftwareImage getSoftwareImage() {
-        return softwareImage;
-    }
-
-    public void setSoftwareImage(SoftwareImage softwareImage) {
-        this.softwareImage = softwareImage;
-    }
-   
-
     public Integer getSoftwareId() {
         return softwareId;
     }
@@ -207,7 +194,7 @@ public void setCategoryName(String categoryName) {
         return name;
     }
 
-  
+   
 
     public void setName(String name) {
         this.name = name;

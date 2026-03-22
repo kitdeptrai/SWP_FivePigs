@@ -166,6 +166,7 @@ CREATE TABLE License (
     expire_date DATETIME,
     status VARCHAR(20),
 
+
     FOREIGN KEY (software_id) REFERENCES Software(software_id),
     FOREIGN KEY (owner_id) REFERENCES Users(user_id)
 );
@@ -389,7 +390,6 @@ CREATE INDEX idx_item_guideline ON Review_Guideline_Item(guideline_id);
 
 USE fivepigs;
 
-
 CREATE TABLE Reviewer_Assignment (
     assignment_id INT AUTO_INCREMENT PRIMARY KEY,
     software_id INT NOT NULL,
@@ -405,6 +405,7 @@ CREATE TABLE Reviewer_Assignment (
     FOREIGN KEY (software_id) REFERENCES Software(software_id) ON DELETE CASCADE,
     FOREIGN KEY (reviewer_id) REFERENCES Users(user_id) ON DELETE CASCADE
 );
+
 
 
 CREATE INDEX idx_assignment_reviewer ON Reviewer_Assignment(reviewer_id, status, assigned_at);
