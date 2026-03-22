@@ -646,7 +646,7 @@ public class SoftwareDao {
                     swVersion.setFileUrl(rs.getString("file_url"));
                     swVersion.setReleaseNote(rs.getString("version_release_note"));
                     Number fileSizeValue = (Number) rs.getObject("file_size");
-                    swVersion.setFileSize(fileSizeValue == null ? null : fileSizeValue.intValue());
+                    swVersion.setFileSize(fileSizeValue == null ? null : fileSizeValue.longValue());
                     swVersion.setCreatedAt(rs.getObject("version_created_at", LocalDateTime.class));
                     Object isActiveValue = rs.getObject("is_active");
                     if (isActiveValue instanceof Boolean booleanValue) {
@@ -876,7 +876,7 @@ public class SoftwareDao {
                 sw.setPrice(rs.getDouble("price"));
                 sw.setIsFree(rs.getInt("is_free"));
                 sw.setAvgRating(rs.getDouble("avg_rating"));
-                sw.setIconUrl(rs.getString("icon_url"));
+                
                 list.add(sw);
             }
         }
@@ -905,7 +905,7 @@ public class SoftwareDao {
                     sw.setDownloadCount(rs.getInt("download_count"));
                     sw.setIsFree(rs.getInt("is_free"));
                     sw.setPrice(rs.getDouble("price"));
-                    sw.setIconUrl(rs.getString("icon_url"));
+                    
                     list.add(sw);
                 }
             }
@@ -943,7 +943,7 @@ public class SoftwareDao {
                     sw.setAvgRating(rs.getDouble("avg_rating"));
                     sw.setIsFree(rs.getInt("is_free"));
                     sw.setPrice(rs.getDouble("price"));
-                    sw.setIconUrl(rs.getString("icon_url"));
+                    
                     list.add(sw);
                 }
             }
@@ -971,7 +971,7 @@ public class SoftwareDao {
                     sw.setPrice(rs.getDouble("price"));
                     sw.setDownloadCount(rs.getInt("downloadCount"));
                     sw.setAvgRating(rs.getDouble("avg_rating"));
-                    sw.setIconUrl(rs.getString("icon_url"));
+                    
                     list.add(sw);
                 }
             }
@@ -1008,7 +1008,7 @@ public class SoftwareDao {
                     sw.setIsFree(rs.getInt("is_free"));
                     sw.setPrice(rs.getDouble("price"));
                     sw.setAvgRating(rs.getDouble("avg_rating"));
-                    sw.setIconUrl(rs.getString("icon_url"));
+                    
                     list.add(sw);
                 }
             }
@@ -1049,7 +1049,7 @@ public class SoftwareDao {
                     sw.setStatus(rs.getString("status"));
                     sw.setDownloadCount(rs.getInt("download_count"));
                     sw.setAvgRating(rs.getDouble("avg_rating"));
-                    sw.setIconUrl(rs.getString("icon_url"));
+                    
 
                     sections.computeIfAbsent(genreName, k -> new ArrayList<>()).add(sw);
                 }
@@ -1112,7 +1112,7 @@ public class SoftwareDao {
                 sw.setPrice(rs.getDouble("price"));
                 sw.setIsFree(rs.getInt("is_free"));
                 sw.setAvgRating(rs.getDouble("avg_rating"));
-                sw.setIconUrl(rs.getString("icon_url"));
+                
                 list.add(sw);
             }
         }
@@ -1220,7 +1220,7 @@ public class SoftwareDao {
                     sw.setIsFree(rs.getInt("is_free"));
                     sw.setAvgRating(rs.getDouble("avg_rating"));
                     sw.setDownloadCount(rs.getInt("download_count"));
-                    sw.setIconUrl(rs.getString("icon_url"));
+                    
                     list.add(sw);
                 }
             }

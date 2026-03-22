@@ -32,7 +32,7 @@ public class CartDao {
                     sw.setPrice(rs.getDouble("price"));
                     sw.setIsFree(rs.getInt("is_free"));
                     sw.setAvgRating(rs.getDouble("avg_rating"));
-                    sw.setIconUrl(rs.getString("icon_url"));
+                    
                     items.add(sw);
                 }
             }
