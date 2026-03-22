@@ -14,14 +14,14 @@ public class SoftwareVersion {
     private String versionName;
     private String fileUrl;
     private String releaseNote;
-    private Long fileSize;
+    private Integer fileSize;
     private LocalDateTime createdAt;
     private Integer isActive;
 
     public SoftwareVersion() {
     }
 
-    public SoftwareVersion(Integer versionId, Integer softwareId, String versionName, String fileUrl, String releaseNote, Long fileSize, LocalDateTime createdAt, Integer isActive) {
+    public SoftwareVersion(Integer versionId, Integer softwareId, String versionName, String fileUrl, String releaseNote, Integer fileSize, LocalDateTime createdAt, Integer isActive) {
         this.versionId = versionId;
         this.softwareId = softwareId;
         this.versionName = versionName;
@@ -72,11 +72,11 @@ public class SoftwareVersion {
         this.releaseNote = releaseNote;
     }
 
-    public Long getFileSize() {
+    public Integer getFileSize() {
         return fileSize;
     }
 
-    public void setFileSize(Long fileSize) {
+    public void setFileSize(Integer fileSize) {
         this.fileSize = fileSize;
     }
 

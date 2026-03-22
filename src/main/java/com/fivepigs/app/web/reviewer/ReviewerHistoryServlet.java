@@ -31,7 +31,7 @@ public class ReviewerHistoryServlet extends HttpServlet {
 
         User user = (User) session.getAttribute("user");
         int reviewerId = user.getUserId();
-        ReviewHistoryDao dao = new ReviewHistoryDao();
+
         // 2️⃣ Lấy page từ request
         int currentPage = 1;
         String pageParam = request.getParameter("page");
@@ -51,7 +51,8 @@ public class ReviewerHistoryServlet extends HttpServlet {
             keyword = keyword.trim();
         }
 
-       
+        ReviewHistoryDao dao = new ReviewHistoryDao();
+
         int totalRecords;
         List<ReviewHistoryDTO> historyList;
 

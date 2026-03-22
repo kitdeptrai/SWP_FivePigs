@@ -68,20 +68,7 @@
                                     <span class="meta-value">Technical Review</span>
                                 </div>
                             </div>
-                            <div class="software-action-row">
-                                <c:choose>
-                                    <c:when test="${not empty software.softwareVersion and not empty software.softwareVersion.fileUrl}">
-                                        <a href="${pageContext.request.contextPath}/reviewer/download-software?softwareId=${software.softwareId}"
-                                           class="download-btn">
-                                            <i class="fa-solid fa-download"></i> Download Software File
-                                        </a>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <span class="file-missing">No software file uploaded yet</span>
-                                    </c:otherwise>
-                                </c:choose>
-                            </div>
-                        </div>              
+                        </div>
                     </div>
 
                     <form method="post" action="${pageContext.request.contextPath}/review_software" class="review-form">
