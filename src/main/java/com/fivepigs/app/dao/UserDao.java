@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 
 public class UserDao {
 
@@ -106,6 +107,36 @@ public class UserDao {
             ps.setInt(1, roleId);
             ps.setInt(2, userId);
             ps.executeUpdate();
+        }
+    }
+
+    public boolean updateProfile(Integer userId,
+                                 String fullName,
+                                 String phone,
+                                 String avatar,
+                                 LocalDate dateOfBirth,
+                                 String gender,
+                                 String address,
+                                 String bio) throws SQLException {
+        String sql = "UPDATE Users " +
+                "SET full_name = ?, phone = ?, avatar = ?, date_of_birth = ?, gender = ?, address = ?, bio = ? " +
+                "WHERE user_id = ?";
+
+        try (Connection c = Db.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, fullName);
+            ps.setString(2, phone);
+            ps.setString(3, avatar);
+            if (dateOfBirth != null) {
+                ps.setDate(4, java.sql.Date.valueOf(dateOfBirth));
+            } else {
+                ps.setNull(4, java.sql.Types.DATE);
+            }
+            ps.setString(5, gender);
+            ps.setString(6, address);
+            ps.setString(7, bio);
+            ps.setInt(8, userId);
+            return ps.executeUpdate() > 0;
         }
     }
 }
