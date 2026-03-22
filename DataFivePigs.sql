@@ -352,7 +352,7 @@ INSERT INTO Software_Image (software_id,image_url,is_thumbnail) VALUES
 (2,'images/ins_detail2.webp',0),
 (2,'images/ins_detail3.webp',0),
 (2,'images/ins_detail4.webp',0);
-
+=======
 -- Resident Evil Requiem (ID = 11)
 INSERT INTO Software_Image (software_id,image_url,is_thumbnail) VALUES
 (11,'uploads/images/RE9_icon.jpg',1),
@@ -399,7 +399,7 @@ INSERT INTO Software_Image (software_id,image_url,is_thumbnail) VALUES
 (2,'uploads/images/ins_detail2.webp',0),
 (2,'uploads/images/ins_detail3.webp',0),
 (2,'uploads/images/ins_detail4.webp',0);
-
+>>>>>>> 5e4f8c2db8a6fed33530c9b498cdff4c8b7c02b5
 
 INSERT INTO Software_Review_Process (software_id, reviewer_id, test_result)
 VALUES
@@ -775,19 +775,3 @@ INSERT INTO License (license_key,software_id,owner_id,purchase_date,expire_date,
 ('LIC-MC-44SDK',16,15,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'Active'),
 ('LIC-GTA5-88SKD',12,16,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'Active');
 
- use FivePigs;
-INSERT INTO Software_Version
-(software_id, version_name, file_url, file_size, is_active)
-VALUES
-(21,'1.0.0','uploads/files/discord_v1.zip',10485760,1),
-(22,'1.0.0','uploads/files/snapchat_v1.zip',10485760,1),
-(23,'1.0.0','uploads/files/zoom_v1.zip',10485760,1),
-(24,'1.0.0','uploads/files/photoshop_v1.zip',20485760,1),
-(25,'1.0.0','uploads/files/notion_v1.zip',10485760,1);
-
-SELECT version_id, software_id, version_name, file_url, is_active
-FROM Software_Version
-WHERE software_id = 21;
-
-
-  

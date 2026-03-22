@@ -78,10 +78,11 @@
                     <div class="filter-divider"></div>
 
                     <button type="button" class="chip active" data-type="all">All Types</button>
-                    <button type="button" class="chip" data-type="PRODUCT_SUBMITTED">Submitted</button>
-                    <button type="button" class="chip" data-type="REVIEW_APPROVED">Approved</button>
-                    <button type="button" class="chip" data-type="REVIEW_REJECTED">Rejected</button>
-                    <button type="button" class="chip" data-type="PENDING_APPROVAL">Pending Approval</button>
+                    <button type="button" class="chip" data-type="New Assignments">New Assignments</button>
+                    <button type="button" class="chip" data-type="In Progress">In Progress</button>
+                    <button type="button" class="chip" data-type="Completed">Completed</button>
+                    <button type="button" class="chip" data-type="Updates">Updates</button>
+                    <button type="button" class="chip" data-type="System">System</button>
                 </div>
 
                 <form class="noti-search-wrapper" onsubmit="return false;">
@@ -89,6 +90,8 @@
                         <i class="fa-solid fa-magnifying-glass"></i>
                         <input type="text"
                                id="searchInput"
+                               name="keyword"
+                               value="${keyword}"
                                placeholder="Search notifications..." />
                     </div>
                 </form>
@@ -121,28 +124,16 @@
                                         <span class="noti-title">${n.title}</span>
 
                                         <c:choose>
-                                            <c:when test="${n.priority eq 'HIGH' || n.priority eq 'High' || n.priority eq 'CRITICAL' || n.priority eq 'Critical'}">
+                                            <c:when test="${n.priority eq 'High' || n.priority eq 'Critical'}">
                                                 <span class="badge b-high">High Priority</span>
                                             </c:when>
-                                            <c:when test="${n.priority eq 'MEDIUM' || n.priority eq 'Medium'}">
+                                            <c:when test="${n.priority eq 'Medium'}">
                                                 <span class="badge b-med">Medium</span>
                                             </c:when>
                                             <c:otherwise>
                                                 <span class="badge b-low">Low</span>
                                             </c:otherwise>
                                         </c:choose>
-
-                                        <c:if test="${not empty n.type}">
-                                            <span class="badge b-low">
-                                                <c:choose>
-                                                    <c:when test="${n.type eq 'PRODUCT_SUBMITTED'}">Submitted</c:when>
-                                                    <c:when test="${n.type eq 'REVIEW_APPROVED'}">Approved</c:when>
-                                                    <c:when test="${n.type eq 'REVIEW_REJECTED'}">Rejected</c:when>
-                                                    <c:when test="${n.type eq 'PENDING_APPROVAL'}">Pending Approval</c:when>
-                                                    <c:otherwise>${n.type}</c:otherwise>
-                                                </c:choose>
-                                            </span>
-                                        </c:if>
 
                                         <c:if test="${!n.read}">
                                             <span class="badge b-unread">Unread</span>
@@ -164,8 +155,7 @@
                                                             '${n.priority}',
                                                             '${n.type}',
                                                             '${n.createdAt}',
-                                                            '${n.relatedUrl}',
-                                                            '${n.read}'
+                                                            '${n.relatedUrl}'
                                                             )">
                                         View Details <i class="fa-solid fa-chevron-right"></i>
                                     </button>
@@ -201,6 +191,7 @@
             </main>
         </div>
 
+        <!-- Modal đặt ngoài main để tránh ảnh hưởng layout -->
         <div id="detailsModal" class="noti-modal" onclick="closeIfBackdrop(event)">
             <div class="noti-modal-box">
                 <button type="button" class="noti-modal-close" onclick="closeModal()">✕</button>
@@ -213,7 +204,7 @@
                         <div id="mTitle" class="modal-title"></div>
                         <div class="modal-badges">
                             <span id="mPriority" class="badge b-high">High Priority</span>
-                            <span id="mType" class="badge b-low"></span>
+                            <span id="mType" class="badge b-low">System</span>
                         </div>
                     </div>
                 </div>
@@ -280,61 +271,42 @@
                     const content = card.getAttribute("data-content") || "";
 
                     let okRead = true;
-                    if (readFilter === "unread") okRead = !isRead;
-                    if (readFilter === "read") okRead = isRead;
+                    if (readFilter === "unread")
+                        okRead = !isRead;
+                    if (readFilter === "read")
+                        okRead = isRead;
 
-                    let okType = true;
-                    if (typeFilter === "all") {
-                        okType = true;
-                    } else {
-                        okType = (type === typeFilter);
-                    }
-
+                    const okType = (typeFilter === "all") ? true : (type === typeFilter);
                     const okSearch = (q === "") ? true : (title.includes(q) || content.includes(q));
 
                     card.style.display = (okRead && okType && okSearch) ? "flex" : "none";
                 });
             }
 
-            function getTypeLabel(type) {
-                if (type === "PRODUCT_SUBMITTED") return "Submitted";
-                if (type === "REVIEW_APPROVED") return "Approved";
-                if (type === "REVIEW_REJECTED") return "Rejected";
-                if (type === "PENDING_APPROVAL") return "Pending Approval";
-                return type || "";
-            }
-
-            function openDetails(id, title, content, priority, type, time, relatedUrl, isRead) {
+            function openDetails(id, title, content, priority, type, time, relatedUrl) {
                 document.getElementById("mTitle").innerText = title || "";
                 document.getElementById("mContent").innerText = content || "";
                 document.getElementById("mTime").innerText = time || "";
-                document.getElementById("mStatus").innerText = (isRead === "true") ? "Read" : "Unread";
+                document.getElementById("mStatus").innerText = "Active";
 
                 currentRelatedUrl = relatedUrl || "";
 
-                const pri = (priority || "LOW").toLowerCase();
+                const pri = (priority || "Low").toLowerCase();
                 const priEl = document.getElementById("mPriority");
                 priEl.className = "badge " + (
                         (pri === "high" || pri === "critical") ? "b-high" :
                         (pri === "medium") ? "b-med" : "b-low"
-                );
+                        );
                 priEl.innerText =
                         (pri === "high" || pri === "critical") ? "High Priority" :
                         (pri === "medium") ? "Medium" : "Low";
 
                 const typeEl = document.getElementById("mType");
-                const typeLabel = getTypeLabel(type);
-                if (typeLabel && typeLabel.trim() !== "") {
-                    typeEl.className = "badge b-low";
-                    typeEl.innerText = typeLabel;
-                    typeEl.style.display = "inline-flex";
-                } else {
-                    typeEl.innerText = "";
-                    typeEl.style.display = "none";
-                }
+                typeEl.className = "badge b-low";
+                typeEl.innerText = type || "System";
 
                 const goBtn = document.getElementById("goBtn");
-                if (!currentRelatedUrl || currentRelatedUrl.trim() === "") {
+                if (!currentRelatedUrl) {
                     goBtn.style.opacity = ".5";
                     goBtn.style.pointerEvents = "none";
                 } else {
@@ -358,7 +330,7 @@
             }
 
             function goRelated() {
-                if (currentRelatedUrl && currentRelatedUrl.trim() !== "") {
+                if (currentRelatedUrl) {
                     window.location.href = "${pageContext.request.contextPath}" + currentRelatedUrl;
                 }
             }
