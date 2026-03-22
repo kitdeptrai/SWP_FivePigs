@@ -1,6 +1,9 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
+ */
 package com.fivepigs.app.web.reviewer;
 
-import com.fivepigs.app.dao.NotificationDao;
 import com.fivepigs.app.dao.ReviewScoreDao;
 import com.fivepigs.app.dao.SoftwareDao;
 import com.fivepigs.app.model.ReviewScore;
@@ -9,10 +12,7 @@ import com.fivepigs.app.model.User;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.*;
 
 import java.io.IOException;
 
@@ -22,18 +22,6 @@ public class ReviewSoftwareServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("user") == null) {
-            response.sendRedirect(request.getContextPath() + "/login");
-            return;
-        }
-
-        User user = (User) session.getAttribute("user");
-        if (!Integer.valueOf(5).equals(user.getRoleId())) {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN);
-            return;
-        }
 
         String idRaw = request.getParameter("softwareId");
         if (idRaw == null || idRaw.trim().isEmpty()) {
@@ -76,12 +64,8 @@ public class ReviewSoftwareServlet extends HttpServlet {
 
         try {
             User user = (User) session.getAttribute("user");
-            if (!Integer.valueOf(5).equals(user.getRoleId())) {
-                response.sendError(HttpServletResponse.SC_FORBIDDEN);
-                return;
-            }
-
             int reviewerId = user.getUserId();
+
             int softwareId = Integer.parseInt(request.getParameter("softwareId"));
 
             int noMalware = request.getParameter("no_malware") != null ? 1 : 0;
@@ -106,13 +90,6 @@ public class ReviewSoftwareServlet extends HttpServlet {
 
             ReviewScoreDao reviewScoreDao = new ReviewScoreDao();
             SoftwareDao softwareDao = new SoftwareDao();
-            NotificationDao notificationDao = new NotificationDao();
-
-            Software software = softwareDao.getSoftwareById(softwareId);
-            if (software == null) {
-                response.sendRedirect(request.getContextPath() + "/reviewer_pending");
-                return;
-            }
 
             ReviewScore reviewScore = new ReviewScore();
             reviewScore.setSoftwareId(softwareId);
@@ -136,72 +113,14 @@ public class ReviewSoftwareServlet extends HttpServlet {
                 softwareDao.updateSoftwareStatus(softwareId, "REJECTED");
             }
 
-            // ===== Notification cho vendor =====
-            String vendorTitle;
-            String vendorContent;
-            String vendorType;
-            String vendorPriority = "HIGH";
-            String vendorRelatedUrl = "/vendor/products";
-
-            if ("APPROVED".equals(decision)) {
-                vendorTitle = "Your product passed reviewer check";
-                vendorContent = "Product \"" + software.getName()
-                        + "\" has been reviewed successfully and moved to approval stage.";
-                vendorType = "REVIEW_APPROVED";
-            } else {
-                vendorTitle = "Your product was rejected by reviewer";
-                vendorContent = "Product \"" + software.getName()
-                        + "\" did not pass reviewer evaluation. Please check review notes.";
-                vendorType = "REVIEW_REJECTED";
-            }
-
-            notificationDao.insertForUser(
-                    software.getVendorId(),
-                    vendorTitle,
-                    vendorContent,
-                    vendorType,
-                    vendorPriority,
-                    vendorRelatedUrl
-            );
-
-            // ===== Nếu approved thì gửi thêm cho approval =====
-            if ("APPROVED".equals(decision)) {
-                String approvalTitle = "Product waiting for approval";
-                String approvalContent = "Product \"" + software.getName()
-                        + "\" has passed reviewer evaluation and is waiting for approval.";
-                String approvalType = "PENDING_APPROVAL";
-                String approvalPriority = "HIGH";
-                String approvalRelatedUrl = "/approval/pending";
-
-                // role_id = 4 là APPROVAL
-                notificationDao.insertForRole(
-                        4,
-                        approvalTitle,
-                        approvalContent,
-                        approvalType,
-                        approvalPriority,
-                        approvalRelatedUrl
-                );
-            }
-
             response.sendRedirect(request.getContextPath() + "/reviewer_history");
 
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("error", "Submit review failed.");
-
-            try {
-                String softwareIdRaw = request.getParameter("softwareId");
-                if (softwareIdRaw != null && !softwareIdRaw.trim().isEmpty()) {
-                    int softwareId = Integer.parseInt(softwareIdRaw);
-                    Software software = new SoftwareDao().getSoftwareById(softwareId);
-                    request.setAttribute("software", software);
-                }
-            } catch (Exception ignored) {
-            }
-
             request.getRequestDispatcher("/WEB-INF/views/reviewer/reviewer_software.jsp")
                     .forward(request, response);
         }
     }
+
 }

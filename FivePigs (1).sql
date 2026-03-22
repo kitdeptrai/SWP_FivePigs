@@ -41,6 +41,7 @@ CREATE TABLE Software (
     short_description NVARCHAR(255),
     vendor_id INT NOT NULL,
     category_id INT,
+    price DECIMAL(10,2) DEFAULT 0,
     is_free TINYINT(1) DEFAULT 0,
     status VARCHAR(30) DEFAULT 'PENDING_REVIEW',
     download_count INT DEFAULT 0,
@@ -80,7 +81,7 @@ CREATE TABLE Software_Version (
     file_size BIGINT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     is_active TINYINT(1) DEFAULT 1,
-    
+    pricing_type VARCHAR(20) DEFAULT 'SIMPLE',
     FOREIGN KEY (software_id) REFERENCES Software(software_id)
         ON DELETE CASCADE
 );
@@ -93,7 +94,6 @@ CREATE TABLE Software_Pricing (
     price DECIMAL(10,2) NOT NULL,
     is_active TINYINT(1) DEFAULT 1,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    
     FOREIGN KEY (software_id) REFERENCES Software(software_id)
 );
 
@@ -110,8 +110,6 @@ CREATE TABLE Cart_Detail (
     cart_detail_id INT AUTO_INCREMENT PRIMARY KEY,
     cart_id INT,
     software_id INT,
-    pricing_id INT NULL,
-    FOREIGN KEY (pricing_id) REFERENCES Software_Pricing(pricing_id),
     FOREIGN KEY (cart_id) REFERENCES Cart(cart_id),
     FOREIGN KEY (software_id) REFERENCES Software(software_id)
 );
@@ -151,6 +149,7 @@ CREATE TABLE License (
     software_id INT,
     owner_id INT, -- người mua license 
     max_users INT DEFAULT 1, -- giới hạn user
+    current_users INT DEFAULT 0, -- số user đang dùng
     purchase_date DATETIME,
     expire_date DATETIME,
     status VARCHAR(20),
@@ -170,8 +169,12 @@ CREATE TABLE License (
     expire_date DATETIME,
     status VARCHAR(20),
 
+<<<<<<< HEAD
 >>>>>>> 4e74f896e3584b2c7b4b3118d2c21034d6963716
 >>>>>>> d7e24f0dfcc4b53ab79a48e4194a632f678ff91d
+=======
+>>>>>>> 69737e60ddf2534278b3643aff4b7bb299ead5d4
+>>>>>>> 6703ff05ebf51eb07eb679432b3d241b4a063421
     FOREIGN KEY (software_id) REFERENCES Software(software_id),
     FOREIGN KEY (owner_id) REFERENCES Users(user_id)
 );
@@ -196,8 +199,12 @@ CREATE TABLE License_User (
 
     UNIQUE KEY uq_license_user (license_id, user_id),
 
+<<<<<<< HEAD
 >>>>>>> 4e74f896e3584b2c7b4b3118d2c21034d6963716
 >>>>>>> d7e24f0dfcc4b53ab79a48e4194a632f678ff91d
+=======
+>>>>>>> 69737e60ddf2534278b3643aff4b7bb299ead5d4
+>>>>>>> 6703ff05ebf51eb07eb679432b3d241b4a063421
     FOREIGN KEY (license_id) REFERENCES License(license_id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE
 );
@@ -252,13 +259,10 @@ CREATE TABLE Report (
 -- 18. Notification
 CREATE TABLE Notification (
     notification_id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    title VARCHAR(150) NOT NULL,
+    user_id INT,
+    title VARCHAR(150),
     content LONGTEXT,
     is_read TINYINT(1) DEFAULT 0,
-    type VARCHAR(50) DEFAULT 'UPDATE',
-    priority VARCHAR(20) DEFAULT 'MEDIUM',
-    related_url VARCHAR(255),
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES Users(user_id)
 );
@@ -281,8 +285,11 @@ CREATE TABLE Vendor_Payout (
 <<<<<<< HEAD
 =======
 -- 19.1 Vendor Payout Audit Log
+<<<<<<< HEAD
 >>>>>>> 4e74f896e3584b2c7b4b3118d2c21034d6963716
 >>>>>>> d7e24f0dfcc4b53ab79a48e4194a632f678ff91d
+=======
+>>>>>>> 6703ff05ebf51eb07eb679432b3d241b4a063421
 CREATE TABLE Admin_Payout_Audit (
     audit_id INT AUTO_INCREMENT PRIMARY KEY,
     payout_id INT NOT NULL,
@@ -295,17 +302,29 @@ CREATE TABLE Admin_Payout_Audit (
     FOREIGN KEY (payout_id) REFERENCES Vendor_Payout(payout_id),
     FOREIGN KEY (admin_user_id) REFERENCES Users(user_id)
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 =======
+=======
+>>>>>>> 6703ff05ebf51eb07eb679432b3d241b4a063421
 );
 
+>>>>>>> 69737e60ddf2534278b3643aff4b7bb299ead5d4
 CREATE TABLE Vendor_Earning (
     earning_id INT AUTO_INCREMENT PRIMARY KEY,
     vendor_id INT NOT NULL,
     software_id INT,
     order_id INT,
     amount DECIMAL(12,2), -- tiền vendor nhận được (sau fee)
+<<<<<<< HEAD
+	gross_amount DECIMAL(12,2),
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+	commission_rate DECIMAL(5,2),
+    FOREIGN KEY (vendor_id) REFERENCES Users(user_id),
+    FOREIGN KEY (software_id) REFERENCES Software(software_id),
+    FOREIGN KEY (order_id) REFERENCES Orders(order_id)
+=======
 
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 
@@ -331,23 +350,14 @@ CREATE TABLE Wallet (
     status VARCHAR(20),
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES Users(user_id)
+<<<<<<< HEAD
 >>>>>>> 4e74f896e3584b2c7b4b3118d2c21034d6963716
 >>>>>>> d7e24f0dfcc4b53ab79a48e4194a632f678ff91d
+=======
+>>>>>>> 69737e60ddf2534278b3643aff4b7bb299ead5d4
+>>>>>>> 6703ff05ebf51eb07eb679432b3d241b4a063421
 );
 
-CREATE TABLE Vendor_Earning (
-    earning_id INT AUTO_INCREMENT PRIMARY KEY,
-    vendor_id INT NOT NULL,
-    software_id INT,
-    order_id INT,
-    amount DECIMAL(12,2), -- tiền vendor nhận được (sau fee)
-
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-
-    FOREIGN KEY (vendor_id) REFERENCES Users(user_id),
-    FOREIGN KEY (software_id) REFERENCES Software(software_id),
-    FOREIGN KEY (order_id) REFERENCES Orders(order_id)
-);
 
 CREATE TABLE System_Config (
     config_key VARCHAR(50) PRIMARY KEY,
@@ -416,8 +426,12 @@ CREATE INDEX idx_item_guideline ON Review_Guideline_Item(guideline_id);
 
 USE fivepigs;
 
+<<<<<<< HEAD
 >>>>>>> 4e74f896e3584b2c7b4b3118d2c21034d6963716
 >>>>>>> d7e24f0dfcc4b53ab79a48e4194a632f678ff91d
+=======
+>>>>>>> 69737e60ddf2534278b3643aff4b7bb299ead5d4
+>>>>>>> 6703ff05ebf51eb07eb679432b3d241b4a063421
 CREATE TABLE Reviewer_Assignment (
     assignment_id INT AUTO_INCREMENT PRIMARY KEY,
     software_id INT NOT NULL,
@@ -439,11 +453,15 @@ CREATE TABLE Reviewer_Assignment (
 
 =======
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 
 =======
 >>>>>>> 4e74f896e3584b2c7b4b3118d2c21034d6963716
 >>>>>>> d7e24f0dfcc4b53ab79a48e4194a632f678ff91d
+=======
+>>>>>>> 69737e60ddf2534278b3643aff4b7bb299ead5d4
+>>>>>>> 6703ff05ebf51eb07eb679432b3d241b4a063421
 CREATE INDEX idx_assignment_reviewer ON Reviewer_Assignment(reviewer_id, status, assigned_at);
 CREATE INDEX idx_assignment_software ON Reviewer_Assignment(software_id, status);
 
@@ -452,7 +470,11 @@ CREATE INDEX idx_assignment_software ON Reviewer_Assignment(software_id, status)
 
 =======
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 =======
 >>>>>>> 4e74f896e3584b2c7b4b3118d2c21034d6963716
 >>>>>>> d7e24f0dfcc4b53ab79a48e4194a632f678ff91d
+=======
+>>>>>>> 69737e60ddf2534278b3643aff4b7bb299ead5d4
+>>>>>>> 6703ff05ebf51eb07eb679432b3d241b4a063421
