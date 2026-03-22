@@ -1,4 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <c:set var="activeMenu" value="guidelines" />
@@ -145,7 +146,16 @@
                             <div class="g-actions">
                                 <button type="button" class="icon-btn"
                                         title="Edit"
-                                        onclick="openGuidelineModal('edit', ${g.guidelineId})">
+                                        onclick="openGuidelineModal(
+                                                        'edit',
+                                                        '${g.guidelineId}',
+                                                        '${g.category}',
+                                                        '${g.priority}',
+                                                        '${fn:escapeXml(g.title)}',
+                                                        '${g.description}',
+                                                        '${g.icon}',
+                                                        '${g.color}'
+                                                        )">
                                     <i class="fa-regular fa-pen-to-square"></i>
                                 </button>
 
@@ -250,13 +260,16 @@
                 box.style.display = willShow ? "block" : "none";
 
                 if (!willShow) {
-                    if (link) link.innerText = "View checklist items";
+                    if (link)
+                        link.innerText = "View checklist items";
                     return;
                 }
 
-                if (link) link.innerText = "Hide checklist";
+                if (link)
+                    link.innerText = "Hide checklist";
 
-                if (box.dataset.loaded === "1") return;
+                if (box.dataset.loaded === "1")
+                    return;
 
                 box.innerHTML = '<div class="items-loading">Loading...</div>';
 
@@ -276,9 +289,9 @@
                     } else {
                         box.innerHTML = items.map(it =>
                             '<div class="check-item">' +
-                            '<i class="fa-regular fa-circle-check"></i>' +
-                            '<span>' + escapeHtml(it.itemText) + '</span>' +
-                            '</div>'
+                                    '<i class="fa-regular fa-circle-check"></i>' +
+                                    '<span>' + escapeHtml(it.itemText) + '</span>' +
+                                    '</div>'
                         ).join("");
                     }
 
@@ -298,32 +311,73 @@
                         .replaceAll("'", "&#039;");
             }
 
-            function openGuidelineModal(mode, guidelineId) {
+            async function openGuidelineModal(
+                    mode,
+                    guidelineId = "",
+                    category = "",
+                    priority = "",
+                    titleText = "",
+                    description = "",
+                    icon = "",
+                    color = ""
+                    ) {
+
                 const modal = document.getElementById("guidelineModal");
                 const title = document.getElementById("modalTitle");
                 const form = document.getElementById("guidelineForm");
 
-                document.getElementById("guidelineId").value = "";
-                document.getElementById("fCategory").value = "";
-                document.getElementById("fPriority").value = "";
-                document.getElementById("fTitle").value = "";
-                document.getElementById("fDescription").value = "";
-                document.getElementById("fIcon").value = "";
-                document.getElementById("fColor").value = "";
-
-                modalItems = [];
-                renderModalItems();
-
                 if (mode === "add") {
+
                     title.innerText = "Add New Guideline";
                     form.action = BASE + "/reviewer_guideline_create";
+
+                    document.getElementById("guidelineId").value = "";
+                    document.getElementById("fCategory").value = "";
+                    document.getElementById("fPriority").value = "";
+                    document.getElementById("fTitle").value = "";
+                    document.getElementById("fDescription").value = "";
+                    document.getElementById("fIcon").value = "";
+                    document.getElementById("fColor").value = "";
+
+                    modalItems = [];
+                    renderModalItems();
+
                     modal.style.display = "flex";
                     return;
                 }
 
+                // ===== EDIT =====
+
                 title.innerText = "Edit Guideline";
                 form.action = BASE + "/reviewer_guideline_update";
+
                 document.getElementById("guidelineId").value = guidelineId;
+                document.getElementById("fCategory").value = category;
+                document.getElementById("fPriority").value = priority;
+                document.getElementById("fTitle").value = titleText;
+                document.getElementById("fDescription").value = description;
+                document.getElementById("fIcon").value = icon;
+                document.getElementById("fColor").value = color;
+
+                // LOAD CHECKLIST ITEMS
+                try {
+
+                    const res = await fetch(BASE + "/reviewer_guideline_items?guidelineId=" + guidelineId);
+
+                    if (res.ok) {
+                        const items = await res.json();
+
+                        modalItems = items.map(i => i.itemText);
+                    } else {
+                        modalItems = [];
+                    }
+
+                } catch (e) {
+                    console.error(e);
+                    modalItems = [];
+                }
+
+                renderModalItems();
 
                 modal.style.display = "flex";
             }
@@ -334,7 +388,8 @@
 
             window.onclick = function (event) {
                 const modal = document.getElementById("guidelineModal");
-                if (event.target === modal) modal.style.display = "none";
+                if (event.target === modal)
+                    modal.style.display = "none";
             }
 
             let modalItems = [];
@@ -370,7 +425,8 @@
             function addChecklistItem() {
                 const inp = document.getElementById("newItemText");
                 const v = (inp.value || "").trim();
-                if (!v) return;
+                if (!v)
+                    return;
 
                 modalItems.push(v);
                 inp.value = "";

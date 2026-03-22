@@ -36,7 +36,7 @@
 
                         <p class="card-title">Pending Reviews</p>
                         <h2>${pendingReviewApp}</h2>
-                        <span class="warning-text">Requires attention</span>
+                        <span class="warning-text">Total</span>
                     </div>
 
                     <!-- Card 2 -->
@@ -51,7 +51,7 @@
 
                         <p class="card-title">Completed Reviews</p>
                         <h2>${completeReviewApp}</h2>
-                        <span class="success-text">50% completion rate</span>
+                        <span class="success-text">Total</span>
                     </div>
 
 
@@ -78,7 +78,7 @@
 
                     <a href="${pageContext.request.contextPath}/reviewer_dashboard_detail" class="panel dashboard-link-panel">
                         <div class="panel-header">
-                            <h3>Monthly Target Progress</h3>
+                            <h3>Total software reviews</h3>
                             <span class="target">${reviewedCount} / ${inReviewCount + reviewedCount}</span>
                         </div>
 
