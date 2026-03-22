@@ -12,7 +12,7 @@ import java.util.List;
 
 public class NotificationDao {
 
-    private Notification mapRow(ResultSet rs) throws SQLException {
+     private Notification mapRow(ResultSet rs) throws SQLException {
         Notification n = new Notification();
         n.setNotificationId(rs.getInt("notification_id"));
         n.setUserId(rs.getInt("user_id"));
@@ -23,12 +23,16 @@ public class NotificationDao {
         return n;
     }
 
+    // 1. Lấy tất cả notification của user
     public List<Notification> getByUser(int userId) {
         List<Notification> list = new ArrayList<>();
-        String sql = "SELECT * FROM Notification WHERE user_id = ? ORDER BY created_at DESC";
 
-        try (Connection con = Db.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+        String sql = "SELECT notification_id, user_id, title, content, is_read, type, priority, related_url, created_at "
+                + "FROM Notification "
+                + "WHERE user_id = ? "
+                + "ORDER BY created_at DESC";
+
+        try (Connection con = Db.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setInt(1, userId);
             try (ResultSet rs = ps.executeQuery()) {
@@ -36,6 +40,7 @@ public class NotificationDao {
                     list.add(mapRow(rs));
                 }
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -136,4 +141,9 @@ public class NotificationDao {
             e.printStackTrace();
         }
     }
+
+    
+
+   
+
 }

@@ -55,7 +55,7 @@ public class Software {
     private String language;
     
     private String imageUrl;
-     private Double qualityScore;
+    private Double qualityScore;
     private String iconUrl;
 
     public String getIconUrl() {
@@ -114,7 +114,10 @@ public void setCategoryName(String categoryName) {
     public Software() {
     }
 
-    public Software(Integer softwareId, String name, String short_description, Integer vendorId, Integer categoryId, Double price, Integer isFree, String status, Integer downloadCount, Double avgRating, LocalDateTime createdAt, Double revenue, String appName, ApprovalProcess ap, ReviewerProcess rp) {
+    public Software(Integer softwareId, String name, String short_description, String IconUrl, Integer vendorId,
+            Integer categoryId, Double price, Integer isFree, String status,
+            Integer downloadCount, Double avgRating, LocalDateTime createdAt,
+            Double revenue, String appName, ApprovalProcess ap, ReviewerProcess rp, SoftwareImage sImage) {
         this.softwareId = softwareId;
         this.name = name;
         this.shortDescription = shortDescription;
@@ -130,6 +133,9 @@ public void setCategoryName(String categoryName) {
         this.appName = appName;
         this.approvalProcess = ap;
         this.reviewerProcess = rp;
+        this.iconUrl=iconUrl;
+        
+        
     }
 
     public SoftwareDetail getSoftwareDetail() {
@@ -148,7 +154,13 @@ public void setCategoryName(String categoryName) {
         this.softwareVersion = softwareVersion;
     }
 
+    public Category getCategory() {
+        return category;
+    }
 
+    public void setCategory(Category category) {
+        this.category = category;
+    }
 
     public User getUser() {
         return user;
@@ -157,29 +169,7 @@ public void setCategoryName(String categoryName) {
     public void setUser(User user) {
         this.user = user;
     }
-    
-    
 
-    public Category getCategory() {
-        return category;
-    }
-
-    public void setCategory(Category category) {
-        this.category = category;
-    }
-    
-    
-
-    public SoftwareImage getSoftwareImage() {
-        return softwareImage;
-    }
-
-    public void setSoftwareImage(SoftwareImage softwareImage) {
-        this.softwareImage = softwareImage;
-    }
-
-    
-    
     public ApprovalProcess getApprovalProcess() {
         return approvalProcess;
     }
@@ -196,6 +186,15 @@ public void setCategoryName(String categoryName) {
         this.reviewerProcess = rp;
     }
 
+    public SoftwareImage getSoftwareImage() {
+        return softwareImage;
+    }
+
+    public void setSoftwareImage(SoftwareImage softwareImage) {
+        this.softwareImage = softwareImage;
+    }
+   
+
     public Integer getSoftwareId() {
         return softwareId;
     }
@@ -207,6 +206,8 @@ public void setCategoryName(String categoryName) {
     public String getName() {
         return name;
     }
+
+  
 
     public void setName(String name) {
         this.name = name;
