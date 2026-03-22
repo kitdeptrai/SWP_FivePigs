@@ -3,7 +3,7 @@
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Admin - Employees</title>
@@ -122,29 +122,54 @@
 
     <main class="main">
         <h1 style="margin-top: 0;">Employees Management</h1>
-        <p class="subtitle">Quản lý danh sách nhân viên hệ thống.</p>
+        <p class="subtitle">Manage the system employee list.</p>
 
         <div class="card" style="max-width: 100%;">
             <div style="display:flex; justify-content: space-between; align-items:center; gap: 16px;">
                 <div>
-                    <h2 style="margin:0; font-size: 18px; color: var(--dark-blue);">Danh sách nhân viên</h2>
-                    <p style="margin:6px 0 0; color:#64748b; font-size: 13px;">Role: reviewer / aproval</p>
+                    <h2 style="margin:0; font-size: 18px; color: var(--dark-blue);">Employee list</h2>
+                    <p style="margin:6px 0 0; color:#64748b; font-size: 13px;">Roles: reviewer / approval</p>
                 </div>
                 <a href="#add-employee" style="padding: 10px 14px; border-radius: 10px; background: var(--accent); color: #fff; text-decoration:none; font-weight: 600;">+ Add Employee</a>
             </div>
 
             <c:if test="${param.success == '1'}">
-                <div class="alert success">Tạo nhân viên thành công. Mật khẩu mặc định đã được gửi qua email.</div>
+                <div class="alert success">Employee created successfully. The default password has been sent by email.</div>
             </c:if>
             <c:if test="${param.error == 'email_exists'}">
-                <div class="alert danger">Email đã tồn tại trong hệ thống.</div>
+                <div class="alert danger">Email already exists in the system.</div>
             </c:if>
             <c:if test="${param.error == 'missing_fields'}">
-                <div class="alert danger">Vui lòng nhập đầy đủ Họ tên, Email và Role.</div>
+                <div class="alert danger">Please fill in full name, email, and role.</div>
             </c:if>
             <c:if test="${param.error == 'db_error'}">
-                <div class="alert danger">Không thể tạo nhân viên (lỗi database).</div>
+                <div class="alert danger">Unable to create employee (database error).</div>
             </c:if>
+
+            <form method="get" action="${pageContext.request.contextPath}/admin/employees" style="margin-top:16px; display:grid; grid-template-columns: 2fr 1fr 1fr auto auto; gap:10px; align-items:end;">
+                <div>
+                    <label style="display:block; font-size:12px; color:#64748b; margin-bottom:6px;">Search</label>
+                    <input type="text" name="keyword" value="${keyword}" placeholder="Name, email, phone..." style="width:100%; padding:10px 12px; border:1px solid #cbd5e1; border-radius:8px;" />
+                </div>
+                <div>
+                    <label style="display:block; font-size:12px; color:#64748b; margin-bottom:6px;">Role</label>
+                    <select name="role" style="width:100%; padding:10px 12px; border:1px solid #cbd5e1; border-radius:8px;">
+                        <option value="">All</option>
+                        <option value="reviewer" ${role == 'reviewer' ? 'selected' : ''}>reviewer</option>
+                        <option value="approval" ${role == 'approval' || role == 'aproval' ? 'selected' : ''}>approval</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="display:block; font-size:12px; color:#64748b; margin-bottom:6px;">Status</label>
+                    <select name="status" style="width:100%; padding:10px 12px; border:1px solid #cbd5e1; border-radius:8px;">
+                        <option value="">All</option>
+                        <option value="ACTIVE" ${status == 'ACTIVE' ? 'selected' : ''}>ACTIVE</option>
+                        <option value="INACTIVE" ${status == 'INACTIVE' ? 'selected' : ''}>INACTIVE</option>
+                    </select>
+                </div>
+                <button type="submit" style="padding:10px 14px; border-radius:8px; border:none; background:#3b82f6; color:#fff; font-weight:600;">Filter</button>
+                <a href="${pageContext.request.contextPath}/admin/employees" style="padding:10px 14px; border-radius:8px; border:1px solid #cbd5e1; color:#334155; text-decoration:none; font-weight:600; text-align:center;">Reset</a>
+            </form>
 
             <table>
                 <thead>
@@ -177,7 +202,7 @@
                                 <div style="display: flex; gap: 8px;">
                                     <a href="#edit-emp-${e.userId}" style="color: var(--accent); text-decoration: none; font-size: 13px; font-weight: 600;">Edit</a>
                                     <c:if test="${e.status == 'ACTIVE'}">
-                                        <a href="#disable-emp-${e.userId}" style="color: var(--danger); text-decoration: none; font-size: 13px; font-weight: 600;">Disable</a>
+                                        <a href="#disable-emp-${e.userId}" style="color: var(--danger); text-decoration: none; font-size: 13px; font-weight: 600;" onclick="return confirm('Are you sure you want to disable this employee?');">Disable</a>
                                     </c:if>
                                     <c:if test="${e.status == 'INACTIVE'}">
                                         <a href="#enable-emp-${e.userId}" style="color: #22c55e; text-decoration: none; font-size: 13px; font-weight: 600;">Enable</a>
@@ -227,15 +252,15 @@
                                 <div id="disable-emp-${e.userId}" class="modal">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <h2>Khóa tài khoản</h2>
+                                            <h2>Lock account</h2>
                                             <a class="close-modal" href="${pageContext.request.contextPath}/admin/employees">×</a>
                                         </div>
-                                        <p>Bạn có chắc chắn muốn khóa tài khoản của <strong><c:out value="${e.fullName}"/></strong>?</p>
+                                        <p>Are you sure you want to lock the account of <strong><c:out value="${e.fullName}"/></strong>?</p>
                                         <form method="post" action="${pageContext.request.contextPath}/admin/employees/disable">
                                             <input type="hidden" name="userId" value="${e.userId}" />
                                             <div class="actions">
-                                                <button type="submit" style="background: var(--danger);">Xác nhận khóa</button>
-                                                <a class="small" href="${pageContext.request.contextPath}/admin/employees">Hủy</a>
+                                                <button type="submit" style="background: var(--danger);">Confirm lock</button>
+                                                <a class="small" href="${pageContext.request.contextPath}/admin/employees">Cancel</a>
                                             </div>
                                         </form>
                                     </div>
@@ -245,29 +270,49 @@
                                 <div id="enable-emp-${e.userId}" class="modal">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <h2>Mở khóa tài khoản</h2>
+                                            <h2>Unlock account</h2>
                                             <a class="close-modal" href="${pageContext.request.contextPath}/admin/employees">×</a>
                                         </div>
-                                        <p>Bạn có chắc chắn muốn mở khóa tài khoản của <strong><c:out value="${e.fullName}"/></strong>?</p>
+                                        <p>Are you sure you want to unlock the account of <strong><c:out value="${e.fullName}"/></strong>?</p>
                                         <form method="post" action="${pageContext.request.contextPath}/admin/employees/enable">
                                             <input type="hidden" name="userId" value="${e.userId}" />
                                             <div class="actions">
-                                                <button type="submit" style="background: #22c55e;">Xác nhận mở khóa</button>
-                                                <a class="small" href="${pageContext.request.contextPath}/admin/employees">Hủy</a>
+                                                <button type="submit" style="background: #22c55e;">Confirm unlock</button>
+                                                <a class="small" href="${pageContext.request.contextPath}/admin/employees">Cancel</a>
                                             </div>
                                         </form>
                                     </div>
                                 </div>
+
                             </td>
                         </tr>
                     </c:forEach>
                     <c:if test="${empty employees}">
                         <tr>
-                            <td colspan="7" style="text-align:center; color:#94a3b8; padding: 16px;">Chưa có nhân viên.</td>
+                            <td colspan="7" style="text-align:center; color:#94a3b8; padding: 16px;">No employees found.</td>
                         </tr>
                     </c:if>
                 </tbody>
             </table>
+
+            <c:if test="${totalPages > 1}">
+                <div style="display:flex; justify-content:center; align-items:center; gap:8px; margin-top:16px; flex-wrap:wrap;">
+                    <c:if test="${currentPage > 1}">
+                        <a href="${pageContext.request.contextPath}/admin/employees?page=${currentPage - 1}&keyword=${keyword}&role=${role}&status=${status}" style="padding:8px 12px; border:1px solid #cbd5e1; border-radius:8px; text-decoration:none; color:#334155;">Previous</a>
+                    </c:if>
+
+                    <c:forEach var="i" begin="1" end="${totalPages}">
+                        <a href="${pageContext.request.contextPath}/admin/employees?page=${i}&keyword=${keyword}&role=${role}&status=${status}"
+                           style="padding:8px 12px; border-radius:8px; text-decoration:none; border:1px solid #cbd5e1; background:${i == currentPage ? '#3b82f6' : '#fff'}; color:${i == currentPage ? '#fff' : '#334155'}; font-weight:${i == currentPage ? '600' : '500'};">
+                                ${i}
+                        </a>
+                    </c:forEach>
+
+                    <c:if test="${currentPage < totalPages}">
+                        <a href="${pageContext.request.contextPath}/admin/employees?page=${currentPage + 1}&keyword=${keyword}&role=${role}&status=${status}" style="padding:8px 12px; border:1px solid #cbd5e1; border-radius:8px; text-decoration:none; color:#334155;">Next</a>
+                    </c:if>
+                </div>
+            </c:if>
         </div>
 
         <!-- Modal Add Employee (CSS-only :target) -->
@@ -299,7 +344,7 @@
                         </select>
                     </div>
 
-                    <div class="alert" style="margin-top: 14px;">Mật khẩu mặc định: <b>123456</b> (sẽ gửi qua email)</div>
+                    <div class="alert" style="margin-top: 14px;">Default password: <b>123456</b> (sent via email)</div>
 
                     <div class="actions">
                         <button type="submit">Create</button>

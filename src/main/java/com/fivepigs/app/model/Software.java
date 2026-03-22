@@ -34,11 +34,13 @@ public class Software {
     private String language;
     private String imageUrl;
     private Double qualityScore;
+    private String IconUrl;
+    
 
     public Software() {
     }
 
-    public Software(Integer softwareId, String name, String short_description, Integer vendorId,
+    public Software(Integer softwareId, String name, String short_description, String IconUrl, Integer vendorId,
             Integer categoryId, Double price, Integer isFree, String status,
             Integer downloadCount, Double avgRating, LocalDateTime createdAt,
             Double revenue, String appName, ApprovalProcess ap, ReviewerProcess rp) {
@@ -57,7 +59,12 @@ public class Software {
         this.appName = appName;
         this.approvalProcess = ap;
         this.reviewerProcess = rp;
+        this.IconUrl=IconUrl;
+        
     }
+
+
+   
 
     public Integer getSoftwareId() {
         return softwareId;
@@ -69,6 +76,14 @@ public class Software {
 
     public String getName() {
         return name;
+    }
+
+    public String getIconUrl() {
+            return IconUrl;
+    }
+
+     public void setIconUrl(String IconUrl) {
+        this.IconUrl = IconUrl;
     }
 
     public void setName(String name) {

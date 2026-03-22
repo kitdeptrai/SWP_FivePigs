@@ -91,22 +91,51 @@ public class VendorDao {
 
     public List<VendorPayout> getPayoutByVendorId(int vendorId) throws SQLException {
         List<VendorPayout> list = new ArrayList<>();
-        String sql = "SELECT * FROM Vendor_Payout\n"
-                + "WHERE vendor_id=?;";
+
+        String sql = "SELECT * FROM Vendor_Payout WHERE vendor_id=?";
+
         try (Connection c = Db.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
+
             ps.setInt(1, vendorId);
+
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    VendorPayout vp=new VendorPayout();
+
+                    VendorPayout vp = new VendorPayout();
+
                     vp.setPayoutId(rs.getInt("payout_id"));
                     vp.setAmount(rs.getDouble("amount"));
-                    vp.setPeriodStart(rs.getObject("period_start", LocalDateTime.class));
-                    vp.setPeriodEnd(rs.getObject("period_end", LocalDateTime.class));
+                    vp.setPaymentMethod(rs.getString("payment_method"));
+                    vp.setPaymentAccount(rs.getString("payment_account"));
                     vp.setStatus(rs.getString("status"));
+                    vp.setProcessedAt(rs.getObject("processed_at", LocalDateTime.class));
+                    vp.setCreatedAt(rs.getObject("created_at", LocalDateTime.class));
+
                     list.add(vp);
                 }
             }
         }
+
         return list;
     }
+    
+    public void createPayoutRequest(int vendorId, double amount,
+        String paymentMethod, String paymentAccount) throws SQLException {
+
+    String sql = "INSERT INTO Vendor_Payout "
+            + "(vendor_id, amount, payment_method, payment_account, status) "
+            + "VALUES (?, ?, ?, ?, 'PENDING')";
+
+    try (Connection c = Db.getConnection();
+         PreparedStatement ps = c.prepareStatement(sql)) {
+
+        ps.setInt(1, vendorId);
+        ps.setDouble(2, amount);
+        ps.setString(3, paymentMethod);
+        ps.setString(4, paymentAccount);
+        
+
+        ps.executeUpdate();
+    }
+}
 }

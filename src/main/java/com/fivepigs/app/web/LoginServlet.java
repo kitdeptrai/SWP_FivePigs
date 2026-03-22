@@ -13,9 +13,6 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.SQLException;
 
-/**
- * Controller: Xử lý đăng nhập
- */
 @WebServlet(name = "LoginServlet", urlPatterns = {"/login"})
 public class LoginServlet extends HttpServlet {
 
@@ -27,14 +24,21 @@ public class LoginServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        // Kiểm tra đã đăng nhập chưa
+        String redirect = sanitizeRedirect(req.getParameter("redirect"));
+        if (redirect != null) {
+            req.setAttribute("redirect", redirect);
+        }
+
         HttpSession session = req.getSession(false);
         if (session != null && session.getAttribute("user") != null) {
-            // Đã đăng nhập, redirect đến dashboard
+            if (redirect != null) {
+                resp.sendRedirect(req.getContextPath() + redirect);
+                return;
+            }
             redirectToDashboard(req, resp, (User) session.getAttribute("user"));
             return;
         }
-        
+
         req.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(req, resp);
     }
 
@@ -44,11 +48,13 @@ public class LoginServlet extends HttpServlet {
 
         String email = trim(req.getParameter("email"));
         String password = req.getParameter("password");
+        String redirect = sanitizeRedirect(req.getParameter("redirect"));
 
         req.setAttribute("email", email);
+        req.setAttribute("redirect", redirect);
 
         if (email == null || password == null || email.isEmpty() || password.isEmpty()) {
-            req.setAttribute("error", "Vui lòng nhập đầy đủ email và mật khẩu");
+            req.setAttribute("error", "Vui long nhap day du email va mat khau");
             req.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(req, resp);
             return;
         }
@@ -56,20 +62,23 @@ public class LoginServlet extends HttpServlet {
         try {
             User user = userService.login(email, password);
             if (user == null) {
-                req.setAttribute("error", "Email hoặc mật khẩu không đúng");
+                req.setAttribute("error", "Email hoac mat khau khong dung");
                 req.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(req, resp);
                 return;
             }
 
-            // Lưu user vào session
             HttpSession session = req.getSession();
             session.setAttribute("user", user);
             session.setAttribute("roleName", userService.getRoleName(user.getRoleId()));
 
-            // Redirect đến dashboard theo role
+            if (redirect != null) {
+                resp.sendRedirect(req.getContextPath() + redirect);
+                return;
+            }
+
             redirectToDashboard(req, resp, user);
         } catch (SQLException e) {
-            throw new ServletException("Lỗi kết nối database", e);
+            throw new ServletException("Loi ket noi database", e);
         }
     }
 
@@ -79,10 +88,8 @@ public class LoginServlet extends HttpServlet {
             if (roleName == null) {
                 roleName = "User";
             }
-            
-            // Redirect đến dashboard theo role
-            String roleNameLower = (roleName != null) ? roleName.toLowerCase() : "";
-            
+
+            String roleNameLower = roleName.toLowerCase();
             String dashboardPath;
             switch (roleNameLower) {
                 case "admin":
@@ -100,15 +107,13 @@ public class LoginServlet extends HttpServlet {
                     break;
                 case "customer":
                 case "user":
-                    dashboardPath = "/user_dashboard";
-                    break;
                 default:
-                    dashboardPath = "/user_dashboard";
+                    dashboardPath = "/customer_dashboard";
                     break;
             }
             resp.sendRedirect(req.getContextPath() + dashboardPath);
         } catch (SQLException e) {
-            throw new ServletException("Lỗi lấy thông tin role", e);
+            throw new ServletException("Loi lay thong tin role", e);
         }
     }
 
@@ -116,5 +121,15 @@ public class LoginServlet extends HttpServlet {
         if (s == null) return null;
         String t = s.trim();
         return t.isEmpty() ? null : t;
+    }
+
+    private static String sanitizeRedirect(String redirect) {
+        if (redirect == null) return null;
+        String t = redirect.trim();
+        if (t.isEmpty()) return null;
+        if (!t.startsWith("/")) return null;
+        if (t.startsWith("//")) return null;
+        if (t.contains("://")) return null;
+        return t;
     }
 }

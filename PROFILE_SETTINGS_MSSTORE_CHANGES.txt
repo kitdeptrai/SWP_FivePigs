@@ -1,0 +1,57 @@
+FIVEPIGS - UPDATE SUMMARY (Profile + Settings + Microsoft Store style)
+Date: 2026-03-06
+
+1) Updated account dropdown menu in header
+- File: src/main/webapp/WEB-INF/views/customer/header.jsp
+- Changed dropdown layout to Microsoft Store style:
+  + Account block (avatar, full name, email, Sign out)
+  + Menu items:
+    - My Profile
+    - Payment methods
+    - Redeem code or gift cards
+    - Help with payment and refunds
+    - Manage account and devices
+    - Send feedback
+    - Store settings
+- Links now point to:
+  + /profile
+  + /settings?tab=...
+
+2) Expanded Settings page into tab-like sections
+- File: src/main/webapp/WEB-INF/views/customer/settings.jsp
+- Added left navigation + right content area for tabs:
+  + payment_methods
+  + redeem_code
+  + payment_help
+  + devices
+  + feedback
+  + store_settings
+- Kept Change Password form in store_settings section.
+- Added hidden field tab=store_settings for password form submit.
+
+3) Updated Settings servlet to preserve selected tab on submit
+- File: src/main/java/com/fivepigs/app/web/customer/SettingsServlet.java
+- Added tab resolving with whitelist validation.
+- Added selectedTab attribute for GET rendering.
+- POST redirects now keep current tab:
+  + /settings?tab=...&msg=...
+
+4) Updated Profile page structure
+- File: src/main/webapp/WEB-INF/views/customer/profile.jsp
+- Converted profile page to shared CSS classes and cleaner form layout.
+- Preserved update logic and messages.
+
+5) Centralized styles in customer.css
+- File: src/main/webapp/assets/css/customer.css
+- Fixed malformed CSS block around .content-scroll-area that caused layout/style instability.
+- Added commented sections:
+  + ACCOUNT MENU (HEADER)
+  + PROFILE + SETTINGS PAGES
+- Added reusable classes for:
+  + Message boxes
+  + Input/form fields
+  + Settings nav and cards
+
+Notes:
+- The menu and settings structure now follows the Microsoft Store pattern while keeping your existing FIVEPIGS visual style.
+- Placeholder items (payment methods, redeem, feedback, devices) are ready for backend integration later.

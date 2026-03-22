@@ -6,10 +6,22 @@ import com.fivepigs.app.model.Notification;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class NotificationDao {
+
+     private Notification mapRow(ResultSet rs) throws SQLException {
+        Notification n = new Notification();
+        n.setNotificationId(rs.getInt("notification_id"));
+        n.setUserId(rs.getInt("user_id"));
+        n.setTitle(rs.getString("title"));
+        n.setContent(rs.getString("content"));
+        n.setRead(rs.getBoolean("is_read"));
+        n.setCreatedAt(rs.getTimestamp("created_at"));
+        return n;
+    }
 
     // 1. Lấy tất cả notification của user
     public List<Notification> getByUser(int userId) {
@@ -235,4 +247,39 @@ public class NotificationDao {
     private String safeValue(String value, String defaultValue) {
         return (value == null || value.trim().isEmpty()) ? defaultValue : value;
     }
+
+    public void insertNotification(int userId, String title, String content) {
+        String sql = "INSERT INTO Notification(user_id, title, content, is_read, created_at) VALUES(?, ?, ?, 0, NOW())";
+        try (Connection con = Db.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+            ps.setString(2, title);
+            ps.setString(3, content);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public List<Notification> getTopByUser(int userId, int limit) {
+        List<Notification> list = new ArrayList<>();
+        String sql = "SELECT * FROM Notification WHERE user_id = ? ORDER BY created_at DESC LIMIT ?";
+
+        try (Connection con = Db.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+            ps.setInt(2, Math.max(1, limit));
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapRow(rs));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
 }

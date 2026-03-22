@@ -201,6 +201,29 @@
                 background: #1e293b;
                 color: #ffffff;
             }
+            .pagination{
+                display:flex;
+                justify-content:center;
+                gap:8px;
+                margin-top:20px;
+            }
+
+            .pagination button{
+                background:#0f172a;
+                border:none;
+                color:#e2e8f0;
+                padding:6px 12px;
+                border-radius:6px;
+                cursor:pointer;
+            }
+
+            .pagination button.active{
+                background:#3b82f6;
+            }
+
+            .pagination button:hover{
+                background:#475569;
+            }
         </style>
     </head>
 
@@ -337,24 +360,34 @@
                                     </td>
 
                                     <td class="actions">
-                                        <span class="action-btn view">
-                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                                            </svg>
-                                        </span>
-                                        <span class="action-btn revoke">
-                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ff4d4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                            <circle cx="12" cy="12" r="10"></circle>
-                                            <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
-                                            </svg>
-                                        </span>
+
+                                        <c:if test="${l.status != 'REVOKED'}">
+                                            <form action="${pageContext.request.contextPath}/change_status_license" method="post" style="display:inline;">
+
+                                                <input type="hidden" name="licenseId" value="${l.licenseId}">
+                                                <input type="hidden" name="status" value="REVOKED">
+
+                                                <button type="submit" class="action-btn revoke">
+                                                    <svg width="16" height="16" viewBox="0 0 24 24"
+                                                         fill="none" stroke="#ff4d4f"
+                                                         stroke-width="2"
+                                                         stroke-linecap="round"
+                                                         stroke-linejoin="round">
+                                                    <circle cx="12" cy="12" r="10"></circle>
+                                                    <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
+                                                    </svg>
+                                                </button>
+
+                                            </form>
+                                        </c:if>
+
                                     </td>
                                 </tr>
                             </c:forEach>
 
                         </tbody>
                     </table>
+                    <div class="pagination" id="pagination"></div>
 
                 </div>
             </div>
@@ -378,21 +411,28 @@
                         .getElementById("searchInput")
                         .value
                         .toLowerCase();
+
                 const rows = document.querySelectorAll("tbody tr");
+
                 rows.forEach(row => {
 
                     const textMatch =
                             row.innerText.toLowerCase().includes(keyword);
+
                     const statusMatch =
                             currentStatus === "all" ||
                             row.dataset.status.toLowerCase() === currentStatus;
+
                     if (textMatch && statusMatch) {
-                        row.style.display = "";
+                        row.classList.remove("filtered-out");
                     } else {
-                        row.style.display = "none";
+                        row.classList.add("filtered-out");
                     }
 
                 });
+
+                currentPage = 1;
+                createPagination();
             }
 
             function copyLicense(key, btn) {
@@ -403,6 +443,62 @@
                 }, 1000);
             }
 
+            const rowsPerPage = 10;
+            let currentPage = 1;
+
+            function showPage(page) {
+
+                const rows = Array.from(document.querySelectorAll("tbody tr"))
+                        .filter(row => !row.classList.contains("filtered-out"));
+
+                const start = (page - 1) * rowsPerPage;
+                const end = start + rowsPerPage;
+
+                document.querySelectorAll("tbody tr").forEach(row => {
+                    row.style.display = "none";
+                });
+
+                rows.forEach((row, index) => {
+                    if (index >= start && index < end) {
+                        row.style.display = "";
+                    }
+                });
+
+                document.querySelectorAll(".pagination button")
+                        .forEach(btn => btn.classList.remove("active"));
+
+                const activeBtn = document.getElementById("page-" + page);
+                if (activeBtn)
+                    activeBtn.classList.add("active");
+            }
+
+            function createPagination() {
+
+                const pagination = document.getElementById("pagination");
+                pagination.innerHTML = "";
+
+                const rows = Array.from(document.querySelectorAll("tbody tr"))
+                        .filter(row => !row.classList.contains("filtered-out"));
+
+                const totalPages = Math.ceil(rows.length / rowsPerPage);
+
+                for (let i = 1; i <= totalPages; i++) {
+
+                    const btn = document.createElement("button");
+                    btn.innerText = i;
+                    btn.id = "page-" + i;
+
+                    btn.onclick = () => {
+                        currentPage = i;
+                        showPage(i);
+                    };
+
+                    pagination.appendChild(btn);
+                }
+
+                showPage(currentPage);
+            }
+            createPagination();
         </script>
 
     </body>

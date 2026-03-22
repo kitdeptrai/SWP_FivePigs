@@ -1,0 +1,143 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
+ */
+package com.fivepigs.app.web.approval;
+
+import com.fivepigs.app.dao.ApprovalDao;
+import com.fivepigs.app.model.Software;
+import com.fivepigs.app.model.User;
+import java.io.IOException;
+import java.io.PrintWriter;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.sql.SQLException;
+import java.util.List;
+
+/**
+ *
+ * @author thanh
+ */
+@WebServlet(name = "ApprovalPendingDetail", urlPatterns = {"/approval_pending_detail"})
+public class ApprovalPendingDetail extends HttpServlet {
+
+    /**
+     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
+     * methods.
+     *
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        response.setContentType("text/html;charset=UTF-8");
+        try (PrintWriter out = response.getWriter()) {
+            /* TODO output your page here. You may use following sample code. */
+            out.println("<!DOCTYPE html>");
+            out.println("<html>");
+            out.println("<head>");
+            out.println("<title>Servlet ApprovalPendingDetail</title>");
+            out.println("</head>");
+            out.println("<body>");
+            out.println("<h1>Servlet ApprovalPendingDetail at " + request.getContextPath() + "</h1>");
+            out.println("</body>");
+            out.println("</html>");
+        }
+    }
+
+    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+    /**
+     * Handles the HTTP <code>GET</code> method.
+     *
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        User user = (User) request.getSession().getAttribute("user");
+
+        if (user == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+
+        try {
+            ApprovalDao adao = new ApprovalDao();
+            Integer softwareId = Integer.parseInt(request.getParameter("softwareId"));
+            Software s = adao.getPendingDetail(softwareId);
+            request.setAttribute("pendingDetail", s);
+            request.setAttribute("softwareId", softwareId);
+            request.getRequestDispatcher("/WEB-INF/views/Approval/approval_pending_detail.jsp")
+                    .forward(request, response);
+
+        } catch (SQLException e) {
+            throw new ServletException(e);
+        }
+    }
+
+    /**
+     * Handles the HTTP <code>POST</code> method.
+     *
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+         try {
+
+        User user = (User) request.getSession().getAttribute("user");
+        if (user == null) {
+            response.getWriter().println("User session is null");
+            return;
+        }
+
+        String softwareIdStr = request.getParameter("softwareId");
+        String decision = request.getParameter("decision");
+        String note = request.getParameter("note");
+        String status="";
+        if(decision.equals("APPROVED")){
+            status="ACTIVE";
+        }
+        
+        else status="REJECTED";
+        if (softwareIdStr == null || decision == null) {
+            response.getWriter().println("Missing parameters");
+            return;
+        }
+        
+        int softwareId = Integer.parseInt(softwareIdStr);
+        int approverId = user.getUserId();
+
+        ApprovalDao adao = new ApprovalDao();
+        adao.submitDecision(softwareId, approverId, decision, note,status);
+
+        response.sendRedirect(request.getContextPath() + "/approval_history");
+
+    } catch (Exception e) {
+        e.printStackTrace();
+        throw new ServletException(e); 
+    }
+    }
+
+    /**
+     * Returns a short description of the servlet.
+     *
+     * @return a String containing servlet description
+     */
+    @Override
+    public String getServletInfo() {
+        return "Short description";
+    }// </editor-fold>
+
+}

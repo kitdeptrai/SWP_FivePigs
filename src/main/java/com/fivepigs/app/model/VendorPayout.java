@@ -11,22 +11,26 @@ import java.time.LocalDateTime;
  * @author MinhPD
  */
 public class VendorPayout {
+//CREATE TABLE Vendor_Payout (
 //    payout_id INT AUTO_INCREMENT PRIMARY KEY,
-//    vendor_id INT,
-//    amount DECIMAL(12,2),
-//    period_start DATE,
-//    period_end DATE,
-//    status VARCHAR(20),
+//    vendor_id INT NOT NULL,
+//    amount DECIMAL(12,2) NOT NULL,
+//    payment_method VARCHAR(50),       -- BANK / MOMO / PAYPAL
+//    payment_account VARCHAR(255),     -- số TK hoặc email paypal
+//    status VARCHAR(20) DEFAULT 'PENDING',
+//    processed_at DATETIME,
 //    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 //    FOREIGN KEY (vendor_id) REFERENCES Users(user_id)
+//);
     
-    private Integer payoutId;
-    private Integer vendorId;
-    private Double amount;
-    private LocalDateTime periodEnd;
-    private LocalDateTime periodStart;
-    private String status;
-    private LocalDateTime createdAt;
+   Integer payoutId;
+   Integer vendorId;
+   Double amount;
+   String paymentMethod;
+   String paymentAccount;
+   String status;
+   LocalDateTime processedAt;
+   LocalDateTime createdAt;
 
     public Integer getPayoutId() {
         return payoutId;
@@ -52,20 +56,20 @@ public class VendorPayout {
         this.amount = amount;
     }
 
-    public LocalDateTime getPeriodEnd() {
-        return periodEnd;
+    public String getPaymentMethod() {
+        return paymentMethod;
     }
 
-    public void setPeriodEnd(LocalDateTime periodEnd) {
-        this.periodEnd = periodEnd;
+    public void setPaymentMethod(String paymentMethod) {
+        this.paymentMethod = paymentMethod;
     }
 
-    public LocalDateTime getPeriodStart() {
-        return periodStart;
+    public String getPaymentAccount() {
+        return paymentAccount;
     }
 
-    public void setPeriodStart(LocalDateTime periodStart) {
-        this.periodStart = periodStart;
+    public void setPaymentAccount(String paymentAccount) {
+        this.paymentAccount = paymentAccount;
     }
 
     public String getStatus() {
@@ -76,6 +80,14 @@ public class VendorPayout {
         this.status = status;
     }
 
+    public LocalDateTime getProcessedAt() {
+        return processedAt;
+    }
+
+    public void setProcessedAt(LocalDateTime processedAt) {
+        this.processedAt = processedAt;
+    }
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
@@ -83,6 +95,6 @@ public class VendorPayout {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
-    
-    
+   
+   
 }

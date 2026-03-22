@@ -1,5 +1,6 @@
 package com.fivepigs.app.model;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class User {
@@ -8,7 +9,13 @@ public class User {
     private String email;
     private String password;
     private Integer roleId;
-    private String status; // ACTIVE, BLOCKED
+    private String avatar;
+    private String phone;
+    private LocalDate dateOfBirth;
+    private String gender;
+    private String address;
+    private String bio;
+    private String status;
     private LocalDateTime createdAt;
 
     public User() {
@@ -19,20 +26,26 @@ public class User {
         this.email = email;
         this.password = password;
         this.roleId = roleId;
-        this.status = "ACTIVE"; // Mặc định ACTIVE khi đăng ký
+        this.status = "ACTIVE";
     }
 
-    public User(Integer userId, String fullName, String email, String password, Integer roleId, String status, LocalDateTime createdAt) {
+    public User(Integer userId, String fullName, String email, String password, Integer roleId, String avatar,
+                String phone, LocalDate dateOfBirth, String gender, String address, String bio, String status, LocalDateTime createdAt) {
         this.userId = userId;
         this.fullName = fullName;
         this.email = email;
         this.password = password;
         this.roleId = roleId;
+        this.avatar = avatar;
+        this.phone = phone;
+        this.dateOfBirth = dateOfBirth;
+        this.gender = gender;
+        this.address = address;
+        this.bio = bio;
         this.status = status;
         this.createdAt = createdAt;
     }
 
-    // Getters and Setters
     public Integer getUserId() {
         return userId;
     }
@@ -71,6 +84,54 @@ public class User {
 
     public void setRoleId(Integer roleId) {
         this.roleId = roleId;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public LocalDate getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(LocalDate dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getBio() {
+        return bio;
+    }
+
+    public void setBio(String bio) {
+        this.bio = bio;
     }
 
     public String getStatus() {

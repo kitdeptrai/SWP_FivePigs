@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package com.fivepigs.app.web;
+import com.fivepigs.app.dao.SoftwareDao;
 import com.fivepigs.app.dao.VendorDao;
 import com.fivepigs.app.model.Software;
 import java.sql.SQLException;
@@ -12,5 +13,14 @@ import java.util.Map;
 
 
 public class test {
+    public static void main(String[] args) {
+        try {
+            SoftwareDao sw = new SoftwareDao();
+            Integer n = sw.totalDownloadByVendor(4);
+            System.out.println(n);
+        }catch(SQLException e){
+            System.out.println("loi db");
+        }
+    }
 
 }
