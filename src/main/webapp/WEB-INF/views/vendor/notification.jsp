@@ -19,7 +19,7 @@
     <link rel="stylesheet"
           href="${pageContext.request.contextPath}/assets/reviewer/pending.css">
     <link rel="stylesheet"
-          href="${pageContext.request.contextPath}/assets/reviewer/notifications.css">
+          href="${pageContext.request.contextPath}/assets/css/vendor/notification.css">
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
