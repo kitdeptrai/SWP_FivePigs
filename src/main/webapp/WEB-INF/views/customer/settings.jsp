@@ -25,80 +25,43 @@
         <div class="settings-shell">
             <div class="settings-nav">
                 <a href="${pageContext.request.contextPath}/settings?tab=payment_methods" class="settings-nav-item ${currentTab == 'payment_methods' ? 'active' : ''}"><i class="fa-regular fa-credit-card"></i>Payment methods</a>
-                <a href="${pageContext.request.contextPath}/settings?tab=redeem_code" class="settings-nav-item ${currentTab == 'redeem_code' ? 'active' : ''}"><i class="fa-solid fa-gift"></i>Redeem code or gift cards</a>
-                <a href="${pageContext.request.contextPath}/settings?tab=payment_help" class="settings-nav-item ${currentTab == 'payment_help' ? 'active' : ''}"><i class="fa-regular fa-circle-question"></i>Help with payment and refunds</a>
-                <a href="${pageContext.request.contextPath}/settings?tab=devices" class="settings-nav-item ${currentTab == 'devices' ? 'active' : ''}"><i class="fa-solid fa-laptop"></i>Manage account and devices</a>
                 <a href="${pageContext.request.contextPath}/settings?tab=feedback" class="settings-nav-item ${currentTab == 'feedback' ? 'active' : ''}"><i class="fa-regular fa-message"></i>Send feedback</a>
                 <a href="${pageContext.request.contextPath}/settings?tab=store_settings" class="settings-nav-item ${currentTab == 'store_settings' ? 'active' : ''}"><i class="fa-solid fa-gear"></i>Store settings</a>
             </div>
 
             <div class="settings-panel">
-                <c:if test="${param.msg == 'password_updated'}">
-                    <div class="msg-box msg-success">Password updated successfully.</div>
-                </c:if>
-                <c:if test="${param.msg == 'wrong_current_password'}">
-                    <div class="msg-box msg-error">Current password is incorrect.</div>
-                </c:if>
-                <c:if test="${param.msg == 'confirm_not_match'}">
-                    <div class="msg-box msg-error">Confirm password does not match.</div>
-                </c:if>
-                <c:if test="${param.msg == 'invalid_password'}">
-                    <div class="msg-box msg-error">New password must be 6-72 characters.</div>
-                </c:if>
+                <c:if test="${param.msg == 'password_updated'}"><div class="msg-box msg-success">Password updated successfully.</div></c:if>
+                <c:if test="${param.msg == 'wrong_current_password'}"><div class="msg-box msg-error">Current password is incorrect.</div></c:if>
+                <c:if test="${param.msg == 'confirm_not_match'}"><div class="msg-box msg-error">Confirm password does not match.</div></c:if>
+                <c:if test="${param.msg == 'invalid_password'}"><div class="msg-box msg-error">New password must be 6-72 characters.</div></c:if>
+                <c:if test="${param.msg == 'feedback_sent'}"><div class="msg-box msg-success">Thanks. Your feedback has been sent.</div></c:if>
+                <c:if test="${param.msg == 'invalid_feedback_subject'}"><div class="msg-box msg-error">Feedback subject must be 3-150 characters.</div></c:if>
+                <c:if test="${param.msg == 'invalid_feedback_message'}"><div class="msg-box msg-error">Feedback message must be 10-2000 characters.</div></c:if>
                 <c:if test="${param.msg == 'missing_fields' || param.msg == 'user_not_found' || param.msg == 'update_failed'}">
                     <div class="msg-box msg-error">Cannot update settings right now.</div>
                 </c:if>
 
                 <c:choose>
-                    <c:when test="${currentTab == 'payment_methods'}">
-                        <h3 class="settings-title">Payment methods</h3>
-                        <p class="settings-desc">Manage your saved cards and payment options.</p>
-                        <div class="settings-card muted">
-                            <i class="fa-regular fa-credit-card"></i>
-                            <div>
-                                <strong>No payment methods yet</strong>
-                                <p>Add card/bank integration in next step to support real checkout.</p>
-                            </div>
-                        </div>
-                    </c:when>
-
-                    <c:when test="${currentTab == 'redeem_code'}">
-                        <h3 class="settings-title">Redeem code or gift cards</h3>
-                        <p class="settings-desc">Enter a promo code or gift card code to add credit.</p>
-                        <div class="settings-card">
-                            <label class="field-label" for="redeemCode">Code</label>
-                            <input id="redeemCode" type="text" class="text-input" placeholder="XXXXX-XXXXX-XXXXX">
-                            <button type="button" class="install-btn settings-btn">Redeem</button>
-                        </div>
-                    </c:when>
-
-                    <c:when test="${currentTab == 'payment_help'}">
-                        <h3 class="settings-title">Help with payment and refunds</h3>
-                        <p class="settings-desc">Quick answers for payment and refund support.</p>
-                        <div class="settings-list-card">
-                            <div class="settings-list-item"><i class="fa-solid fa-receipt"></i>How to check order history</div>
-                            <div class="settings-list-item"><i class="fa-solid fa-arrow-rotate-left"></i>Refund policy and timeline</div>
-                            <div class="settings-list-item"><i class="fa-solid fa-circle-exclamation"></i>Payment failed troubleshooting</div>
-                        </div>
-                    </c:when>
-
-                    <c:when test="${currentTab == 'devices'}">
-                        <h3 class="settings-title">Manage account and devices</h3>
-                        <p class="settings-desc">Track devices that used this account recently.</p>
-                        <div class="settings-list-card">
-                            <div class="settings-list-item"><i class="fa-solid fa-desktop"></i>Windows PC - Last active: Today</div>
-                            <div class="settings-list-item"><i class="fa-solid fa-laptop"></i>Laptop - Last active: 2 days ago</div>
-                            <div class="settings-list-item"><i class="fa-solid fa-mobile-screen-button"></i>Mobile Browser - Last active: 5 days ago</div>
-                        </div>
-                    </c:when>
-
                     <c:when test="${currentTab == 'feedback'}">
                         <h3 class="settings-title">Send feedback</h3>
                         <p class="settings-desc">Tell us what to improve in FIVEPIGS Store.</p>
                         <div class="settings-card">
-                            <label class="field-label" for="feedbackText">Your feedback</label>
-                            <textarea id="feedbackText" class="text-input textarea-input" placeholder="Write your feedback..."></textarea>
-                            <button type="button" class="install-btn settings-btn">Send feedback</button>
+                            <form method="post" action="${pageContext.request.contextPath}/settings">
+                                <input type="hidden" name="tab" value="feedback">
+                                <div class="field-grid">
+                                    <div>
+                                        <label class="field-label" for="feedbackSubject">Subject</label>
+                                        <input id="feedbackSubject" name="feedbackSubject" type="text" class="text-input" placeholder="What do you want to tell us?" maxlength="150">
+                                    </div>
+                                    <div>
+                                        <label class="field-label" for="feedbackText">Your feedback</label>
+                                        <textarea id="feedbackText" name="feedbackText" class="text-input textarea-input" placeholder="Write your feedback..." maxlength="2000"></textarea>
+                                    </div>
+                                    <div class="settings-actions">
+                                        <button type="submit" class="install-btn settings-btn">Send feedback</button>
+                                    </div>
+                                </div>
+                            </form>
                         </div>
                     </c:when>
 
@@ -107,7 +70,8 @@
                         <p class="settings-desc">Security and account-level store preferences.</p>
 
                         <div class="settings-card">
-                            <h4>Change Password</h4>
+                            <h4 style="padding-bottom: 10px">Change Password</h4>
+
                             <form method="post" action="${pageContext.request.contextPath}/settings">
                                 <input type="hidden" name="tab" value="store_settings">
                                 <div class="field-grid">

@@ -32,19 +32,22 @@
             <div class="left-column">
                 <div class="featured-banner"
                      style="background-image: linear-gradient(to right, rgba(0,0,0,0.7), transparent), url('https://images.unsplash.com/photo-1513364776144-60967b0f800f?q=80&w=2071&auto=format&fit=crop');">
-                    <h1 style="font-size: 32px; margin-bottom: 10px; line-height: 1.2;">Discover trending apps<br>and games on FIVEPIGS</h1>
-                    <p style="opacity: 0.9; margin-bottom: 20px;">Action and Shooter.</p>
-                    <a href="${pageContext.request.contextPath}/search?q="
+                    <h1 style="font-size: 32px; margin-bottom: 10px; line-height: 1.2;">DISCOVER CREATIVE ART APPS <br>AND PAINTING</h1>
+                    <p style="opacity: 0.9; margin-bottom: 20px;">Unleash your creativity with top drawing and painting experiences.</p>
+                    <a href="${pageContext.request.contextPath}/search?q=Design"
                        style="padding: 10px 25px; border: none; background: white; color: #6b70ff; font-weight: 700; border-radius: 8px; cursor: pointer; width: fit-content; text-decoration:none; display:inline-flex;">Explore</a>
                 </div>
                 <div class="sub-banners-row">
                     <div class="sub-card">
+                        <img src="${pageContext.request.contextPath}/assets/images/GOT_Banner.webp">
                         <div class="sub-card-content">
                             <h3>Top Downloads</h3>
                             <p style="font-size: 12px;">SALE IN WINTER</p>
                         </div>
                     </div>
+
                     <div class="sub-card" style="background:linear-gradient(135deg,#4f46e5,#7c3aed)">
+                        <img src="${pageContext.request.contextPath}/assets/images/Word_banner.jpg">
                         <div class="sub-card-content" style="background: linear-gradient(transparent, rgba(0,0,0,0.45));">
                             <h3>Best Selling</h3>
                             <p style="font-size: 12px;">Paid orders ranking</p>
@@ -55,13 +58,13 @@
 
             <div class="right-column-box">
                 <div class="toggle-container">
-                    <div id="home-trend" class="toggle-btn active" onclick="toggleList('home', 'trend')">TRENDING</div>
+                    <div id="home-trend" class="toggle-btn active" onclick="toggleList('home', 'trend')">TOP DOWNLOADS</div>
                     <div id="home-best" class="toggle-btn" onclick="toggleList('home', 'best')">BEST SELLING</div>
                 </div>
 
                 <div class="scrollable-list" id="home-list-trend">
                     <c:if test="${empty trendList}">
-                        <p style="color:#6b7280; font-size:14px;">No trending data.</p>
+                        <p style="color:#6b7280; font-size:14px;">No download ranking data.</p>
                     </c:if>
                     <c:forEach var="sw" items="${trendList}">
                         <a href="${pageContext.request.contextPath}/product?pid=${sw.softwareId}" class="trend-item" style="text-decoration:none; color:inherit;">

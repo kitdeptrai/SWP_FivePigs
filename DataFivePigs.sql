@@ -664,12 +664,45 @@ INSERT INTO Review (software_id, customer_id, rating, comment) VALUES
 (20,7,5,'Amazing world'),
 (20,8,5,'Perfect gameplay');
 
+-- Seed 20 vendor payout requests
 INSERT INTO Vendor_Payout 
-(vendor_id, amount, period_start, period_end, status)
+(payout_id, vendor_id, amount, payment_method, payment_account, status, processed_at, created_at)
 VALUES
-(4,79.17,'2026-01-01','2026-01-31','PAID'),
-(5,359.94,'2026-01-01','2026-01-31','PAID'),
-(6,103.98,'2026-01-01','2026-01-31','PENDING');
+(1001,4,120.50,'BANK','VCB-10001111','PAID','2026-02-01 10:05:00','2026-02-01 09:00:00'),
+(1002,5,280.00,'MOMO','0900000012','PAID','2026-02-02 11:10:00','2026-02-02 09:20:00'),
+(1003,6,95.75,'PAYPAL','vendor3@gmail.com','PAID','2026-02-03 15:00:00','2026-02-03 08:45:00'),
+(1004,4,340.10,'BANK','ACB-10004444','PAID','2026-02-04 16:30:00','2026-02-04 10:00:00'),
+(1005,5,150.25,'MOMO','0900000012','PAID','2026-02-05 14:20:00','2026-02-05 09:40:00'),
+(1006,6,420.00,'BANK','TCB-10006666','PAID','2026-02-06 13:15:00','2026-02-06 09:10:00'),
+(1007,4,78.90,'PAYPAL','vendor1@gmail.com','PAID','2026-02-07 12:00:00','2026-02-07 09:05:00'),
+(1008,5,510.40,'BANK','BIDV-10008888','PAID','2026-02-08 17:45:00','2026-02-08 10:20:00'),
+(1009,6,230.30,'MOMO','0900000013','PAID','2026-02-09 11:50:00','2026-02-09 09:30:00'),
+(1010,4,199.99,'BANK','VIB-10001010','PAID','2026-02-10 15:35:00','2026-02-10 10:10:00'),
+(1011,5,88.80,'MOMO','0900000012','PENDING',NULL,'2026-02-11 09:15:00'),
+(1012,6,132.45,'PAYPAL','vendor3@gmail.com','PENDING',NULL,'2026-02-12 10:05:00'),
+(1013,4,260.00,'BANK','VCB-10001111','PENDING',NULL,'2026-02-13 11:25:00'),
+(1014,5,315.60,'BANK','BIDV-10008888','PENDING',NULL,'2026-02-14 08:55:00'),
+(1015,6,44.20,'MOMO','0900000013','PENDING',NULL,'2026-02-15 09:40:00'),
+(1016,4,505.00,'PAYPAL','vendor1@gmail.com','PENDING',NULL,'2026-02-16 13:00:00'),
+(1017,5,72.15,'BANK','ACB-10005555','PENDING',NULL,'2026-02-17 14:45:00'),
+(1018,6,189.00,'BANK','TCB-10006666','PENDING',NULL,'2026-02-18 10:35:00'),
+(1019,4,640.70,'MOMO','0900000011','PENDING',NULL,'2026-02-19 15:25:00'),
+(1020,5,54.99,'PAYPAL','vendor2@gmail.com','PENDING',NULL,'2026-02-20 16:05:00');
+
+-- Seed 10 successful admin payout audits (APPROVE)
+INSERT INTO Admin_Payout_Audit
+(audit_id, payout_id, admin_user_id, action, from_status, to_status, note, created_at)
+VALUES
+(2001,1001,1,'APPROVE','PENDING','PAID','Approved monthly payout request','2026-02-01 10:06:00'),
+(2002,1002,1,'APPROVE','PENDING','PAID','Approved monthly payout request','2026-02-02 11:11:00'),
+(2003,1003,1,'APPROVE','PENDING','PAID','Approved monthly payout request','2026-02-03 15:01:00'),
+(2004,1004,1,'APPROVE','PENDING','PAID','Approved monthly payout request','2026-02-04 16:31:00'),
+(2005,1005,1,'APPROVE','PENDING','PAID','Approved monthly payout request','2026-02-05 14:21:00'),
+(2006,1006,1,'APPROVE','PENDING','PAID','Approved monthly payout request','2026-02-06 13:16:00'),
+(2007,1007,1,'APPROVE','PENDING','PAID','Approved monthly payout request','2026-02-07 12:01:00'),
+(2008,1008,1,'APPROVE','PENDING','PAID','Approved monthly payout request','2026-02-08 17:46:00'),
+(2009,1009,1,'APPROVE','PENDING','PAID','Approved monthly payout request','2026-02-09 11:51:00'),
+(2010,1010,1,'APPROVE','PENDING','PAID','Approved monthly payout request','2026-02-10 15:36:00');
 
 
 INSERT INTO Orders (customer_id,payment_status_id,total_amount) VALUES
@@ -719,7 +752,7 @@ INSERT INTO Order_Detail (order_id,software_id,price) VALUES
 (20,12,39.99);
 
 
-INSERT INTO License (license_key,software_id,customer_id,purchase_date,expire_date,status) VALUES
+INSERT INTO License (license_key,software_id,owner_id,purchase_date,expire_date,status) VALUES
 ('LIC-RE9-AX92KD',11,7,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'Active'),
 ('LIC-GTA5-2KD82S',12,8,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'Active'),
 ('LIC-MC-92KDLS',16,9,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'Active'),
