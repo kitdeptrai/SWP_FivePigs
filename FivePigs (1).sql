@@ -81,8 +81,20 @@ CREATE TABLE Software_Version (
     file_size BIGINT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     is_active TINYINT(1) DEFAULT 1,
+    pricing_type VARCHAR(20) DEFAULT 'SIMPLE',
     FOREIGN KEY (software_id) REFERENCES Software(software_id)
         ON DELETE CASCADE
+);
+
+CREATE TABLE Software_Pricing (
+    pricing_id INT AUTO_INCREMENT PRIMARY KEY,
+    software_id INT NOT NULL,
+    plan_name VARCHAR(50), -- Basic / Team / Pro
+    max_users INT NOT NULL, -- 1 / 2 / 4 / 10
+    price DECIMAL(10,2) NOT NULL,
+    is_active TINYINT(1) DEFAULT 1,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (software_id) REFERENCES Software(software_id)
 );
 
 -- 9. Cart
@@ -119,14 +131,29 @@ CREATE TABLE Order_Detail (
     order_id INT,
     software_id INT,
     price DECIMAL(10,2),
+    pricing_id INT NULL,
     FOREIGN KEY (order_id) REFERENCES Orders(order_id),
-    FOREIGN KEY (software_id) REFERENCES Software(software_id)
+    FOREIGN KEY (software_id) REFERENCES Software(software_id),
+    FOREIGN KEY (pricing_id) REFERENCES Software_Pricing(pricing_id)
 );
 
 -- 13. License
 CREATE TABLE License (
     license_id INT AUTO_INCREMENT PRIMARY KEY,
     license_key VARCHAR(100) UNIQUE,
+
+	pricing_id INT,
+    software_id INT,
+    owner_id INT, -- người mua license 
+    max_users INT DEFAULT 1, -- giới hạn user
+
+    current_users INT DEFAULT 0, -- số user đang dùng
+
+    purchase_date DATETIME,
+    expire_date DATETIME,
+    status VARCHAR(20),
+	FOREIGN KEY (pricing_id) REFERENCES Software_Pricing(pricing_id),
+
 
     software_id INT,
 
@@ -139,6 +166,7 @@ CREATE TABLE License (
     expire_date DATETIME,
     status VARCHAR(20),
 
+
     FOREIGN KEY (software_id) REFERENCES Software(software_id),
     FOREIGN KEY (owner_id) REFERENCES Users(user_id)
 );
@@ -150,8 +178,18 @@ CREATE TABLE License_User (
 
     assigned_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     status VARCHAR(20) DEFAULT 'ACTIVE',
+    UNIQUE KEY uq_license_user (license_id, user_id),
+
+    assigned_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    status VARCHAR(20) DEFAULT 'ACTIVE',
+    UNIQUE KEY uq_license_user (license_id, user_id),
+
+
+    assigned_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    status VARCHAR(20) DEFAULT 'ACTIVE',
 
     UNIQUE KEY uq_license_user (license_id, user_id),
+
 
     FOREIGN KEY (license_id) REFERENCES License(license_id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE
@@ -229,6 +267,7 @@ CREATE TABLE Vendor_Payout (
 );
 
 -- 19.1 Vendor Payout Audit Log
+
 CREATE TABLE Admin_Payout_Audit (
     audit_id INT AUTO_INCREMENT PRIMARY KEY,
     payout_id INT NOT NULL,
@@ -240,7 +279,9 @@ CREATE TABLE Admin_Payout_Audit (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (payout_id) REFERENCES Vendor_Payout(payout_id),
     FOREIGN KEY (admin_user_id) REFERENCES Users(user_id)
+
 );
+
 
 CREATE TABLE Vendor_Earning (
     earning_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -248,6 +289,14 @@ CREATE TABLE Vendor_Earning (
     software_id INT,
     order_id INT,
     amount DECIMAL(12,2), -- tiền vendor nhận được (sau fee)
+
+	gross_amount DECIMAL(12,2),
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+	commission_rate DECIMAL(5,2),
+    FOREIGN KEY (vendor_id) REFERENCES Users(user_id),
+    FOREIGN KEY (software_id) REFERENCES Software(software_id),
+    FOREIGN KEY (order_id) REFERENCES Orders(order_id)
+
 
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 
@@ -273,43 +322,13 @@ CREATE TABLE Wallet (
     status VARCHAR(20),
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES Users(user_id)
+
 );
 
--- 21. Wallet Transaction
-CREATE TABLE Wallet_Transaction (
-    transaction_id INT AUTO_INCREMENT PRIMARY KEY,
-    wallet_id INT,
-    amount DECIMAL(12,2),
-    transaction_type VARCHAR(20),
-    reference_id INT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (wallet_id) REFERENCES Wallet(wallet_id)
-);
 
--- 22. Support Ticket
-CREATE TABLE Support_Ticket (
-    ticket_id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    subject NVARCHAR(255) NOT NULL,
-    description LONGTEXT NOT NULL,
-    ticket_type VARCHAR(50),
-    status VARCHAR(20) DEFAULT 'OPEN',
-    priority VARCHAR(20) DEFAULT 'MEDIUM',
-    assigned_admin_id INT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES Users(user_id),
-    FOREIGN KEY (assigned_admin_id) REFERENCES Users(user_id)
-);
-
--- 23. Support Ticket Message
-CREATE TABLE Support_Ticket_Message (
-    message_id INT AUTO_INCREMENT PRIMARY KEY,
-    ticket_id INT NOT NULL,
-    sender_id INT NOT NULL,
-    message LONGTEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (ticket_id) REFERENCES Support_Ticket(ticket_id) ON DELETE CASCADE,
-    FOREIGN KEY (sender_id) REFERENCES Users(user_id)
+CREATE TABLE System_Config (
+    config_key VARCHAR(50) PRIMARY KEY,
+    config_value VARCHAR(100)
 );
 
 -- 24. pending review
@@ -317,23 +336,17 @@ CREATE TABLE Review_Score (
     review_score_id INT AUTO_INCREMENT PRIMARY KEY,
     software_id INT NOT NULL,
     reviewer_id INT NOT NULL,
-    
     no_malware TINYINT(1) DEFAULT 0,
     no_copyright_violation TINYINT(1) DEFAULT 0,
     no_spam_content TINYINT(1) DEFAULT 0,
-
     ui_ux_score INT,
     technical_score INT,
     performance_score INT,
     documentation_score INT,
-
     total_score DECIMAL(4,2),
-
     decision VARCHAR(20), -- APPROVED / REJECTED
     review_note LONGTEXT,
-
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-
     FOREIGN KEY (software_id) REFERENCES Software(software_id),
     FOREIGN KEY (reviewer_id) REFERENCES Users(user_id)
 );
@@ -372,6 +385,7 @@ CREATE INDEX idx_guideline_title ON Review_Guideline(title);
 CREATE INDEX idx_item_guideline ON Review_Guideline_Item(guideline_id);
 
 
+
 -- ====     27.   Tảo bảng assignment cho phần My reviews======
 
 USE fivepigs;
@@ -391,6 +405,8 @@ CREATE TABLE Reviewer_Assignment (
     FOREIGN KEY (software_id) REFERENCES Software(software_id) ON DELETE CASCADE,
     FOREIGN KEY (reviewer_id) REFERENCES Users(user_id) ON DELETE CASCADE
 );
+
+
 
 CREATE INDEX idx_assignment_reviewer ON Reviewer_Assignment(reviewer_id, status, assigned_at);
 CREATE INDEX idx_assignment_software ON Reviewer_Assignment(software_id, status);
