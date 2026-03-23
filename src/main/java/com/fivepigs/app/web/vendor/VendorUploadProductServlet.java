@@ -4,6 +4,7 @@
  */
 package com.fivepigs.app.web.vendor;
 
+import java.sql.PreparedStatement;
 import com.fivepigs.app.config.Db;
 import com.fivepigs.app.dao.GenreDao;
 import com.fivepigs.app.dao.SoftwareDao;
@@ -45,15 +46,15 @@ public class VendorUploadProductServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        try{
-        GenreDao gdao = new GenreDao();
-        List<Genre> listGenre = gdao.getAllGenre();
+        try {
+            GenreDao gdao = new GenreDao();
+            List<Genre> listGenre = gdao.getAllGenre();
 
-        request.setAttribute("listGenre", listGenre);
+            request.setAttribute("listGenre", listGenre);
 
-        request.getRequestDispatcher("/WEB-INF/views/vendor/upload_product.jsp").forward(request, response);
-        }catch(SQLException e){
-            
+            request.getRequestDispatcher("/WEB-INF/views/vendor/upload_product.jsp").forward(request, response);
+        } catch (SQLException e) {
+
         }
     }
 
@@ -158,6 +159,13 @@ public class VendorUploadProductServlet extends HttpServlet {
                     releaseNote,
                     softwareFile.getSize()
             );
+            // ===== INSERT NOTIFICATION FOR REVIEWER =====
+            int reviewerId = 2; // TODO: replace bằng query role sau
+
+            String title = "New software submitted - " + name;
+            String content = "A new software \"" + name + "\" has been submitted and is waiting for your review.";
+
+            insertNotification(reviewerId, title, content);
 
             response.sendRedirect(request.getContextPath() + "/vendor/my_products");
 
@@ -217,6 +225,22 @@ public class VendorUploadProductServlet extends HttpServlet {
         filePart.write(fullPath);
 
         return "uploads/" + folder + "/" + fileName;
+    }
+
+    private void insertNotification(int userId, String title, String content) throws Exception {
+
+        String sql = "INSERT INTO Notification "
+                + "(user_id, title, content, is_read, type, priority, related_url) "
+                + "VALUES (?, ?, ?, 0, 'SUBMITTED', 'HIGH', '/reviewer_pending')";
+
+        try (Connection conn = Db.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+            ps.setString(2, title);
+            ps.setString(3, content);
+
+            ps.executeUpdate();
+        }
     }
 
     @Override
