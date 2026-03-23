@@ -18,10 +18,30 @@ VALUES
 INSERT INTO Users (full_name, email, password, role_id, phone)
 VALUES 
 ('Reviewer', 'reviewer@gmail.com', '123456', 5, '0900000002');
+('Nguyen Minh Khoa', 'khoa.nguyen@fivepigs.com', '123456', 5, '0911000001', 'ACTIVE'),
+('Tran Thi Lan', 'lan.tran@fivepigs.com', '123456', 5, '0911000002', 'ACTIVE'),
+('Le Hoang Nam', 'nam.le@fivepigs.com', '123456', 5, '0911000003', 'ACTIVE'),
+('Pham Quoc Huy', 'huy.pham@fivepigs.com', '123456', 5, '0911000004', 'ACTIVE'),
+('Vo Thanh Dat', 'dat.vo@fivepigs.com', '123456', 5, '0911000005', 'ACTIVE'),
+('Dang Thu Trang', 'trang.dang@fivepigs.com', '123456', 5, '0911000006', 'ACTIVE'),
+('Bui Anh Tuan', 'tuan.bui@fivepigs.com', '123456', 5, '0911000007', 'ACTIVE'),
+('Do Thi Mai', 'mai.do@fivepigs.com', '123456', 5, '0911000008', 'ACTIVE'),
+('Hoang Gia Bao', 'bao.hoang@fivepigs.com', '123456', 5, '0911000009', 'ACTIVE'),
+('Phan Duc Long', 'long.phan@fivepigs.com', '123456', 5, '0911000010', 'ACTIVE');
 
 INSERT INTO Users (full_name, email, password, role_id, phone)
 VALUES 
 ('Approval', 'approval@gmail.com', '123456', 4, '0900000003');
+('Nguyen Tuan Anh', 'tuananh.nguyen@fivepigs.com', '123456', 4, '0922000001', 'ACTIVE'),
+('Tran Quang Hieu', 'hieu.tran@fivepigs.com', '123456', 4, '0922000002', 'ACTIVE'),
+('Le Thi Ngoc', 'ngoc.le@fivepigs.com', '123456', 4, '0922000003', 'ACTIVE'),
+('Pham Minh Duc', 'duc.pham@fivepigs.com', '123456', 4, '0922000004', 'ACTIVE'),
+('Vo Thanh Tung', 'tung.vo@fivepigs.com', '123456', 4, '0922000005', 'ACTIVE'),
+('Dang Hoang Phuc', 'phuc.dang@fivepigs.com', '123456', 4, '0922000006', 'ACTIVE'),
+('Bui Ngoc Anh', 'anh.bui@fivepigs.com', '123456', 4, '0922000007', 'ACTIVE'),
+('Do Quoc Viet', 'viet.do@fivepigs.com', '123456', 4, '0922000008', 'ACTIVE'),
+('Hoang Minh Tri', 'tri.hoang@fivepigs.com', '123456', 4, '0922000009', 'ACTIVE'),
+('Phan Thanh Son', 'son.phan@fivepigs.com', '123456', 4, '0922000010', 'ACTIVE');
 
 INSERT INTO Users (full_name, email, password, role_id, phone)
 VALUES
@@ -306,7 +326,6 @@ VALUES
 (30,2,'Multiplayer and matchmaking system tested');
 
 
-<<<<<<< HEAD
 INSERT INTO Software_Image (software_id,image_url,is_thumbnail) VALUES
 (11,'images/RE9_icon.jpg',1),
 (11,'images/RE9_detail1.jpg',0),
@@ -352,54 +371,6 @@ INSERT INTO Software_Image (software_id,image_url,is_thumbnail) VALUES
 (2,'images/ins_detail2.webp',0),
 (2,'images/ins_detail3.webp',0),
 (2,'images/ins_detail4.webp',0);
-=======
--- Resident Evil Requiem (ID = 11)
-INSERT INTO Software_Image (software_id,image_url,is_thumbnail) VALUES
-(11,'uploads/images/RE9_icon.jpg',1),
-(11,'uploads/images/RE9_detail1.jpg',0),
-(11,'uploads/images/RE9_detail2.jpg',0),
-(11,'uploads/images/RE9_detail3.jpg',0),
-(11,'uploads/images/RE9_detail4.jpg',0);
-
--- Warzone (ID = 13)
-INSERT INTO Software_Image (software_id,image_url,is_thumbnail) VALUES
-(13,'uploads/images/Warzone_icon.png',1),
-(13,'uploads/images/Warzone_detail1.jpg',0),
-(13,'uploads/images/Warzone_detail2.jpg',0),
-(13,'uploads/images/Warzone_detail3.jpg',0),
-(13,'uploads/images/Warzone_detail4.jpg',0);
-
--- PUBG (ID = 19)
-INSERT INTO Software_Image (software_id,image_url,is_thumbnail) VALUES
-(19,'uploads/images/pubg_icon.png',1),
-(19,'uploads/images/pubg_detail1.png',0),
-(19,'uploads/images/pubg_detail2.webp',0),
-(19,'uploads/images/pubg_detail3.jpg',0),
-(19,'uploads/images/pubg_detail4.jpg',0);
-
--- Minecraft (ID = 16)
-INSERT INTO Software_Image (software_id,image_url,is_thumbnail) VALUES
-(16,'uploads/images/minecraft.webp',1),
-(16,'uploads/images/Minecraft_info1.jpg',0),
-(16,'uploads/images/Minecraft_info2.jpg',0),
-(16,'uploads/images/minecraft_info3.png',0),
-(16,'uploads/images/minecraft_info4.jpg',0);
-
--- Facebook (ID = 1)
-INSERT INTO Software_Image (software_id,image_url,is_thumbnail) VALUES
-(1,'uploads/images/facebook_icon.png',1),
-(1,'uploads/images/facebook_detail1.png',0),
-(1,'uploads/images/facebook_detail2.webp',0),
-(1,'uploads/images/facebook_detail3.jpg',0);
-
--- Instagram (ID = 2)
-INSERT INTO Software_Image (software_id,image_url,is_thumbnail) VALUES
-(2,'uploads/images/instagram_icon.jpg',1),
-(2,'uploads/images/ins_detail1.webp',0),
-(2,'uploads/images/ins_detail2.webp',0),
-(2,'uploads/images/ins_detail3.webp',0),
-(2,'uploads/images/ins_detail4.webp',0);
->>>>>>> 5e4f8c2db8a6fed33530c9b498cdff4c8b7c02b5
 
 INSERT INTO Software_Review_Process (software_id, reviewer_id, test_result)
 VALUES

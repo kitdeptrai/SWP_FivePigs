@@ -47,6 +47,7 @@ public class Software {
     private ReviewerProcess reviewerProcess;
     private SoftwareVersion softwareVersion;
     private SoftwareDetail softwareDetail;
+    private String iconUrl;
 
     private Date reviewDate;
     private String recommendation;
@@ -289,9 +290,15 @@ public void setSoftwareImage(SoftwareImage softwareImage) {
         this.appName = appName;
     }
 
+    public String getIconUrl() {
+        return iconUrl;
+    }
 
-   
-public String getFormattedCreatedAt() {
+    public void setIconUrl(String iconUrl) {
+        this.iconUrl = iconUrl;
+    }
+
+    public String getFormattedCreatedAt() {
     if (createdAt == null) return "";
     DateTimeFormatter formatter =
             DateTimeFormatter.ofPattern("yyyy-MM-dd");
