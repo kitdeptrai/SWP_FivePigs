@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.fivepigs.app.dao;
 
 import com.fivepigs.app.config.Db;
@@ -15,15 +11,17 @@ import java.sql.SQLException;
 public class ReviewScoreDao {
 
     public boolean saveReviewScore(ReviewScore rs) {
+        String sql = """
+            INSERT INTO Review_Score
+            (software_id, reviewer_id,
+             no_malware, no_copyright_violation, no_spam_content,
+             ui_ux_score, technical_score, performance_score, documentation_score,
+             total_score, decision, review_note)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """;
 
-        String sql = "INSERT INTO Review_Score "
-                + "(software_id, reviewer_id, "
-                + "no_malware, no_copyright_violation, no_spam_content, "
-                + "ui_ux_score, technical_score, performance_score, documentation_score, "
-                + "total_score, decision, review_note) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-        try (Connection conn = Db.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, rs.getSoftwareId());
             ps.setInt(2, rs.getReviewerId());
@@ -51,24 +49,25 @@ public class ReviewScoreDao {
 
     public void insertReviewScore(ReviewScore r) throws SQLException {
         String sql = """
-        INSERT INTO Review_Score (
-            software_id,
-            reviewer_id,
-            no_malware,
-            no_copyright_violation,
-            no_spam_content,
-            ui_ux_score,
-            technical_score,
-            performance_score,
-            documentation_score,
-            total_score,
-            decision,
-            review_note
-        )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    """;
+            INSERT INTO Review_Score (
+                software_id,
+                reviewer_id,
+                no_malware,
+                no_copyright_violation,
+                no_spam_content,
+                ui_ux_score,
+                technical_score,
+                performance_score,
+                documentation_score,
+                total_score,
+                decision,
+                review_note
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """;
 
-        try (Connection conn = Db.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, r.getSoftwareId());
             ps.setInt(2, r.getReviewerId());
@@ -89,38 +88,53 @@ public class ReviewScoreDao {
 
     public ReviewScore getReviewDetailById(int reviewScoreId) throws Exception {
         String sql = """
-        SELECT rs.review_score_id,
-               rs.software_id,
-               rs.reviewer_id,
-               rs.no_malware,
-               rs.no_copyright_violation,
-               rs.no_spam_content,
-               rs.ui_ux_score,
-               rs.technical_score,
-               rs.performance_score,
-               rs.documentation_score,
-               rs.total_score,
-               rs.decision,
-               rs.review_note,
-               rs.created_at,
-               s.name AS software_name,
-               s.short_description,
-               s.price,
-               c.category_name,
-               sv.version_name AS version,
-               si.image_url
-        FROM Review_Score rs
-        JOIN Software s ON rs.software_id = s.software_id
-        LEFT JOIN Category c ON s.category_id = c.category_id
-        LEFT JOIN Software_Version sv
-               ON sv.software_id = s.software_id AND sv.is_active = 1
-        LEFT JOIN Software_Image si
-               ON si.software_id = s.software_id AND si.is_thumbnail = 1
-        WHERE rs.review_score_id = ?
-        LIMIT 1
-    """;
+            SELECT rs.review_score_id,
+                   rs.software_id,
+                   rs.reviewer_id,
+                   rs.no_malware,
+                   rs.no_copyright_violation,
+                   rs.no_spam_content,
+                   rs.ui_ux_score,
+                   rs.technical_score,
+                   rs.performance_score,
+                   rs.documentation_score,
+                   rs.total_score,
+                   rs.decision,
+                   rs.review_note,
+                   rs.created_at,
+                   s.name AS software_name,
+                   s.short_description,
+                   CASE
+                       WHEN s.is_free = 1 THEN 0
+                       ELSE COALESCE(sp.price, 0)
+                   END AS price,
+                   c.category_name,
+                   sv.version_name AS version,
+                   si.image_url
+            FROM Review_Score rs
+            JOIN Software s
+                 ON rs.software_id = s.software_id
+            LEFT JOIN Category c
+                 ON s.category_id = c.category_id
+            LEFT JOIN Software_Version sv
+                 ON sv.software_id = s.software_id
+                AND sv.is_active = 1
+            LEFT JOIN Software_Image si
+                 ON si.software_id = s.software_id
+                AND si.is_thumbnail = 1
+            LEFT JOIN (
+                SELECT software_id, MIN(price) AS price
+                FROM Software_Pricing
+                WHERE is_active = 1
+                GROUP BY software_id
+            ) sp
+                 ON sp.software_id = s.software_id
+            WHERE rs.review_score_id = ?
+            LIMIT 1
+        """;
 
-        try (Connection conn = Db.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, reviewScoreId);
 
@@ -160,7 +174,8 @@ public class ReviewScoreDao {
     public int countReviewsByReviewer(int reviewerId) throws SQLException {
         String sql = "SELECT COUNT(*) FROM Review_Score WHERE reviewer_id = ?";
 
-        try (Connection conn = Db.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, reviewerId);
 

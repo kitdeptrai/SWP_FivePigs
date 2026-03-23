@@ -105,17 +105,49 @@ public class ApprovalPendingDetail extends HttpServlet {
         String softwareIdStr = request.getParameter("softwareId");
         String decision = request.getParameter("decision");
         String note = request.getParameter("note");
-
+        String status="";
+        if(decision.equals("APPROVED")){
+            status="ACTIVE";
+        }
+        
+        else status="REJECTED";
         if (softwareIdStr == null || decision == null) {
             response.getWriter().println("Missing parameters");
             return;
         }
-
+        
         int softwareId = Integer.parseInt(softwareIdStr);
         int approverId = user.getUserId();
 
         ApprovalDao adao = new ApprovalDao();
-        adao.submitDecision(softwareId, approverId, decision, note);
+        adao.submitDecision(softwareId, approverId, decision, note,status);
+
+        com.fivepigs.app.dao.SoftwareDao softwareDao = new com.fivepigs.app.dao.SoftwareDao();
+        com.fivepigs.app.model.Software software = softwareDao.getSoftwareById(softwareId);
+        if (software != null && software.getVendorId() != null) {
+            com.fivepigs.app.dao.NotificationDao notificationDao = new com.fivepigs.app.dao.NotificationDao();
+            String appName = software.getName() != null ? software.getName() : ("Software #" + softwareId);
+            String title = "Software Approval Decision - " + appName;
+            String content;
+            String type;
+            
+            if ("APPROVED".equals(decision)) {
+                content = "Congratulations! Your software \"" + appName + "\" has been approved and is now active.";
+                type = "APPROVED";
+            } else {
+                content = "Unfortunately, your software \"" + appName + "\" has been rejected. Note: " + note;
+                type = "REJECTED";
+            }
+            
+            notificationDao.insertNotification(
+                software.getVendorId(),
+                title,
+                content,
+                type,
+                type.equals("APPROVED") ? "MEDIUM" : "HIGH",
+                request.getContextPath() + "/vendor_software_detail?id=" + softwareId
+            );
+        }
 
         response.sendRedirect(request.getContextPath() + "/approval_history");
 

@@ -192,7 +192,17 @@
                 </div>
 
 
+                <c:if test="${param.error == 'min'}">
+                    <p style="color:red;">Minimum payout is $50</p>
+                </c:if>
 
+                <c:if test="${param.error == 'balance'}">
+                    <p style="color:red;">Not enough balance</p>
+                </c:if>
+
+                <c:if test="${param.success == '1'}">
+                    <p style="color:green;">Payout request created!</p>
+                </c:if>
                 <!-- TABLE -->
                 <div class="table-card">
 
@@ -228,7 +238,7 @@
                                     <td>
                                         <c:choose>
                                             <c:when test="${item.status == 'PAID'}">
-                                                <span class="status paid">
+                                                <span class="status active">
                                                     <i class="fa-solid fa-circle-check"></i> Paid
                                                 </span>
                                             </c:when>
@@ -276,7 +286,7 @@
 
                     <!-- Balance -->
                     <p class="balance">
-                        Available balance: $${wallet.balance}
+                        Available balance: $${balance}
                     </p>
 
                     <!-- Payment Method -->

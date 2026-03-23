@@ -5,7 +5,9 @@
 package com.fivepigs.app.web.vendor;
 
 import com.fivepigs.app.config.Db;
+import com.fivepigs.app.dao.GenreDao;
 import com.fivepigs.app.dao.SoftwareDao;
+import com.fivepigs.app.model.Genre;
 import com.fivepigs.app.model.Software;
 import com.fivepigs.app.model.User;
 import com.fivepigs.app.service.SoftwareService;
@@ -21,6 +23,7 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part;
 import java.io.File;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -37,19 +40,22 @@ import java.util.List;
 )
 public class VendorUploadProductServlet extends HttpServlet {
 
-    private SoftwareService softwareService;
-
-    public void init() {
-        softwareService = new SoftwareService();
-    }
+    private SoftwareService softwareService = new SoftwareService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        try{
+        GenreDao gdao = new GenreDao();
+        List<Genre> listGenre = gdao.getAllGenre();
+
+        request.setAttribute("listGenre", listGenre);
+
         request.getRequestDispatcher("/WEB-INF/views/vendor/upload_product.jsp").forward(request, response);
+        }catch(SQLException e){
+            
+        }
     }
-
-
 
     @Override
     protected void doPost(HttpServletRequest request,
@@ -72,7 +78,7 @@ public class VendorUploadProductServlet extends HttpServlet {
             String systemRequire = request.getParameter("systemRequire");
             String categoryParam = request.getParameter("category");
             String priceParam = request.getParameter("price");
-
+            String[] genreIds = request.getParameterValues("genres");
             // ===== VALIDATE =====
             String validationError = softwareService.validateUpload(
                     name, description, priceParam, categoryParam
@@ -95,7 +101,7 @@ public class VendorUploadProductServlet extends HttpServlet {
 
             int categoryId = Integer.parseInt(categoryParam);
             double price = Double.parseDouble(priceParam);
-
+            int isFree = (price == 0) ? 1 : 0;
             // ===== INSERT SOFTWARE =====
             Software software = new Software();
             software.setName(name);
@@ -103,9 +109,11 @@ public class VendorUploadProductServlet extends HttpServlet {
             software.setVendorId(user.getUserId());
             software.setCategoryId(categoryId);
             software.setPrice(price);
-
+            software.setIsFree(isFree);
             int softwareId = softwareService.createSoftware(software);
-
+            if (genreIds != null && genreIds.length > 0) {
+                softwareService.addSoftwareGenres(softwareId, genreIds);
+            }
             // ===== INSERT SOFTWARE DETAIL =====
             softwareService.createSoftwareDetail(
                     softwareId,

@@ -48,7 +48,7 @@ public class ChangeStatusOfProductServlet extends HttpServlet {
             }
             Integer softwareId=Integer.parseInt(request.getParameter("softwareId"));
             String status=request.getParameter("status");
-            swdao.changeStatusSoftware(user.getUserId(), softwareId, status);
+            swdao.changeStatusSoftware( softwareId, status);
            
             response.sendRedirect(request.getContextPath() + "/vendor/my_products");
         } catch (SQLException e) {

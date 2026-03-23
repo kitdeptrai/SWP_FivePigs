@@ -24,12 +24,12 @@ import java.util.Map;
 public class VendorDao {
 
     public Double sumRevenue(int vendorId) throws SQLException {
-        String sql = "SELECT s.vendor_id,SUM(od.price) AS total_revenue FROM Orders o \n"
-                + "JOIN Order_Detail od ON o.order_id = od.order_id\n"
-                + "JOIN Software s ON od.software_id = s.software_id\n"
-                + "JOIN Payment_Status ps ON o.payment_status_id = ps.payment_status_id\n"
-                + "WHERE ps.status_name = 'PAID' AND s.vendor_id = ?\n"
-                + "GROUP BY s.vendor_id;";
+        String sql = "SELECT \n"
+                + "    vendor_id,\n"
+                + "    SUM(amount) AS total_revenue\n"
+                + "FROM Vendor_Earning\n"
+                + "WHERE vendor_id = ?\n"
+                + "GROUP BY vendor_id;";
         try (Connection c = Db.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, vendorId);
             try (ResultSet rs = ps.executeQuery()) {
@@ -118,24 +118,22 @@ public class VendorDao {
 
         return list;
     }
-    
+
     public void createPayoutRequest(int vendorId, double amount,
-        String paymentMethod, String paymentAccount) throws SQLException {
+            String paymentMethod, String paymentAccount) throws SQLException {
 
-    String sql = "INSERT INTO Vendor_Payout "
-            + "(vendor_id, amount, payment_method, payment_account, status) "
-            + "VALUES (?, ?, ?, ?, 'PENDING')";
+        String sql = "INSERT INTO Vendor_Payout "
+                + "(vendor_id, amount, payment_method, payment_account, status) "
+                + "VALUES (?, ?, ?, ?, 'PENDING')";
 
-    try (Connection c = Db.getConnection();
-         PreparedStatement ps = c.prepareStatement(sql)) {
+        try (Connection c = Db.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
 
-        ps.setInt(1, vendorId);
-        ps.setDouble(2, amount);
-        ps.setString(3, paymentMethod);
-        ps.setString(4, paymentAccount);
-        
+            ps.setInt(1, vendorId);
+            ps.setDouble(2, amount);
+            ps.setString(3, paymentMethod);
+            ps.setString(4, paymentAccount);
 
-        ps.executeUpdate();
+            ps.executeUpdate();
+        }
     }
-}
 }

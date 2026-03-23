@@ -2,7 +2,7 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Admin - Reports</title>
@@ -121,10 +121,10 @@
 
     <main class="main">
         <h1 style="margin-top: 0;">Reports Management</h1>
-        <p class="subtitle">Quản lý các report chưa xử lý (demo UI).</p>
+        <p class="subtitle">Manage pending reports (demo UI).</p>
 
         <div class="card" style="max-width: 100%;">
-            <div class="alert">Bạn có thể nối DAO để load danh sách report (status = UNREAD/PENDING) và hiển thị ở đây.</div>
+            <div class="alert">You can connect a DAO to load reports (status = UNREAD/PENDING) and display them here.</div>
 
             <table>
                 <thead>

@@ -7,6 +7,7 @@
 
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <!DOCTYPE html>
 <html>
@@ -43,21 +44,33 @@
             .version-list{
                 display:flex;
                 flex-direction:column;
-                gap:25px;
-            }
-
-            .version-card{
-                background:#1f2937;
-                padding:25px;
-                border-radius:16px;
-                border:1px solid #374151;
-                display:flex;
                 gap:20px;
             }
 
+            /* CARD */
+
+            .version-card{
+                background: linear-gradient(145deg,#1e293b,#0f172a);
+                border-radius:16px;
+                padding:22px;
+                display:flex;
+                align-items:center;
+                gap:20px;
+                border:1px solid rgba(255,255,255,0.05);
+                transition:0.25s;
+            }
+
+            .version-card:hover{
+                transform:translateY(-4px);
+                border:1px solid rgba(99,102,241,0.4);
+                box-shadow:0 12px 30px rgba(0,0,0,0.4);
+            }
+
+            /* ICON */
+
             .version-icon{
-                width:60px;
-                height:60px;
+                width:56px;
+                height:56px;
                 background:#111827;
                 border-radius:12px;
                 display:flex;
@@ -67,34 +80,46 @@
                 color:#6366f1;
             }
 
+            /* INFO */
+
             .version-info{
                 flex:1;
             }
 
             .version-title{
-                font-size:20px;
+                font-size:18px;
                 font-weight:600;
-                margin-bottom:5px;
+                color:#f1f5f9;
+                display:flex;
+                align-items:center;
+                gap:10px;
             }
+
+            /* META */
 
             .version-meta{
                 font-size:13px;
-                color:#9ca3af;
-                margin-bottom:15px;
+                color:#94a3b8;
+                margin-top:6px;
+                display:flex;
+                gap:20px;
             }
+
+            /* BADGES */
 
             .badge-current{
                 background:#1e3a8a;
                 color:#60a5fa;
-                padding:3px 10px;
+                padding:4px 10px;
                 border-radius:20px;
                 font-size:12px;
+                font-weight:500;
             }
 
             .badge-deprecated{
                 background:#374151;
                 color:#9ca3af;
-                padding:3px 10px;
+                padding:4px 10px;
                 border-radius:20px;
                 font-size:12px;
             }
@@ -131,6 +156,105 @@
                 color:white;
             }
 
+            .release-note{
+                margin-top:10px;
+                font-size:14px;
+                color:#cbd5f5;
+                line-height:1.5;
+                background:#0f172a;
+                padding:10px 14px;
+                border-radius:8px;
+                border:1px solid rgba(255,255,255,0.05);
+            }
+            /* MODAL BACKGROUND */
+
+            .modal{
+                display:none;
+                position:fixed;
+                top:0;
+                left:0;
+                width:100%;
+                height:100%;
+                background:rgba(0,0,0,0.7);
+                justify-content:center;
+                align-items:center;
+                z-index:999;
+            }
+
+            /* MODAL BOX */
+
+            .modal-content{
+                background:#ffffff;
+                width:500px;
+                border-radius:12px;
+                padding:30px;
+                color:#111827; /* thêm dòng này */
+            }
+
+            /* HEADER */
+
+            .modal-header{
+                display:flex;
+                justify-content:space-between;
+                align-items:center;
+                margin-bottom:20px;
+            }
+
+            .modal-close{
+                font-size:22px;
+                cursor:pointer;
+            }
+
+            /* FORM */
+
+            .form-group{
+                margin-bottom:18px;
+                display:flex;
+                flex-direction:column;
+            }
+
+            .form-group label{
+                font-weight:500;
+                color:#374151;
+                margin-bottom:6px;
+            }
+
+            .form-group input,
+            .form-group select,
+            .form-group textarea{
+                padding:10px;
+                border-radius:6px;
+                border:1px solid #ddd;
+                color:#111827;   /* thêm */
+                background:#fff; /* thêm */
+            }
+
+            /* UPLOAD BOX */
+
+            .upload-box{
+                border:2px dashed #ccc;
+                padding:25px;
+                text-align:center;
+                border-radius:10px;
+                color:#374151;
+            }
+
+            .upload-icon{
+                font-size:28px;
+                margin-bottom:10px;
+            }
+
+            /* BUTTON */
+
+            .btn-submit{
+                width:100%;
+                background:#020617;
+                color:white;
+                padding:12px;
+                border:none;
+                border-radius:8px;
+                cursor:pointer;
+            }
         </style>
 
     </head>
@@ -149,16 +273,16 @@
                         Version Management
                     </div>
 
-                    <a href="upload-version?softwareId=${softwareId}" class="btn-upload">
+                    <button class="btn-upload" onclick="openUploadModal()">
                         <i class="fa fa-plus"></i>
                         Upload New Version
-                    </a>
+                    </button>
 
                 </div>
 
                 <div class="version-list">
 
-                    <c:forEach var="v" items="${listVersion}">
+                    <c:forEach var="s" items="${listVersion}">
 
                         <div class="version-card">
 
@@ -169,52 +293,152 @@
                             <div class="version-info">
 
                                 <div class="version-title">
-                                    ${infoSoftware.name} v${v.versionName}
 
-                                    <c:choose>
-                                        <c:when test="${v.isCurrent}">
-                                            <span class="badge-current">Current</span>
-                                        </c:when>
-                                        <c:otherwise>
-                                            <span class="badge-deprecated">Deprecated</span>
-                                        </c:otherwise>
-                                    </c:choose>
+                                    ${s.name} v${s.softwareVersion.versionName}
+
+                                    <!-- ACTIVE VERSION -->
+                                    <c:if test="${s.softwareVersion.isActive == 1}">
+                                        <span class="badge-current">Current</span>
+                                    </c:if>
+
+                                    <!-- NOT ACTIVE -->
+                                    <c:if test="${s.softwareVersion.isActive == 0}">
+                                        <span class="badge-deprecated">Deprecated</span>
+
+                                        <!-- BUTTON ACTIVE -->
+                                        <form action="${pageContext.request.contextPath}/vendor/activate_version"
+                                              method="post"
+                                              style="display:inline; margin-left:10px;">
+
+                                            <input type="hidden" name="versionId" value="${s.softwareVersion.versionId}">
+                                            <input type="hidden" name="softwareId" value="${softwareId}">
+
+                                            <button type="submit"
+                                                    class="btn"
+                                                    style="background:#22c55e; color:white;"
+                                                    onclick="return confirm('Set this version as active?')">
+
+                                                <i class="fa-solid fa-check"></i> Set Active
+                                            </button>
+
+                                        </form>
+                                    </c:if>
 
                                 </div>
 
                                 <div class="version-meta">
-                                    ${v.releaseDate} • ${v.downloadCount} downloads • ${v.size} MB
+                                    <span>
+                                        <i class="fa-regular fa-calendar"></i>
+                                        ${s.softwareVersion.createdAt.toLocalDate()}
+                                    </span>
+
+                                    <span>
+                                        <i class="fa-solid fa-hard-drive"></i>
+                                        <c:set var="size" value="${s.softwareVersion.fileSize}" />
+
+                                        <c:choose>
+
+                                            <c:when test="${size < 1024 * 1024}">
+                                                <fmt:formatNumber value="${size / 1024.0}" maxFractionDigits="1"/> KB
+                                            </c:when>
+
+                                            <c:when test="${size < 1024 * 1024 * 1024}">
+                                                <fmt:formatNumber value="${size / (1024.0 * 1024)}" maxFractionDigits="1"/> MB
+                                            </c:when>
+
+                                            <c:otherwise>
+                                                <fmt:formatNumber value="${size / (1024.0 * 1024 * 1024)}" maxFractionDigits="1"/> GB
+                                            </c:otherwise>
+
+                                        </c:choose>
+                                    </span>
                                 </div>
-
-                                <ul class="changelog">
-                                    <c:forEach var="log" items="${v.changelog}">
-                                        <li>${log}</li>
-                                        </c:forEach>
-                                </ul>
-
-                            </div>
-
-                            <div class="version-actions">
-
-                                <button class="btn btn-edit">
-                                    Edit
-                                </button>
-
-                                <button class="btn btn-delete">
-                                    Delete
-                                </button>
+                                <div class="release-note">
+                                    <i class="fa-solid fa-file-lines"></i>
+                                    ${s.softwareVersion.releaseNote}
+                                </div>
 
                             </div>
 
                         </div>
 
                     </c:forEach>
-
                 </div>
 
             </div>
 
         </div>
+        <!-- Upload Version Modal -->
+        <div id="uploadModal" class="modal">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h3>Upload a new version of your software product</h3>
+                    <span class="modal-close" onclick="closeUploadModal()">×</span>
+                </div>
+
+                <form action="upload_version" method="post" enctype="multipart/form-data">
+
+                    <input type="hidden" name="softwareId" value="${softwareId}">
+
+                    <div class="form-group">
+                        <label>Version</label>
+                        <input type="text" name="versionName" placeholder="v2.0.0" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Release note</label>
+                        <textarea name="releaseNote" rows="4"
+                                  placeholder="Added new feature&#10;Fixed bug in module X"></textarea>
+                    </div>
+
+                    <div class="form-group upload-box">
+
+                        <i class="fa-solid fa-cloud-arrow-up upload-icon"></i>
+
+                        <input type="file"
+                               name="softwareFile"
+                               accept=".txt"
+                               required>
+
+                        <p>Accepted formats: txt (Max 500MB)</p>
+
+                    </div>
+
+                    <button class="btn-submit">
+                        <i class="fa-solid fa-upload"></i>
+                        Create Version
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+        <script>
+
+            function openUploadModal() {
+                document.getElementById("uploadModal").style.display = "flex";
+            }
+
+            function closeUploadModal() {
+                document.getElementById("uploadModal").style.display = "none";
+            }
+
+            /* click outside modal */
+
+            window.onclick = function (e) {
+
+                const modal = document.getElementById("uploadModal");
+
+                if (e.target === modal) {
+                    modal.style.display = "none";
+                }
+
+            }
+
+        </script>
 
     </body>
 
