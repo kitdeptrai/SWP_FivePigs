@@ -14,7 +14,7 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/vendor/vendor.css">
         <style>
-            
+
 
             /* Container */
             .container{
@@ -81,7 +81,7 @@
             .card.active{
                 display:block;
             }
-            
+
             input, textarea, select{
                 width:100%;
                 padding:12px;
@@ -166,6 +166,72 @@
                 font-size:13px;
                 color:#94a3b8;
             }
+            .genre-grid{
+                display:grid;
+                grid-template-columns:repeat(auto-fill, minmax(140px,1fr));
+                gap:14px;
+                margin-bottom:20px;
+            }
+
+            .genre-card{
+                background:#0f172a;
+                border:1px solid #334155;
+                border-radius:10px;
+                padding:14px;
+                text-align:center;
+                cursor:pointer;
+                transition:0.25s;
+                position:relative;
+            }
+
+            .genre-card:hover{
+                border-color:#6366f1;
+                transform:translateY(-2px);
+            }
+
+            /* Ẩn checkbox */
+            .genre-card input{
+                display:none;
+            }
+
+            /* text */
+            .genre-name{
+                font-size:14px;
+                color:#cbd5e1;
+                font-weight:500;
+            }
+
+            /* khi checked → đổi text */
+            .genre-card input:checked + .genre-name{
+                color:white;
+            }
+
+            /* trick: highlight cả card */
+            .genre-card input:checked + .genre-name::before{
+                content:"";
+                position:absolute;
+                inset:0;
+                border-radius:10px;
+                background:linear-gradient(145deg,#4f46e5,#6366f1);
+                z-index:-1;
+            }
+
+            /* text */
+            .genre-name{
+                font-size:14px;
+                color:#cbd5e1;
+                font-weight:500;
+            }
+
+            /* SELECTED STYLE */
+            .genre-card input:checked + .genre-name{
+                color:#fff;
+            }
+            .genre-card.active{
+                background:linear-gradient(145deg,#4f46e5,#6366f1);
+                border-color:#6366f1;
+            }
+
         </style>
     </head>
     <body>
@@ -233,7 +299,24 @@
                                 </option>
 
                             </select>
+                            <label>Genres *</label>
 
+                            <div class="genre-grid">
+
+                                <c:forEach var="g" items="${listGenre}">
+                                    <label class="genre-card">
+                                        <input type="checkbox" name="genres" value="${g.genreId}">
+                                        <span class="genre-name">${g.name}</span>
+                                    </label>
+                                </c:forEach>
+
+                            </div>
+
+                            <small style="color:#94a3b8;">
+                                Hold Ctrl (Windows) or Cmd (Mac) to select multiple
+                            </small>
+                            <br/>
+                            <br/>
                             <label>Price (USD) *</label>
                             <input type="number"
                                    name="price"
@@ -302,7 +385,11 @@
             </div>
         </div>
         <script>
-
+            document.querySelectorAll('.genre-card input').forEach(input => {
+                input.addEventListener('change', function () {
+                    this.parentElement.classList.toggle('active', this.checked);
+                });
+            });
             function nextStep(step) {
 
                 if (step === 1) {

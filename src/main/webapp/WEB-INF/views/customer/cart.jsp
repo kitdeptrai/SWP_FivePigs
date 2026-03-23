@@ -42,6 +42,16 @@
                                     <div>
                                         <div style="font-weight:700;">${item.name}</div>
                                         <div style="font-size:13px;color:#666;">
+                                            <c:if test="${not empty item.planName}">
+                                                <span>${item.planName}</span>
+                                                <c:if test="${not empty item.planMaxUsers}">
+                                                    <span> • ${item.planMaxUsers} user<c:if test="${item.planMaxUsers != 1}">s</c:if></span>
+                                                </c:if>
+                                                <c:if test="${not empty item.durationDays}">
+                                                    <span> • ${item.durationDays} day<c:if test="${item.durationDays != 1}">s</c:if></span>
+                                                </c:if>
+                                                <br>
+                                            </c:if>
                                             <c:choose>
                                                 <c:when test="${item.isFree == 1}">Free</c:when>
                                                 <c:otherwise>$${item.price}</c:otherwise>

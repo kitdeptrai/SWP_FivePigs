@@ -19,13 +19,22 @@ public class NotificationDao {
         n.setTitle(rs.getString("title"));
         n.setContent(rs.getString("content"));
         n.setRead(rs.getBoolean("is_read"));
+        n.setType(rs.getString("type"));
+        n.setPriority(rs.getString("priority"));
+        n.setRelatedUrl(rs.getString("related_url"));
         n.setCreatedAt(rs.getTimestamp("created_at"));
         return n;
     }
 
+    // 1. Lấy tất cả notification của user
     public List<Notification> getByUser(int userId) {
+        return getByUser(userId, "desc");
+    }
+
+    public List<Notification> getByUser(int userId, String dateOrder) {
         List<Notification> list = new ArrayList<>();
-        String sql = "SELECT * FROM Notification WHERE user_id = ? ORDER BY created_at DESC";
+        String orderBy = "ASC".equalsIgnoreCase(dateOrder) ? "ASC" : "DESC";
+        String sql = "SELECT * FROM Notification WHERE user_id = ? ORDER BY created_at " + orderBy + ", notification_id " + orderBy;
 
         try (Connection con = Db.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -36,30 +45,80 @@ public class NotificationDao {
                     list.add(mapRow(rs));
                 }
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
         return list;
     }
 
-    public List<Notification> getTopByUser(int userId, int limit) {
+    public List<Notification> filterByUser(int userId, String readFilter, String typeFilter, String keyword) {
         List<Notification> list = new ArrayList<>();
-        String sql = "SELECT * FROM Notification WHERE user_id = ? ORDER BY created_at DESC LIMIT ?";
+
+        StringBuilder sql = new StringBuilder("""
+            SELECT *
+            FROM Notification
+            WHERE user_id = ?
+        """);
+
+        List<Object> params = new ArrayList<>();
+        params.add(userId);
+
+        if (readFilter != null && !readFilter.equalsIgnoreCase("all")) {
+            if (readFilter.equalsIgnoreCase("unread")) {
+                sql.append(" AND is_read = 0 ");
+            } else if (readFilter.equalsIgnoreCase("read")) {
+                sql.append(" AND is_read = 1 ");
+            }
+        }
+
+        if (typeFilter != null && !typeFilter.equalsIgnoreCase("all")) {
+            sql.append(" AND type = ? ");
+            params.add(typeFilter);
+        }
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            sql.append(" AND (LOWER(title) LIKE ? OR LOWER(content) LIKE ?) ");
+            String kw = "%" + keyword.trim().toLowerCase() + "%";
+            params.add(kw);
+            params.add(kw);
+        }
+
+        sql.append(" ORDER BY created_at DESC ");
 
         try (Connection con = Db.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+             PreparedStatement ps = con.prepareStatement(sql.toString())) {
 
-            ps.setInt(1, userId);
-            ps.setInt(2, Math.max(1, limit));
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     list.add(mapRow(rs));
                 }
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         return list;
+    }
+
+    public int countByUser(int userId) {
+        String sql = "SELECT COUNT(*) FROM Notification WHERE user_id = ?";
+        try (Connection con = Db.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 
     public int countUnreadByUser(int userId) {
@@ -79,14 +138,58 @@ public class NotificationDao {
         return 0;
     }
 
-    public void insertNotification(int userId, String title, String content) {
-        String sql = "INSERT INTO Notification(user_id, title, content, is_read, created_at) VALUES(?, ?, ?, 0, NOW())";
+    public int countHighPriorityByUser(int userId) {
+        String sql = """
+            SELECT COUNT(*)
+            FROM Notification
+            WHERE user_id = ?
+              AND UPPER(priority) IN ('HIGH', 'CRITICAL')
+        """;
+        try (Connection con = Db.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public int countByType(int userId, String type) {
+        String sql = "SELECT COUNT(*) FROM Notification WHERE user_id = ? AND type = ?";
+        try (Connection con = Db.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+            ps.setString(2, type);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    // method mới: insert notification linh hoạt theo type / priority / related_url
+    public void insertNotification(int userId, String title, String content,
+                                   String type, String priority, String relatedUrl) {
+        String sql = """
+            INSERT INTO Notification(user_id, title, content, is_read, type, priority, related_url, created_at)
+            VALUES(?, ?, ?, 0, ?, ?, ?, NOW())
+        """;
         try (Connection con = Db.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setInt(1, userId);
             ps.setString(2, title);
             ps.setString(3, content);
+            ps.setString(4, type);
+            ps.setString(5, priority);
+            ps.setString(6, relatedUrl);
             ps.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
@@ -135,5 +238,41 @@ public class NotificationDao {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    
+public void insertNotification(int userId, String title, String content) {
+        String sql = "INSERT INTO Notification(user_id, title, content, is_read, created_at) VALUES(?, ?, ?, 0, NOW())";
+        try (Connection con = Db.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+            ps.setString(2, title);
+            ps.setString(3, content);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+     public List<Notification> getTopByUser(int userId, int limit) {
+        List<Notification> list = new ArrayList<>();
+        String sql = "SELECT * FROM Notification WHERE user_id = ? ORDER BY created_at DESC LIMIT ?";
+
+        try (Connection con = Db.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+            ps.setInt(2, Math.max(1, limit));
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapRow(rs));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
     }
 }

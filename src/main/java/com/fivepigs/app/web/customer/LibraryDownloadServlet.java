@@ -120,20 +120,7 @@ public class LibraryDownloadServlet extends HttpServlet {
         return in;
     }
 
-    private boolean hasOwnedLicense(int userId, int softwareId) throws SQLException {
-        String sql = "SELECT 1 FROM fivepigs.license " +
-                "WHERE customer_id = ? AND software_id = ? " +
-                "AND (status IS NULL OR UPPER(status) <> 'REVOKED') LIMIT 1";
 
-        try (Connection c = Db.getConnection();
-             PreparedStatement st = c.prepareStatement(sql)) {
-            st.setInt(1, userId);
-            st.setInt(2, softwareId);
-            try (ResultSet rs = st.executeQuery()) {
-                return rs.next();
-            }
-        }
-    }
 
     private Integer resolveUserId(HttpSession session) {
         if (session == null) return null;
@@ -159,6 +146,26 @@ public class LibraryDownloadServlet extends HttpServlet {
             return Integer.valueOf(value.trim());
         } catch (NumberFormatException e) {
             return null;
+        }
+    }
+
+    private boolean hasOwnedLicense(int userId, int softwareId) throws SQLException {
+        String sql = "SELECT 1 " +
+                "FROM fivepigs.license_user lu " +
+                "JOIN fivepigs.license l ON lu.license_id = l.license_id " +
+                "WHERE lu.user_id = ? AND l.software_id = ? " +
+                "AND (lu.status IS NULL OR UPPER(lu.status) = 'ACTIVE') " +
+                "AND (l.status IS NULL OR UPPER(l.status) <> 'REVOKED') " +
+                "AND (l.expire_date IS NULL OR l.expire_date >= NOW()) " +
+                "LIMIT 1";
+
+        try (Connection c = Db.getConnection();
+             PreparedStatement st = c.prepareStatement(sql)) {
+            st.setInt(1, userId);
+            st.setInt(2, softwareId);
+            try (ResultSet rs = st.executeQuery()) {
+                return rs.next();
+            }
         }
     }
 

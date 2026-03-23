@@ -17,6 +17,25 @@ import java.util.List;
 import java.util.Map;
 
 public class ReportDao {
+    public boolean hasActiveAccess(int userId, int softwareId) throws SQLException {
+        String sql = "SELECT 1 " +
+                "FROM fivepigs.license_user lu " +
+                "JOIN fivepigs.license l ON lu.license_id = l.license_id " +
+                "WHERE lu.user_id = ? AND l.software_id = ? " +
+                "AND (lu.status IS NULL OR UPPER(lu.status) = 'ACTIVE') " +
+                "AND (l.status IS NULL OR UPPER(l.status) <> 'REVOKED') " +
+                "AND (l.expire_date IS NULL OR l.expire_date >= NOW()) " +
+                "LIMIT 1";
+        try (Connection c = Db.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            ps.setInt(2, softwareId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        }
+    }
+
     public void reportFromLicense(int softwareId, int reporterId, String reason, String status) throws SQLException {
         String sql = "INSERT INTO fivepigs.report (software_id, reporter_id, reason, status, created_at) " +
                 "VALUES (?, ?, ?, ?, NOW())";

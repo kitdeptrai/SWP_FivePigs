@@ -44,6 +44,10 @@ public class ReportServlet extends HttpServlet {
         }
         try {
             int softwareId = Integer.parseInt(softwareIdRaw);
+            if (!reportDao.hasActiveAccess(user.getUserId(), softwareId)) {
+                response.sendRedirect(request.getContextPath() + "/library?reportMsg=not_owned");
+                return;
+            }
             reportDao.reportFromLicense(softwareId, user.getUserId(), reason.trim(), DEFAULT_STATUS);
             response.sendRedirect(request.getContextPath() + "/library?reportMsg=submitted");
         } catch (NumberFormatException e) {

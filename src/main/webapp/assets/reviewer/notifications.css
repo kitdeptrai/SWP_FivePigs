@@ -166,7 +166,11 @@
     margin: 0 4px;
 }
 
-.notifications-page .chip{
+.notifications-page .chip,
+.notifications-page .chip:visited,
+.notifications-page .chip:hover,
+.notifications-page .chip:focus,
+.notifications-page .chip:active{
     appearance: none;
     border: 1px solid transparent;
     background: rgba(255,255,255,0.08);
@@ -178,10 +182,20 @@
     font-weight: 700;
     line-height: 1;
     transition: all .2s ease;
+    text-decoration: none !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    outline: none;
+}
+
+.notifications-page .chip *{
+    text-decoration: none !important;
 }
 
 .notifications-page .chip:hover{
     background: rgba(255,255,255,0.14);
+    color: #fff;
 }
 
 .notifications-page .chip.active{

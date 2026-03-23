@@ -306,7 +306,7 @@ VALUES
 (30,2,'Multiplayer and matchmaking system tested');
 
 
-<<<<<<< HEAD
+
 INSERT INTO Software_Image (software_id,image_url,is_thumbnail) VALUES
 (11,'images/RE9_icon.jpg',1),
 (11,'images/RE9_detail1.jpg',0),
@@ -352,7 +352,7 @@ INSERT INTO Software_Image (software_id,image_url,is_thumbnail) VALUES
 (2,'images/ins_detail2.webp',0),
 (2,'images/ins_detail3.webp',0),
 (2,'images/ins_detail4.webp',0);
-=======
+
 -- Resident Evil Requiem (ID = 11)
 INSERT INTO Software_Image (software_id,image_url,is_thumbnail) VALUES
 (11,'uploads/images/RE9_icon.jpg',1),
@@ -399,7 +399,7 @@ INSERT INTO Software_Image (software_id,image_url,is_thumbnail) VALUES
 (2,'uploads/images/ins_detail2.webp',0),
 (2,'uploads/images/ins_detail3.webp',0),
 (2,'uploads/images/ins_detail4.webp',0);
->>>>>>> 5e4f8c2db8a6fed33530c9b498cdff4c8b7c02b5
+
 
 INSERT INTO Software_Review_Process (software_id, reviewer_id, test_result)
 VALUES
