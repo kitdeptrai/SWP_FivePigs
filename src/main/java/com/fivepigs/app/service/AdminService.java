@@ -87,6 +87,52 @@ public class AdminService {
         return getProductsPage(parsePage(pageParam), pageSize, keyword, status);
     }
 
+    public PageResult<AdminDao.AdminOrderRow> getSuccessfulOrdersPage(String pageParam,
+                                                                       int pageSize,
+                                                                       String keyword,
+                                                                       String fromDate,
+                                                                       String toDate) {
+        return getSuccessfulOrdersPage(parsePage(pageParam), pageSize, keyword, fromDate, toDate);
+    }
+
+    public PageResult<AdminDao.AdminOrderRow> getSuccessfulOrdersPage(int page,
+                                                                       int pageSize,
+                                                                       String keyword,
+                                                                       String fromDate,
+                                                                       String toDate) {
+        int safePageSize = pageSize <= 0 ? 10 : pageSize;
+        String normalizedKeyword = normalizeKeyword(keyword);
+        java.sql.Date normalizedFromDate = parseSqlDate(fromDate);
+        java.sql.Date normalizedToDate = parseSqlDate(toDate);
+        if (normalizedFromDate != null && normalizedToDate != null && normalizedFromDate.after(normalizedToDate)) {
+            java.sql.Date tmp = normalizedFromDate;
+            normalizedFromDate = normalizedToDate;
+            normalizedToDate = tmp;
+        }
+
+        int totalItems = adminDao.countSuccessfulOrders(normalizedKeyword, normalizedFromDate, normalizedToDate);
+        int totalPages = Math.max(1, (int) Math.ceil((double) totalItems / safePageSize));
+        int currentPage = Math.max(1, Math.min(page, totalPages));
+        int offset = (currentPage - 1) * safePageSize;
+
+        List<AdminDao.AdminOrderRow> items = adminDao.listSuccessfulOrdersPaged(
+                safePageSize,
+                offset,
+                normalizedKeyword,
+                normalizedFromDate,
+                normalizedToDate
+        );
+        return new PageResult<>(items, currentPage, safePageSize, totalItems, totalPages);
+    }
+
+    public List<AdminDao.AdminOrderDetailRow> getOrderDetails(String orderIdStr) {
+        Integer orderId = parseId(orderIdStr);
+        if (orderId == null) {
+            return java.util.Collections.emptyList();
+        }
+        return adminDao.listOrderDetails(orderId);
+    }
+
     public PageResult<AdminDao.VendorPayoutRow> getVendorPayoutsPage(String pageParam,
                                                                       int pageSize,
                                                                       String status,

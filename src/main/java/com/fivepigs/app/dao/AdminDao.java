@@ -784,6 +784,130 @@ public class AdminDao {
         }
     }
 
+    // ===== Orders Management =====
+
+    public int countSuccessfulOrders(String keyword, java.sql.Date fromDate, java.sql.Date toDate) {
+        StringBuilder sql = new StringBuilder(
+                "SELECT COUNT(*) " +
+                "FROM orders o " +
+                "JOIN users u ON o.customer_id = u.user_id " +
+                "JOIN payment_status ps ON o.payment_status_id = ps.payment_status_id " +
+                "WHERE UPPER(ps.status_name) = 'PAID'"
+        );
+        List<Object> params = new ArrayList<>();
+
+        if (keyword != null) {
+            sql.append(" AND (CAST(o.order_id AS CHAR) LIKE ? OR LOWER(u.full_name) LIKE ? OR LOWER(u.email) LIKE ?)");
+            String kw = "%" + keyword.toLowerCase() + "%";
+            params.add(kw);
+            params.add(kw);
+            params.add(kw);
+        }
+        if (fromDate != null) {
+            sql.append(" AND DATE(o.order_date) >= ?");
+            params.add(fromDate);
+        }
+        if (toDate != null) {
+            sql.append(" AND DATE(o.order_date) <= ?");
+            params.add(toDate);
+        }
+
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? rs.getInt(1) : 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    public List<AdminOrderRow> listSuccessfulOrdersPaged(int limit, int offset, String keyword, java.sql.Date fromDate, java.sql.Date toDate) {
+        StringBuilder sql = new StringBuilder(
+                "SELECT o.order_id, o.total_amount, o.order_date, ps.status_name AS payment_status, " +
+                "u.full_name AS customer_name, u.email AS customer_email " +
+                "FROM orders o " +
+                "JOIN users u ON o.customer_id = u.user_id " +
+                "JOIN payment_status ps ON o.payment_status_id = ps.payment_status_id " +
+                "WHERE UPPER(ps.status_name) = 'PAID'"
+        );
+        List<Object> params = new ArrayList<>();
+
+        if (keyword != null) {
+            sql.append(" AND (CAST(o.order_id AS CHAR) LIKE ? OR LOWER(u.full_name) LIKE ? OR LOWER(u.email) LIKE ?)");
+            String kw = "%" + keyword.toLowerCase() + "%";
+            params.add(kw);
+            params.add(kw);
+            params.add(kw);
+        }
+        if (fromDate != null) {
+            sql.append(" AND DATE(o.order_date) >= ?");
+            params.add(fromDate);
+        }
+        if (toDate != null) {
+            sql.append(" AND DATE(o.order_date) <= ?");
+            params.add(toDate);
+        }
+
+        sql.append(" ORDER BY o.order_date DESC LIMIT ? OFFSET ?");
+        params.add(limit);
+        params.add(offset);
+
+        List<AdminOrderRow> rows = new ArrayList<>();
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    rows.add(new AdminOrderRow(
+                            rs.getInt("order_id"),
+                            rs.getString("customer_name"),
+                            rs.getString("customer_email"),
+                            rs.getDouble("total_amount"),
+                            rs.getTimestamp("order_date"),
+                            rs.getString("payment_status")
+                    ));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return rows;
+    }
+
+    public List<AdminOrderDetailRow> listOrderDetails(int orderId) {
+        String sql = "SELECT od.order_detail_id, od.software_id, s.name AS software_name, od.price " +
+                "FROM order_detail od " +
+                "LEFT JOIN software s ON od.software_id = s.software_id " +
+                "WHERE od.order_id = ? " +
+                "ORDER BY od.order_detail_id ASC";
+
+        List<AdminOrderDetailRow> rows = new ArrayList<>();
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, orderId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    rows.add(new AdminOrderDetailRow(
+                            rs.getInt("order_detail_id"),
+                            rs.getInt("software_id"),
+                            rs.getString("software_name"),
+                            rs.getDouble("price")
+                    ));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return rows;
+    }
+
     // ===== CRUD =====
 
     public UserRow findUserById(int userId) {
@@ -1081,6 +1205,78 @@ public class AdminDao {
 
         public String getImageUrl() {
             return imageUrl;
+        }
+    }
+
+    public static class AdminOrderRow {
+        private final int orderId;
+        private final String customerName;
+        private final String customerEmail;
+        private final double totalAmount;
+        private final java.sql.Timestamp orderDate;
+        private final String paymentStatus;
+
+        public AdminOrderRow(int orderId, String customerName, String customerEmail, double totalAmount, java.sql.Timestamp orderDate, String paymentStatus) {
+            this.orderId = orderId;
+            this.customerName = customerName;
+            this.customerEmail = customerEmail;
+            this.totalAmount = totalAmount;
+            this.orderDate = orderDate;
+            this.paymentStatus = paymentStatus;
+        }
+
+        public int getOrderId() {
+            return orderId;
+        }
+
+        public String getCustomerName() {
+            return customerName;
+        }
+
+        public String getCustomerEmail() {
+            return customerEmail;
+        }
+
+        public double getTotalAmount() {
+            return totalAmount;
+        }
+
+        public java.sql.Timestamp getOrderDate() {
+            return orderDate;
+        }
+
+        public String getPaymentStatus() {
+            return paymentStatus;
+        }
+    }
+
+    public static class AdminOrderDetailRow {
+        private final int orderDetailId;
+        private final int softwareId;
+        private final String softwareName;
+        private final double price;
+
+        public AdminOrderDetailRow(int orderDetailId, int softwareId, String softwareName, double price) {
+            this.orderDetailId = orderDetailId;
+            this.softwareId = softwareId;
+            this.softwareName = softwareName;
+            this.price = price;
+        }
+
+        public int getOrderDetailId() {
+            return orderDetailId;
+        }
+
+        public int getSoftwareId() {
+            return softwareId;
+        }
+
+        public String getSoftwareName() {
+            return softwareName;
+        }
+
+        public double getPrice() {
+            return price;
         }
     }
 
