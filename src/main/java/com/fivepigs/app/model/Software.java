@@ -32,6 +32,10 @@ public class Software {
     private String shortDescription;
     private Integer vendorId;
     private Integer categoryId;
+    private Integer pricingId;
+    private String planName;
+    private Integer planMaxUsers;
+    private Integer durationDays;
     private Double price;
     private Integer isFree;
     private String status;
@@ -48,6 +52,7 @@ public class Software {
     private SoftwareVersion softwareVersion;
     private SoftwareDetail softwareDetail;
     private String iconUrl;
+    private SoftwarePricing softwarePricing;
 
     private Date reviewDate;
     private String recommendation;
@@ -57,7 +62,6 @@ public class Software {
     
     private String imageUrl;
      private Double qualityScore;
-  
 
     public String getImageUrl() {
         return imageUrl;
@@ -101,6 +105,14 @@ public void setCategoryName(String categoryName) {
     this.categoryName = categoryName;
 }
 
+    public SoftwarePricing getSoftwarePricing() {
+        return softwarePricing;
+    }
+
+    public void setSoftwarePricing(SoftwarePricing softwarePricing) {
+        this.softwarePricing = softwarePricing;
+    }
+
 
 
   
@@ -134,8 +146,6 @@ public void setCategoryName(String categoryName) {
     public void setIconUrl(String iconUrl) {
         this.iconUrl = iconUrl;
     }
-    
-    
 
     public SoftwareImage getSoftwareImage() {
     return softwareImage;
@@ -233,6 +243,38 @@ public void setSoftwareImage(SoftwareImage softwareImage) {
 
     public void setCategoryId(Integer categoryId) {
         this.categoryId = categoryId;
+    }
+
+    public Integer getPricingId() {
+        return pricingId;
+    }
+
+    public void setPricingId(Integer pricingId) {
+        this.pricingId = pricingId;
+    }
+
+    public String getPlanName() {
+        return planName;
+    }
+
+    public void setPlanName(String planName) {
+        this.planName = planName;
+    }
+
+    public Integer getPlanMaxUsers() {
+        return planMaxUsers;
+    }
+
+    public void setPlanMaxUsers(Integer planMaxUsers) {
+        this.planMaxUsers = planMaxUsers;
+    }
+
+    public Integer getDurationDays() {
+        return durationDays;
+    }
+
+    public void setDurationDays(Integer durationDays) {
+        this.durationDays = durationDays;
     }
 
     public Double getPrice() {

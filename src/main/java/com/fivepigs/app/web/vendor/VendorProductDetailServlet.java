@@ -4,9 +4,11 @@
  */
 package com.fivepigs.app.web.vendor;
 
+import com.fivepigs.app.dao.GenreDao;
 import com.fivepigs.app.dao.ReviewDao;
 import com.fivepigs.app.dao.SoftwareDao;
 import com.fivepigs.app.dao.SoftwareImageDao;
+import com.fivepigs.app.model.Genre;
 import com.fivepigs.app.model.Review;
 import com.fivepigs.app.model.Software;
 import com.fivepigs.app.model.SoftwareImage;
@@ -38,13 +40,20 @@ public class VendorProductDetailServlet extends HttpServlet {
             SoftwareDao swdao = new SoftwareDao();
             SoftwareImageDao idao = new SoftwareImageDao();
             ReviewDao rwdao = new ReviewDao();
+            GenreDao gdao = new GenreDao();
+
+            List<Genre> genres = gdao.getGenresBySoftwareId(softwareId);
+
+            
             Integer downloadCount = swdao.getDownloadBySoftwareId(softwareId);
             Double revenue = swdao.getRevenueBySoftwareId(softwareId);
             Double avgRating = swdao.getRatingBySoftwareId(softwareId);
             Integer totalLicense = swdao.getTotalLicenseBySoftwareId(softwareId);
-            Software infoSoftware = swdao.getSoftwareDetailBySoftwareId(softwareId);
+            Software infoSoftware = swdao.getSoftwareDetailBySoftwareIdVendor(softwareId);
             List<SoftwareImage> listImage = idao.getImagesBySoftwareId(softwareId);
             List<Review> listReview = rwdao.getReviewListBySoftwareId(softwareId);
+            request.setAttribute("listGenre", genres);
+            request.setAttribute("softwareId", softwareId);
             request.setAttribute("listImage", listImage);
             request.setAttribute("listReview", listReview);
             request.setAttribute("infoSoftware", infoSoftware);

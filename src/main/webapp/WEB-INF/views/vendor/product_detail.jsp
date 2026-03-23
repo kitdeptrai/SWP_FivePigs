@@ -1,4 +1,5 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 <%-- 
     Document   : product_detail
     Created on : Feb 16, 2026, 10:19:45 PM
@@ -56,21 +57,11 @@
                 font-size:18px
             }
             .badge{
+                background:#064e3b;
+                color:#22c55e;
                 padding:6px 12px;
                 border-radius:20px;
                 font-size:12px;
-            }
-            .badge-active {
-                background:#064e3b;
-                color:#22c55e;
-            }
-            .badge-rejected {
-                background:#7f1d1d;
-                color:#f87171;
-            }
-            .badge-pending {
-                background:#78350f;
-                color:#fbbf24;
             }
 
             /* Charts */
@@ -102,7 +93,7 @@
                 flex:1;
                 height:8px;
                 background:#334155;
-                border-radius:5px;
+border-radius:5px;
                 overflow:hidden;
             }
             .bar-fill{
@@ -215,7 +206,7 @@
                 display: grid;
                 grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
                 gap: 20px;
-                margin-top: 20px;
+margin-top: 20px;
             }
 
             .image-grid img {
@@ -327,6 +318,7 @@
             .btn-version:hover{
                 background:#4f46e5;
             }
+
         </style>
     </head>
 
@@ -338,33 +330,29 @@
             <div class="main">
 
                 <!-- HEADER -->
-                <div class="product-header">
+<div class="product-header">
                     <img src="/${infoSoftware.softwareImage.imageUrl}">
                     <div class="product-info">
                         <div class="product-title">${infoSoftware.name}</div>
                         <div class="product-meta">v${infoSoftware.softwareVersion.versionName} ? ${infoSoftware.category.categoryName} 
                             ?${createdDateFormatted}</div>
                         <div class="product-price">
-                            <div>$${infoSoftware.price}</div>
-                            <div style="color:#22c55e">$${infoSoftware.price*85/100} (Your earning)</div>
+                            <div style="color:#22c55e">$${infoSoftware.price}</div>
                         </div>
                     </div>
-                    <c:choose>
-                        <c:when test="${infoSoftware.status eq 'ACTIVE' || infoSoftware.status eq 'APPROVED'}">
-                            <div class="badge badge-active">Approved</div>
-                        </c:when>
-                        <c:when test="${infoSoftware.status eq 'REJECTED'}">
-                            <div class="badge badge-rejected">Rejected</div>
-                        </c:when>
-                        <c:otherwise>
-                            <div class="badge badge-pending">Pending</div>
-                        </c:otherwise>
-                    </c:choose>
-                    <div class="product-actions">
-                        <a href="/vendor/version_management?softwareId=${infoSoftware.softwareId}" class="btn-version">
+                    <div class="status ${fn:toLowerCase(infoSoftware.status)}">${infoSoftware.status}</div>
+                    <div class="product-actions" style="display:flex; gap:10px;">
+
+                        <a href="/vendor/version_management?softwareId=${softwareId}" class="btn-version">
                             <i class="fa-solid fa-code-branch"></i>
-                            Version Management
+                            Version
                         </a>
+
+                        <a href="/vendor/plan_management?softwareId=${softwareId}" class="btn-version">
+                            <i class="fa-solid fa-layer-group"></i>
+                            Plans
+                        </a>
+
                     </div>
                 </div>
 
@@ -393,7 +381,7 @@
                     </div>
                     <div class="card">
                         <div class="card-icon warning">
-                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
                             </svg>
                         </div>
@@ -442,10 +430,21 @@
                                     <p>${infoSoftware.category.categoryName}</p>
                                 </div>
 
+
                                 <div class="info-item">
                                     <span>Created At</span>
                                     <p>${infoSoftware.createdAt.toLocalDate()}</p>
                                 </div>
+                                <div class="info-item" style="grid-column: span 2;">
+                                    <span>Genres</span>
+
+                                    <div class="genre-list">
+<c:forEach var="g" items="${listGenre}">
+                                            <p>${g.name}<p>
+                                            </c:forEach>
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
 
@@ -519,8 +518,7 @@
                                         <span>${item.createdAt.toLocalDate()}</span>
                                         <span class="dot">•</span>
                                     </div>
-
-                                    <div class="review-content">
+<div class="review-content">
                                         ${item.comment}
                                     </div>
                                 </div>

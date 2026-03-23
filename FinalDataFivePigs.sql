@@ -425,6 +425,56 @@ VALUES
 (30,2,'Multiplayer and matchmaking system tested');
 
 
+<<<<<<< HEAD:FinalDataFivePigs.sql
+=======
+
+INSERT INTO Software_Image (software_id,image_url,is_thumbnail) VALUES
+(11,'images/RE9_icon.jpg',1),
+(11,'images/RE9_detail1.jpg',0),
+(11,'images/RE9_detail2.jpg',0),
+(11,'images/RE9_detail3.jpg',0),
+(11,'images/RE9_detail4.jpg',0);
+
+-- Warzone (ID = 13)
+INSERT INTO Software_Image (software_id,image_url,is_thumbnail) VALUES
+(13,'images/Warzone_icon.png',1),
+(13,'images/Warzone_detail1.jpg',0),
+(13,'images/Warzone_detail2.jpg',0),
+(13,'images/Warzone_detail3.jpg',0),
+(13,'images/Warzone_detail4.jpg',0);
+
+-- PUBG (ID = 19)
+INSERT INTO Software_Image (software_id,image_url,is_thumbnail) VALUES
+(19,'images/pubg_icon.png',1),
+(19,'images/pubg_detail1.png',0),
+(19,'images/pubg_detail2.webp',0),
+(19,'images/pubg_detail3.jpg',0),
+(19,'images/pubg_detail4.jpg',0);
+
+-- Minecraft (ID = 16)
+INSERT INTO Software_Image (software_id,image_url,is_thumbnail) VALUES
+(16,'images/minecraft.webp',1),
+(16,'images/Minecraft_info1.jpg',0),
+(16,'images/Minecraft_info2.jpg',0),
+(16,'images/minecraft_info3.png',0),
+(16,'images/minecraft_info4.jpg',0);
+
+-- Facebook (ID = 1)
+INSERT INTO Software_Image (software_id,image_url,is_thumbnail) VALUES
+(1,'images/facebook_icon.png',1),
+(1,'images/facebook_detail1.png',0),
+(1,'images/facebook_detail2.webp',0),
+(1,'images/facebook_detail3.jpg',0);
+
+-- Instagram (ID = 2)
+INSERT INTO Software_Image (software_id,image_url,is_thumbnail) VALUES
+(2,'images/instagram_icon.jpg',1),
+(2,'images/ins_detail1.webp',0),
+(2,'images/ins_detail2.webp',0),
+(2,'images/ins_detail3.webp',0),
+(2,'images/ins_detail4.webp',0);
+
+>>>>>>> daab0f27da907699b6d350bf9fc271ab7199585a:DataFivePigs.sql
 -- Resident Evil Requiem (ID = 11)
 INSERT INTO Software_Image (software_id,image_url,is_thumbnail) VALUES
 (11,'uploads/images/RE9_icon.jpg',1),
@@ -471,6 +521,10 @@ INSERT INTO Software_Image (software_id,image_url,is_thumbnail) VALUES
 (2,'uploads/images/ins_detail2.webp',0),
 (2,'uploads/images/ins_detail3.webp',0),
 (2,'uploads/images/ins_detail4.webp',0);
+<<<<<<< HEAD:FinalDataFivePigs.sql
+=======
+
+>>>>>>> daab0f27da907699b6d350bf9fc271ab7199585a:DataFivePigs.sql
 
 INSERT INTO Software_Review_Process (software_id, reviewer_id, test_result)
 VALUES

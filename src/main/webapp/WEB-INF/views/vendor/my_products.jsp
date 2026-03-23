@@ -202,6 +202,61 @@
             .pagination button.active{
                 background:#4f46e5;
             }
+            .filter-bar{
+                display:flex;
+                justify-content:space-between;
+                align-items:center;
+                margin-bottom:25px;
+                gap:20px;
+            }
+
+            /* search */
+            .search-box{
+                background:#1e293b;
+                padding:8px 14px;
+                border-radius:10px;
+                display:flex;
+                align-items:center;
+                gap:8px;
+                width:280px;
+            }
+
+            .search-box input{
+                background:transparent;
+                border:none;
+                outline:none;
+                color:white;
+                width:100%;
+            }
+
+            /* status buttons */
+
+            .status-filters{
+                margin-top:40px;
+                display:flex;
+                gap:10px;
+            }
+
+            .filter-btn{
+                background:#1e293b;
+                border:1px solid #334155;
+                padding:6px 14px;
+                border-radius:8px;
+                color:#cbd5e1;
+                cursor:pointer;
+                transition:0.2s;
+            }
+
+            .filter-btn:hover{
+                background:#334155;
+            }
+
+            .filter-btn.active{
+                background:#4f46e5;
+                color:white;
+                border-color:#4f46e5;
+            }
+
         </style>
     </head>
 
@@ -278,11 +333,30 @@
                         <p class="card-title">Total Revenue</p>                      
                     </div>
                 </div>
+                <div class="filter-bar">
 
+                    <!-- Search -->
+                    <div class="search-box">
+                        <i class="fa fa-search"></i>
+                        <input type="text" id="searchInput" placeholder="Search software name...">
+                    </div>
+
+                    <!-- Status Filter -->
+                    <div class="status-filters">
+
+                        <button class="filter-btn active" data-status="ALL">All</button>
+                        <button class="filter-btn" data-status="ACTIVE">Active</button>
+                        <button class="filter-btn" data-status="DEACTIVE">Deactive</button>
+                        <button class="filter-btn" data-status="REJECTED">Reject</button>
+                        <button class="filter-btn" data-status="PENDING">Pending</button>
+
+                    </div>
+
+                </div>
                 <!-- Products -->
                 <div class="products">
                     <c:forEach var="item" items="${softwareCardList}">
-                        <div class="product-card">
+                        <div class="product-card" data-status="${item.status}" data-name="${item.name}">
                             <img src="/${item.softwareImage.imageUrl}" />
                             <div class="product-info">
                                 <div class="product-header">
@@ -318,7 +392,7 @@
                                     <a href="/vendor/product_detail?softwareId=${item.softwareId}" class="btn-outline">View Details</a>
                                     <c:choose>
 
-                                        
+
                                         <c:when test="${item.status == 'ACTIVE'}">
                                             <form action="change_status_product" method="post">
                                                 <input type="hidden" name="softwareId" value="${item.softwareId}">
@@ -335,7 +409,7 @@
                                             </form>
                                         </c:when>
 
-                                        
+
                                         <c:when test="${item.status == 'DEACTIVE'}">
                                             <form action="change_status_product" method="post">
                                                 <input type="hidden" name="softwareId" value="${item.softwareId}">
@@ -350,6 +424,28 @@
                                                     </svg>
                                                 </button>
                                             </form>
+                                        </c:when>
+
+                                        <c:when test="${item.status == 'REJECTED'}">
+
+                                            <a href="/vendor/resubmit_product?softwareId=${item.softwareId}"
+                                               class="icon-btn"
+                                               title="Resubmit">
+
+                                                <svg width="24" height="24" viewBox="0 0 24 24"
+                                                     fill="none"
+                                                     stroke="#f59e0b"
+                                                     stroke-width="2"
+                                                     stroke-linecap="round"
+                                                     stroke-linejoin="round">
+
+                                                <path d="M23 4v6h-6"></path>
+                                                <path d="M20.49 15A9 9 0 1 1 23 10"></path>
+
+                                                </svg>
+
+                                            </a>
+
                                         </c:when>
 
                                     </c:choose>
@@ -367,47 +463,121 @@
         <script>
             const itemsPerPage = 8;
 
-            const products = document.querySelectorAll(".product-card");
+            const products = Array.from(document.querySelectorAll(".product-card"));
             const pagination = document.getElementById("pagination");
 
-            const totalPages = Math.ceil(products.length / itemsPerPage);
+            const searchInput = document.getElementById("searchInput");
+            const filterButtons = document.querySelectorAll(".filter-btn");
 
-            function showPage(page) {
+            let currentStatus = "ALL";
+
+            function getFilteredProducts() {
+
+                const searchValue = searchInput.value.toLowerCase();
+
+                return products.filter(card => {
+
+                    const name = card.dataset.name.toLowerCase();
+                    const status = card.dataset.status;
+
+                    const matchName = name.includes(searchValue);
+
+                    let matchStatus = false;
+
+                    if (currentStatus === "ALL") {
+                        matchStatus = true;
+                    } else if (currentStatus === "PENDING") {
+                        matchStatus = status.startsWith("PENDING");
+                    } else {
+                        matchStatus = status === currentStatus;
+                    }
+
+                    return matchName && matchStatus;
+
+                });
+
+            }
+
+            function showPage(page, filteredProducts) {
 
                 const start = (page - 1) * itemsPerPage;
                 const end = start + itemsPerPage;
 
-                products.forEach((card, index) => {
-                    if (index >= start && index < end) {
-                        card.style.display = "flex";
-                    } else {
-                        card.style.display = "none";
-                    }
+                products.forEach(card => card.style.display = "none");
+
+                filteredProducts.slice(start, end).forEach(card => {
+                    card.style.display = "flex";
                 });
 
-                document.querySelectorAll(".pagination button").forEach(btn => {
-                    btn.classList.remove("active");
-                });
-
-                document.getElementById("page-" + page).classList.add("active");
             }
 
-            function createPagination() {
+            function createPagination(filteredProducts) {
+
+                pagination.innerHTML = "";
+
+                const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+
+                if (totalPages === 0)
+                    return;
 
                 for (let i = 1; i <= totalPages; i++) {
 
                     const btn = document.createElement("button");
                     btn.innerText = i;
-                    btn.id = "page-" + i;
 
-                    btn.onclick = () => showPage(i);
+                    btn.onclick = () => {
+
+                        showPage(i, filteredProducts);
+
+                        document.querySelectorAll(".pagination button").forEach(b => b.classList.remove("active"));
+                        btn.classList.add("active");
+
+                    };
 
                     pagination.appendChild(btn);
+
                 }
+
+                pagination.querySelector("button").click();
+
             }
 
-            createPagination();
-            showPage(1);
+            function filterProducts() {
+
+                const filteredProducts = getFilteredProducts();
+
+                products.forEach(card => card.style.display = "none");
+
+                if (filteredProducts.length === 0) {
+
+                    pagination.innerHTML = "";
+
+                    return;
+                }
+
+                createPagination(filteredProducts);
+
+            }
+
+            searchInput.addEventListener("input", filterProducts);
+
+            filterButtons.forEach(btn => {
+
+                btn.addEventListener("click", () => {
+
+                    filterButtons.forEach(b => b.classList.remove("active"));
+                    btn.classList.add("active");
+
+                    currentStatus = btn.dataset.status;
+
+                    filterProducts();
+
+                });
+
+            });
+
+            filterProducts();
+
         </script>
     </body>
 </html>
