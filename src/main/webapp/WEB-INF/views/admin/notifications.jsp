@@ -2,7 +2,7 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Admin - Notifications</title>
@@ -92,10 +92,10 @@
 
     <main class="main">
         <h1 style="margin-top: 0;">Notifications</h1>
-        <p class="subtitle">Danh sách thông báo hệ thống (demo).</p>
+        <p class="subtitle">System notifications (demo).</p>
 
         <div class="card" style="max-width: 100%;">
-            <div class="alert">Chưa có dữ liệu thật. Bạn có thể nối DB sau.</div>
+            <div class="alert">No real data yet. You can connect the DB later.</div>
             <ul style="margin: 12px 0 0; padding-left: 18px; color: var(--muted);">
                 <li>New user registered</li>
                 <li>New software submitted for approval</li>

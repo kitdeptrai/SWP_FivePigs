@@ -43,7 +43,7 @@ public class VendorResubmitProductServlet extends HttpServlet {
         try {
             Integer softwareId = Integer.parseInt(request.getParameter("softwareId"));
             SoftwareDao swdao = new SoftwareDao();
-            Software software = swdao.getSoftwareDetailBySoftwareId(softwareId);
+            Software software = swdao.getSoftwareDetailBySoftwareIdVendor(softwareId);
             request.setAttribute("softwareId", softwareId);
 
             request.setAttribute("software", software);

@@ -47,7 +47,7 @@ public class VendorProductDetailServlet extends HttpServlet {
             Double revenue = swdao.getRevenueBySoftwareId(softwareId);
             Double avgRating = swdao.getRatingBySoftwareId(softwareId);
             Integer totalLicense = swdao.getTotalLicenseBySoftwareId(softwareId);
-            Software infoSoftware = swdao.getSoftwareDetailBySoftwareId(softwareId);
+            Software infoSoftware = swdao.getSoftwareDetailBySoftwareIdVendor(softwareId);
             List<SoftwareImage> listImage = idao.getImagesBySoftwareId(softwareId);
             List<Review> listReview = rwdao.getReviewListBySoftwareId(softwareId);
             request.setAttribute("listGenre", genres);

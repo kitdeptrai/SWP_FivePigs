@@ -129,13 +129,13 @@ public class ApprovalDao {
                 SELECT
                     s.name,
                     s.status,
-                    sa.approval_date,
+                    s.created_at,
                     sa.approval_note
                 FROM Software s
                 LEFT JOIN Software_Approval sa
                     ON s.software_id = sa.software_id
                 WHERE s.status = 'PENDING_APPROVAL'
-                ORDER BY sa.approval_date DESC;
+                ORDER BY s.created_at DESC;
     """;
 
         try (Connection c = Db.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
@@ -145,11 +145,10 @@ public class ApprovalDao {
             while (rs.next()) {
                 Software s = new Software();
                 ApprovalProcess ap = new ApprovalProcess();
-                ReviewerProcess rp = new ReviewerProcess();
                 s.setAppName(rs.getString("name"));
                 s.setStatus(rs.getString("status"));
-                if (rs.getTimestamp("approval_date") != null) {
-                    ap.setApproval_date(rs.getTimestamp("approval_date").toLocalDateTime());
+                if (rs.getTimestamp("created_at") != null) {
+                    ap.setApproval_date(rs.getTimestamp("created_at").toLocalDateTime());
                 }
 
                 ap.setApproval_note(rs.getString("approval_note"));
@@ -303,7 +302,8 @@ public class ApprovalDao {
                          c.category_name,
                          u.full_name,
                          sd.description,
-                         sv.version_name
+                         sv.version_name,
+                         sa.decision
                      FROM Software s
                      JOIN Users u 
                          ON u.user_id = s.vendor_id
@@ -313,7 +313,9 @@ public class ApprovalDao {
                          ON sd.software_id = s.software_id
                      LEFT JOIN Software_Version sv 
                          ON sv.software_id = s.software_id
-                         AND sv.is_active = 1
+                     AND sv.is_active = 1
+                     LEFT JOIN Software_Approval sa
+                        ON sa.software_id = s.software_id       
                      WHERE s.software_id = ?;
                      """;
 
@@ -324,6 +326,7 @@ public class ApprovalDao {
                     Software s = new Software();
                     SoftwareDetail sd = new SoftwareDetail();
                     SoftwareVersion sv = new SoftwareVersion();
+                    ApprovalProcess ap = new ApprovalProcess();
                     Category c = new Category();
                     User u = new User();
 
@@ -332,11 +335,13 @@ public class ApprovalDao {
                     u.setFullName(rs.getString("full_name"));
                     sd.setDescription(rs.getString("description"));
                     sv.setVersionName(rs.getString("version_name"));
+                    ap.setDecision(rs.getString("decision"));
 
                     s.setUser(u);
                     s.setCategory(c);
                     s.setSoftwareDetail(sd);
                     s.setSoftwareVersion(sv);
+                    s.setApprovalProcess(ap);
 
                     return s;
                 }
@@ -347,7 +352,7 @@ public class ApprovalDao {
         return null;
     }
 
-    public void submitDecision(int softwareId, int approverId, String decision, String note) throws SQLException {
+    public void submitDecision(int softwareId, int approverId, String decision, String note,String status) throws SQLException {
 
         Connection c = Db.getConnection();
         try {
@@ -379,7 +384,7 @@ public class ApprovalDao {
         """;
 
             try (PreparedStatement ps = c.prepareStatement(statusSql)) {
-                ps.setString(1, decision); // APPROVED hoặc REJECTED
+                ps.setString(1, status); // APPROVED hoặc REJECTED
                 ps.setInt(2, softwareId);
                 ps.executeUpdate();
             }

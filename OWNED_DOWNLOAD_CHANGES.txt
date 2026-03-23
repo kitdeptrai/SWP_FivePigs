@@ -1,0 +1,76 @@
+OWNED DOWNLOAD FLOW - CHANGE SUMMARY
+====================================
+
+Date: 2026-03-06
+Workspace: D:\IntelliJ\SWP_FivePigs
+
+1) Behavior changes
+-------------------
+- Sau khi checkout, product trong Library hien thi trang thai:
+  - Owned • Not downloaded
+- User co the bam Download trong Library.
+- Sau khi download, trang thai doi thanh:
+  - Owned • Downloaded
+- Neu bam lai, nut hien Download Again.
+
+2) New files added
+------------------
+A) src/main/java/com/fivepigs/app/dao/UserSoftwareStateDao.java
+- Tao va quan ly bang user_software_state (auto create if not exists).
+- Luu trang thai downloaded theo tung user + software.
+- Method chinh:
+  - getDownloadedMapByUser(userId)
+  - markDownloaded(userId, softwareId)
+
+B) src/main/java/com/fivepigs/app/web/customer/LibraryDownloadServlet.java
+- Endpoint moi: POST /library/download
+- Chuc nang:
+  - Kiem tra login
+  - Kiem tra user co license so huu software
+  - Mark downloaded
+  - Tang software.download_count
+  - Neu file_url la http/https -> redirect de tai
+  - Neu file local ton tai -> stream file
+  - Neu chua co file -> tra ve fallback txt package
+
+3) Existing files modified
+--------------------------
+A) src/main/java/com/fivepigs/app/web/customer/LibraryServlet.java
+- Bo sung lay downloadedMap tu UserSoftwareStateDao.
+- Truyen downloadedMap ra JSP.
+
+B) src/main/java/com/fivepigs/app/dao/SoftwareDao.java
+- Bo sung method:
+  - getSoftwareNameById(int softwareId)
+  - getActiveFileUrlBySoftwareId(int softwareId)
+  - increaseDownloadCount(int softwareId)
+
+C) src/main/webapp/WEB-INF/views/customer/library.jsp
+- Doi hien thi status tu Installed sang:
+  - Owned • Not downloaded
+  - Owned • Downloaded
+- Them nut Download / Download Again
+- Them form POST toi /library/download
+- Them thong bao not_owned
+
+4) Database note
+----------------
+- He thong tu dong tao bang user_software_state neu chua co.
+- Bang moi:
+  - user_id INT
+  - software_id INT
+  - downloaded TINYINT(1)
+  - downloaded_at DATETIME
+  - PRIMARY KEY(user_id, software_id)
+
+5) Important implementation note
+--------------------------------
+- Download currently uu tien:
+  1) Software_Version.file_url (active version)
+  2) Neu khong co file_url/binary -> fallback tai file txt de flow khong loi.
+- De co tai file that, can cap nhat Software_Version.file_url.
+
+6) Validation status
+--------------------
+- Da sua code xong.
+- Chua xac nhan compile lan cuoi do chua duoc cap quyen chay Maven ngoai sandbox.

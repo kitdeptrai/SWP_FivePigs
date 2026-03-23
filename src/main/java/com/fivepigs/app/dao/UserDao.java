@@ -49,7 +49,7 @@ public class UserDao {
     }
 
     public User findByEmail(String email) throws SQLException {
-        String sql = "SELECT u.user_id, u.full_name, u.email, u.password, u.role_id, u.status, u.created_at, r.role_name " +
+        String sql = "SELECT u.user_id, u.full_name, u.email, u.password, u.role_id, u.status, u.created_at, u.avatar, r.role_name " +
                      "FROM Users u " +
                      "INNER JOIN Role r ON u.role_id = r.role_id " +
                      "WHERE u.email = ?";
@@ -65,6 +65,7 @@ public class UserDao {
                     user.setPassword(rs.getString("password"));
                     user.setRoleId(rs.getInt("role_id"));
                     user.setStatus(rs.getString("status"));
+                    user.setAvatar(rs.getString("avatar"));
                     if (rs.getTimestamp("created_at") != null) {
                         user.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
                     }
@@ -95,6 +96,27 @@ public class UserDao {
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setString(1, newPassword);
             ps.setString(2, email);
+            ps.executeUpdate();
+        }
+    }
+
+    public void updateProfile(int userId, String fullName, String avatar) throws SQLException {
+        String sql = "UPDATE fivepigs.users SET full_name = ?, avatar = ? WHERE user_id = ?";
+        try (Connection c = Db.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, fullName);
+            ps.setString(2, avatar);
+            ps.setInt(3, userId);
+            ps.executeUpdate();
+        }
+    }
+
+    public void updateRoleByUserId(Integer userId, Integer roleId) throws SQLException {
+        String sql = "UPDATE users SET role_id = ? WHERE user_id = ?";
+        try (Connection c = Db.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, roleId);
+            ps.setInt(2, userId);
             ps.executeUpdate();
         }
     }

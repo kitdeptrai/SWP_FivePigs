@@ -22,17 +22,19 @@ public class SoftwareDetail {
     private String version;
     private String sysRequirement;
     private String releaseNote;
+    private String language;
 
     public SoftwareDetail() {
     }
 
-    public SoftwareDetail(Integer detailId, Integer softwareId, String description, String version, String sysRequirement, String releaseNote) {
+    public SoftwareDetail(Integer detailId, Integer softwareId, String description, String version, String sysRequirement, String releaseNote, String language) {
         this.detailId = detailId;
         this.softwareId = softwareId;
         this.description = description;
         this.version = version;
         this.sysRequirement = sysRequirement;
         this.releaseNote = releaseNote;
+        this.language = language;
     }
 
     public Integer getDetailId() {
@@ -83,4 +85,11 @@ public class SoftwareDetail {
         this.releaseNote = releaseNote;
     }
 
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
+    }
 }
