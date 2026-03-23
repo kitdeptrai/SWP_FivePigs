@@ -14,7 +14,7 @@
             --sidebar-bg: #0f172a;
             --card-bg: #ffffff;
             --text-main: #334155;
-            --bg-gray: #f1f5f9;
+            --bg-gray: #f5f7fb;
             --accent: #3b82f6;
         }
 
@@ -22,7 +22,7 @@
             background-color: var(--bg-gray);
             color: var(--text-main);
             margin: 0;
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            font-family: 'Inter', sans-serif;
         }
 
         .layout {

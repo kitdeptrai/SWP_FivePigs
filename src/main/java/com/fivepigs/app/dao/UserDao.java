@@ -51,9 +51,9 @@ public class UserDao {
 
     public User findByEmail(String email) throws SQLException {
         String sql = "SELECT u.user_id, u.full_name, u.email, u.password, u.role_id, u.status, u.created_at, r.role_name " +
-                     "FROM Users u " +
-                     "INNER JOIN Role r ON u.role_id = r.role_id " +
-                     "WHERE u.email = ?";
+                "FROM Users u " +
+                "INNER JOIN Role r ON u.role_id = r.role_id " +
+                "WHERE u.email = ?";
         try (Connection c = Db.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setString(1, email);

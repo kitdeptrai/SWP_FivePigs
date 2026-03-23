@@ -87,6 +87,7 @@ public class CartDao {
         try (Connection c = Db.getConnection()) {
             c.setAutoCommit(false);
             try {
+                ensureOrderCommissionColumn(c);
                 int cartId = getOrCreateCartId(c, userId);
                 List<Software> items = getCartItemsTx(c, cartId);
                 if (items.isEmpty()) {
@@ -95,15 +96,17 @@ public class CartDao {
                 }
 
                 int paidStatusId = getOrCreatePaidStatusId(c);
+                double commissionRateSnapshot = getCommissionRateSnapshot(c);
                 double total = items.stream().mapToDouble(i -> i.getIsFree() != null && i.getIsFree() == 1 ? 0.0 : safePrice(i.getPrice())).sum();
 
                 int orderId;
                 try (PreparedStatement st = c.prepareStatement(
-                        "INSERT INTO fivepigs.orders(customer_id, payment_status_id, total_amount) VALUES(?, ?, ?)",
+                        "INSERT INTO fivepigs.orders(customer_id, payment_status_id, total_amount, commission_rate) VALUES(?, ?, ?, ?)",
                         Statement.RETURN_GENERATED_KEYS)) {
                     st.setInt(1, userId);
                     st.setInt(2, paidStatusId);
                     st.setDouble(3, total);
+                    st.setDouble(4, commissionRateSnapshot);
                     st.executeUpdate();
 
                     try (ResultSet keys = st.getGeneratedKeys()) {
@@ -237,6 +240,52 @@ public class CartDao {
             }
         }
         return items;
+    }
+
+    private void ensureOrderCommissionColumn(Connection c) throws SQLException {
+        try (PreparedStatement st = c.prepareStatement(
+                "ALTER TABLE fivepigs.orders ADD COLUMN commission_rate DECIMAL(5,4) NULL")) {
+            st.executeUpdate();
+        } catch (SQLException e) {
+            String state = e.getSQLState();
+            int code = e.getErrorCode();
+            boolean duplicateColumn = "42S21".equals(state) || code == 1060;
+            if (!duplicateColumn) {
+                throw e;
+            }
+        }
+    }
+
+    private double getCommissionRateSnapshot(Connection c) throws SQLException {
+        try (PreparedStatement st = c.prepareStatement(
+                "SELECT config_value FROM fivepigs.system_config WHERE config_key = 'commission_percent' LIMIT 1")) {
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    String raw = rs.getString("config_value");
+                    if (raw != null && !raw.isBlank()) {
+                        try {
+                            double percent = Double.parseDouble(raw.trim());
+                            if (percent < 0) {
+                                percent = 0;
+                            }
+                            if (percent > 20) {
+                                percent = 20;
+                            }
+                            return percent / 100.0;
+                        } catch (NumberFormatException ignored) {
+                        }
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            String state = e.getSQLState();
+            int code = e.getErrorCode();
+            boolean tableMissing = "42S02".equals(state) || code == 1146;
+            if (!tableMissing) {
+                throw e;
+            }
+        }
+        return 0.10;
     }
 
     private int getOrCreatePaidStatusId(Connection c) throws SQLException {

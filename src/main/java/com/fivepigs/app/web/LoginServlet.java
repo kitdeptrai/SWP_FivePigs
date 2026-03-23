@@ -2,7 +2,6 @@ package com.fivepigs.app.web;
 
 import com.fivepigs.app.model.User;
 import com.fivepigs.app.service.UserService;
-
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -39,6 +38,7 @@ public class LoginServlet extends HttpServlet {
             return;
         }
 
+        CaptchaApiServlet.ensureCaptcha(req, "login");
         req.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(req, resp);
     }
 
@@ -54,7 +54,16 @@ public class LoginServlet extends HttpServlet {
         req.setAttribute("redirect", redirect);
 
         if (email == null || password == null || email.isEmpty() || password.isEmpty()) {
-            req.setAttribute("error", "Vui long nhap day du email va mat khau");
+            req.setAttribute("error", "Please enter both email and password.");
+            CaptchaApiServlet.ensureCaptcha(req, "login");
+            req.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(req, resp);
+            return;
+        }
+
+        String captchaError = CaptchaApiServlet.requireVerified(req.getSession(), "login");
+        if (captchaError != null) {
+            req.setAttribute("error", captchaError);
+            CaptchaApiServlet.ensureCaptcha(req, "login");
             req.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(req, resp);
             return;
         }
@@ -62,7 +71,8 @@ public class LoginServlet extends HttpServlet {
         try {
             User user = userService.login(email, password);
             if (user == null) {
-                req.setAttribute("error", "Email hoac mat khau khong dung");
+                req.setAttribute("error", "Invalid email or password.");
+                CaptchaApiServlet.ensureCaptcha(req, "login");
                 req.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(req, resp);
                 return;
             }
@@ -78,7 +88,7 @@ public class LoginServlet extends HttpServlet {
 
             redirectToDashboard(req, resp, user);
         } catch (SQLException e) {
-            throw new ServletException("Loi ket noi database", e);
+            throw new ServletException("Database connection error", e);
         }
     }
 
@@ -113,7 +123,7 @@ public class LoginServlet extends HttpServlet {
             }
             resp.sendRedirect(req.getContextPath() + dashboardPath);
         } catch (SQLException e) {
-            throw new ServletException("Loi lay thong tin role", e);
+            throw new ServletException("Failed to load role information", e);
         }
     }
 

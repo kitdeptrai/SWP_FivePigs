@@ -14,7 +14,7 @@
             --sidebar-bg: #0f172a;
             --card-bg: #ffffff;
             --text-main: #334155;
-            --bg-gray: #f1f5f9;
+            --bg-gray: #f5f7fb;
             --accent: #3b82f6;
         }
 
@@ -22,7 +22,7 @@
             background-color: var(--bg-gray);
             color: var(--text-main);
             margin: 0;
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            font-family: 'Inter', sans-serif;
         }
 
         .layout {
@@ -84,11 +84,17 @@
         }
 
         .card {
-            background: var(--card-bg);
-            padding: 24px;
-            border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            border: 1px solid #e2e8f0;
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            border: 1px solid #e5e7eb;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.12);
         }
 
         table {
@@ -212,15 +218,15 @@
                         </td>
                         <td><fmt:formatDate value="${u.createdAt}" pattern="dd/MM/yyyy HH:mm"/></td>
                         <td>
-                                <div style="display:flex; gap: 8px;">
-                                    <a href="#edit-user-${u.userId}" style="color: var(--accent); text-decoration: none; font-size: 13px; font-weight: 600;">Edit</a>
-                                    <c:if test="${u.status == 'ACTIVE'}">
-                                        <a href="#disable-user-${u.userId}" style="color: var(--danger); text-decoration: none; font-size: 13px; font-weight: 600;" onclick="return confirm('Are you sure you want to disable this vendor?');">Disable</a>
-                                    </c:if>
-                                    <c:if test="${u.status == 'INACTIVE'}">
-                                        <a href="#enable-user-${u.userId}" style="color: #22c55e; text-decoration: none; font-size: 13px; font-weight: 600;">Enable</a>
-                                    </c:if>
-                                </div>
+                            <div style="display:flex; gap: 8px;">
+                                <a href="#edit-user-${u.userId}" style="color: var(--accent); text-decoration: none; font-size: 13px; font-weight: 600;">Edit</a>
+                                <c:if test="${u.status == 'ACTIVE'}">
+                                    <a href="#disable-user-${u.userId}" style="color: var(--danger); text-decoration: none; font-size: 13px; font-weight: 600;" onclick="return confirm('Are you sure you want to disable this vendor?');">Disable</a>
+                                </c:if>
+                                <c:if test="${u.status == 'INACTIVE'}">
+                                    <a href="#enable-user-${u.userId}" style="color: #22c55e; text-decoration: none; font-size: 13px; font-weight: 600;">Enable</a>
+                                </c:if>
+                            </div>
 
                             <!-- Modal Edit User -->
                             <div id="edit-user-${u.userId}" class="modal">
