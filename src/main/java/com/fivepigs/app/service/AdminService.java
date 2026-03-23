@@ -10,6 +10,7 @@ public class AdminService {
     private static final Set<String> EMPLOYEE_ROLES = Set.of("reviewer", "approval", "aproval");
     private static final Set<String> ACTIVE_STATUSES = Set.of("ACTIVE", "INACTIVE");
     private static final Set<String> PAYOUT_STATUSES = Set.of("PENDING", "PAID");
+    private static final Set<String> REPORT_STATUSES = Set.of("PENDING", "ERROR_REVIEW", "ERROR_APPROVAL", "REJECTED", "ERROR_REJECTED");
 
     private final AdminDao adminDao;
 
@@ -83,7 +84,7 @@ public class AdminService {
         return new PageResult<>(items, currentPage, safePageSize, totalItems, totalPages);
     }
 
-    public PageResult<AdminDao.AdminProductRow> getProductsPage(String pageParam, int pageSize, String keyword, String status) {
+    public PageResult<AdminDao.AdminProductReportRow> getProductsPage(String pageParam, int pageSize, String keyword, String status) {
         return getProductsPage(parsePage(pageParam), pageSize, keyword, status);
     }
 
@@ -193,18 +194,36 @@ public class AdminService {
         return null;
     }
 
-    public PageResult<AdminDao.AdminProductRow> getProductsPage(int page, int pageSize, String keyword, String status) {
+    public PageResult<AdminDao.AdminProductReportRow> getProductsPage(int page, int pageSize, String keyword, String status) {
         int safePageSize = pageSize <= 0 ? 10 : pageSize;
         String normalizedKeyword = normalizeKeyword(keyword);
-        String normalizedStatus = normalizeProductStatusFilter(status);
+        String normalizedStatus = normalizeReportStatusFilter(status);
 
         int totalItems = adminDao.countProducts(normalizedKeyword, normalizedStatus);
         int totalPages = Math.max(1, (int) Math.ceil((double) totalItems / safePageSize));
         int currentPage = Math.max(1, Math.min(page, totalPages));
         int offset = (currentPage - 1) * safePageSize;
 
-        List<AdminDao.AdminProductRow> items = adminDao.listProductsPaged(safePageSize, offset, normalizedKeyword, normalizedStatus);
+        List<AdminDao.AdminProductReportRow> items = adminDao.listProductsPaged(safePageSize, offset, normalizedKeyword, normalizedStatus);
         return new PageResult<>(items, currentPage, safePageSize, totalItems, totalPages);
+    }
+
+    public String approveReport(String reportIdStr) throws SQLException {
+        Integer reportId = parseId(reportIdStr);
+        if (reportId == null) {
+            return "invalid_id";
+        }
+        boolean updated = adminDao.updateReportStatus(reportId, "PENDING", "ERROR_REVIEW");
+        return updated ? null : "invalid_state";
+    }
+
+    public String rejectReport(String reportIdStr) throws SQLException {
+        Integer reportId = parseId(reportIdStr);
+        if (reportId == null) {
+            return "invalid_id";
+        }
+        boolean updated = adminDao.updateReportStatus(reportId, "PENDING", "REJECTED");
+        return updated ? null : "invalid_state";
     }
 
     public AdminDao.AdminProductDetailRow getProductDetail(String softwareIdStr) {
@@ -346,11 +365,15 @@ public class AdminService {
         return value;
     }
 
-    private String normalizeProductStatusFilter(String status) {
+    private String normalizeReportStatusFilter(String status) {
         if (isBlank(status)) {
             return null;
         }
-        return status.trim().toUpperCase();
+        String value = status.trim().toUpperCase();
+        if (!REPORT_STATUSES.contains(value)) {
+            return null;
+        }
+        return value;
     }
 
     private String normalizePayoutStatusFilter(String status) {

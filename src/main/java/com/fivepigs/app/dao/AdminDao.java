@@ -516,20 +516,23 @@ public class AdminDao {
     public int countProducts(String keyword, String status) {
         StringBuilder sql = new StringBuilder(
                 "SELECT COUNT(*) " +
-                        "FROM software s " +
-                        "LEFT JOIN users u ON s.vendor_id = u.user_id " +
-                        "LEFT JOIN category c ON s.category_id = c.category_id " +
+                        "FROM report r " +
+                        "JOIN software s ON r.software_id = s.software_id " +
+                        "LEFT JOIN users vendor ON s.vendor_id = vendor.user_id " +
+                        "LEFT JOIN users reporter ON r.reporter_id = reporter.user_id " +
                         "WHERE 1=1"
         );
         List<Object> params = new ArrayList<>();
 
         if (status != null) {
-            sql.append(" AND s.status = ?");
+            sql.append(" AND UPPER(r.status) = ?");
             params.add(status);
         }
         if (keyword != null) {
-            sql.append(" AND (LOWER(s.name) LIKE ? OR LOWER(COALESCE(u.full_name, '')) LIKE ? OR LOWER(COALESCE(c.category_name, '')) LIKE ?)");
+            sql.append(" AND (CAST(r.report_id AS CHAR) LIKE ? OR LOWER(COALESCE(s.name, '')) LIKE ? OR LOWER(COALESCE(vendor.full_name, '')) LIKE ? OR LOWER(COALESCE(reporter.full_name, '')) LIKE ? OR LOWER(COALESCE(r.reason, '')) LIKE ?)");
             String kw = "%" + keyword.toLowerCase() + "%";
+            params.add(kw);
+            params.add(kw);
             params.add(kw);
             params.add(kw);
             params.add(kw);
@@ -549,34 +552,38 @@ public class AdminDao {
         }
     }
 
-    public List<AdminProductRow> listProductsPaged(int limit, int offset, String keyword, String status) {
+    public List<AdminProductReportRow> listProductsPaged(int limit, int offset, String keyword, String status) {
         StringBuilder sql = new StringBuilder(
-                "SELECT s.software_id, s.name, s.price, s.is_free, s.status, s.download_count, s.avg_rating, s.created_at, " +
-                        "u.full_name AS vendor_name, c.category_name " +
-                        "FROM software s " +
-                        "LEFT JOIN users u ON s.vendor_id = u.user_id " +
-                        "LEFT JOIN category c ON s.category_id = c.category_id " +
+                "SELECT r.report_id, r.software_id, r.reason, r.status AS report_status, r.created_at AS report_created_at, " +
+                        "s.name, s.status AS software_status, " +
+                        "vendor.full_name AS vendor_name, reporter.full_name AS reporter_name " +
+                        "FROM report r " +
+                        "JOIN software s ON r.software_id = s.software_id " +
+                        "LEFT JOIN users vendor ON s.vendor_id = vendor.user_id " +
+                        "LEFT JOIN users reporter ON r.reporter_id = reporter.user_id " +
                         "WHERE 1=1"
         );
         List<Object> params = new ArrayList<>();
 
         if (status != null) {
-            sql.append(" AND s.status = ?");
+            sql.append(" AND UPPER(r.status) = ?");
             params.add(status);
         }
         if (keyword != null) {
-            sql.append(" AND (LOWER(s.name) LIKE ? OR LOWER(COALESCE(u.full_name, '')) LIKE ? OR LOWER(COALESCE(c.category_name, '')) LIKE ?)");
+            sql.append(" AND (CAST(r.report_id AS CHAR) LIKE ? OR LOWER(COALESCE(s.name, '')) LIKE ? OR LOWER(COALESCE(vendor.full_name, '')) LIKE ? OR LOWER(COALESCE(reporter.full_name, '')) LIKE ? OR LOWER(COALESCE(r.reason, '')) LIKE ?)");
             String kw = "%" + keyword.toLowerCase() + "%";
             params.add(kw);
             params.add(kw);
             params.add(kw);
+            params.add(kw);
+            params.add(kw);
         }
 
-        sql.append(" ORDER BY s.created_at DESC LIMIT ? OFFSET ?");
+        sql.append(" ORDER BY r.created_at DESC, r.report_id DESC LIMIT ? OFFSET ?");
         params.add(limit);
         params.add(offset);
 
-        List<AdminProductRow> rows = new ArrayList<>();
+        List<AdminProductReportRow> rows = new ArrayList<>();
         try (Connection conn = Db.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql.toString())) {
             for (int i = 0; i < params.size(); i++) {
@@ -584,17 +591,16 @@ public class AdminDao {
             }
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    rows.add(new AdminProductRow(
+                    rows.add(new AdminProductReportRow(
+                            rs.getInt("report_id"),
                             rs.getInt("software_id"),
                             rs.getString("name"),
                             rs.getString("vendor_name"),
-                            rs.getString("category_name"),
-                            rs.getDouble("price"),
-                            rs.getInt("is_free"),
-                            rs.getString("status"),
-                            rs.getInt("download_count"),
-                            rs.getDouble("avg_rating"),
-                            rs.getTimestamp("created_at")
+                            rs.getString("reporter_name"),
+                            rs.getString("reason"),
+                            rs.getString("report_status"),
+                            rs.getString("software_status"),
+                            rs.getTimestamp("report_created_at")
                     ));
                 }
             }
@@ -602,6 +608,17 @@ public class AdminDao {
             e.printStackTrace();
         }
         return rows;
+    }
+
+    public boolean updateReportStatus(int reportId, String fromStatus, String toStatus) throws SQLException {
+        String sql = "UPDATE report SET status = ? WHERE report_id = ? AND UPPER(status) = ?";
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, toStatus);
+            ps.setInt(2, reportId);
+            ps.setString(3, fromStatus.toUpperCase());
+            return ps.executeUpdate() > 0;
+        }
     }
 
     public AdminProductDetailRow getProductDetail(int softwareId) {
@@ -1151,6 +1168,66 @@ public class AdminDao {
 
         public double getAvgRating() {
             return avgRating;
+        }
+
+        public java.sql.Timestamp getCreatedAt() {
+            return createdAt;
+        }
+    }
+
+    public static class AdminProductReportRow {
+        private final int reportId;
+        private final int softwareId;
+        private final String name;
+        private final String vendorName;
+        private final String reporterName;
+        private final String reason;
+        private final String reportStatus;
+        private final String softwareStatus;
+        private final java.sql.Timestamp createdAt;
+
+        public AdminProductReportRow(int reportId, int softwareId, String name, String vendorName, String reporterName, String reason, String reportStatus, String softwareStatus, java.sql.Timestamp createdAt) {
+            this.reportId = reportId;
+            this.softwareId = softwareId;
+            this.name = name;
+            this.vendorName = vendorName;
+            this.reporterName = reporterName;
+            this.reason = reason;
+            this.reportStatus = reportStatus;
+            this.softwareStatus = softwareStatus;
+            this.createdAt = createdAt;
+        }
+
+        public int getReportId() {
+            return reportId;
+        }
+
+        public int getSoftwareId() {
+            return softwareId;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getVendorName() {
+            return vendorName;
+        }
+
+        public String getReporterName() {
+            return reporterName;
+        }
+
+        public String getReason() {
+            return reason;
+        }
+
+        public String getReportStatus() {
+            return reportStatus;
+        }
+
+        public String getSoftwareStatus() {
+            return softwareStatus;
         }
 
         public java.sql.Timestamp getCreatedAt() {

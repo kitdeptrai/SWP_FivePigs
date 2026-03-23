@@ -24,7 +24,7 @@
         </a>
         <a href="${pageContext.request.contextPath}/admin/products" class="menu-item ${activeMenu == 'products' ? 'active' : ''}">
             <i class="fa-solid fa-box"></i>
-            <span>Products</span>
+            <span>Reported Products</span>
         </a>
         <a href="${pageContext.request.contextPath}/admin/orders" class="menu-item ${activeMenu == 'orders' ? 'active' : ''}">
             <i class="fa-solid fa-cart-shopping"></i>

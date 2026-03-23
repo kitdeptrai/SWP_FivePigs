@@ -775,3 +775,15 @@ INSERT INTO License (license_key,software_id,owner_id,purchase_date,expire_date,
 ('LIC-MC-44SDK',16,15,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'Active'),
 ('LIC-GTA5-88SKD',12,16,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'Active');
 
+INSERT INTO Report (software_id, reporter_id, reason, status, created_at) VALUES
+(11, 7, 'Game bi crash sau man hinh loading dau tien tren Windows 11.', 'PENDING', NOW()),
+(12, 8, 'Khong luu duoc save game, he thong bao loi write data.', 'PENDING', NOW()),
+(16, 9, 'Sau khi cap nhat, game bi giat va FPS giam rat manh.', 'PENDING', NOW()),
+(20, 10, 'Khong the mo game sau khi cai dat, man hinh den hoan toan.', 'PENDING', NOW()),
+(6, 11, 'Ung dung dang xem thi tu dong vang ra sau khoang 5 phut.', 'PENDING', NOW()),
+(24, 12, 'Tinh nang export PNG khong hoat dong voi file lon.', 'PENDING', NOW()),
+(26, 13, 'Slack khong gui duoc file dinh kem trong kenh nhom.', 'PENDING', NOW()),
+(29, 14, 'Game bi dung khi vao khu vuc dong nguoi trong ban do.', 'PENDING', NOW()),
+(30, 15, 'Khong tao duoc room moi, he thong quay loading lien tuc.', 'PENDING', NOW()),
+(23, 16, 'Zoom khong bat duoc microphone du da cap quyen trong may.', 'PENDING', NOW());
+
