@@ -26,20 +26,20 @@ public class AppServlet extends HttpServlet {
         String selectedGenre = normalizeGenre(request.getParameter("genre"));
 
         try {
-            List<Software> softwareList = sdao.getSoftwareByCategoryWithIcon("2");
+            List<Software> softwareList = sdao.getSoftwareByCategoryWithIcon("1");
             Map<String, List<Software>> sections = new LinkedHashMap<>();
             List<String> genres = new ArrayList<>();
             List<Software> genreResults = new ArrayList<>();
 
             try {
-                genres = sdao.getGenresByCategory(2);
+                genres = sdao.getGenresByCategory(1);
                 if (selectedGenre == null) {
                     for (String genre : genres) {
-                        List<Software> list = sdao.getSoftwareByCategoryAndGenre(2, genre);
+                        List<Software> list = sdao.getSoftwareByCategoryAndGenre(1, genre);
                         sections.put(genre, list);
                     }
                 } else {
-                    genreResults = sdao.getSoftwareByCategoryAndGenre(2, selectedGenre);
+                    genreResults = sdao.getSoftwareByCategoryAndGenre(1, selectedGenre);
                 }
             } catch (SQLException ignored) {
                 request.setAttribute("appWarning", "Thieu bang genre/software_genre, dang hien thi danh sach app mac dinh.");

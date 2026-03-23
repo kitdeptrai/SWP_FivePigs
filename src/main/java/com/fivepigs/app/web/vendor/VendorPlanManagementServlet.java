@@ -4,8 +4,8 @@
  */
 package com.fivepigs.app.web.vendor;
 
-import com.fivepigs.app.dao.SoftwareDao;
-import com.fivepigs.app.model.Software;
+import com.fivepigs.app.dao.SoftwarePricingDao;
+import com.fivepigs.app.model.SoftwarePricing;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -20,21 +20,24 @@ import java.util.List;
  *
  * @author MinhPD
  */
-@WebServlet(name = "VendorVersionManagementServlet", urlPatterns = {"/vendor/version_management"})
-public class VendorVersionManagementServlet extends HttpServlet {
+@WebServlet(name = "VendorPlanManagementServlet", urlPatterns = {"/vendor/plan_management"})
+public class VendorPlanManagementServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            SoftwareDao sdao=new SoftwareDao();
-            int softwareId=Integer.parseInt(request.getParameter("softwareId"));
-            List<Software> listVersion=sdao.getSoftwareVersionBySoftwareId(softwareId);
-            request.setAttribute("listVersion", listVersion);
+            Integer softwareId=Integer.parseInt(request.getParameter("softwareId"));
+            SoftwarePricingDao swpdao = new SoftwarePricingDao();
+            List<SoftwarePricing> list=swpdao.getPlanBySoftwareId(softwareId);
             request.setAttribute("softwareId", softwareId);
-            request.getRequestDispatcher("/WEB-INF/views/vendor/version_management.jsp").forward(request, response);
+            request.setAttribute("list", list);
+            request.getRequestDispatcher("/WEB-INF/views/vendor/plan_management.jsp").forward(request, response);
         } catch (SQLException e) {
+            e.printStackTrace();
 
+            response.setContentType("text/plain");
+            e.printStackTrace(response.getWriter());
         }
     }
 
@@ -44,9 +47,14 @@ public class VendorVersionManagementServlet extends HttpServlet {
 
     }
 
+    /**
+     * Returns a short description of the servlet.
+     *
+     * @return a String containing servlet description
+     */
     @Override
     public String getServletInfo() {
         return "Short description";
-    }
+    }// </editor-fold>
 
 }

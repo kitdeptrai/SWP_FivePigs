@@ -1,30 +1,29 @@
-<%-- 
-    Document   : upload_product
-    Created on : Mar 2, 2026, 7:36:49 PM
-    Author     : MinhPD
---%>
-
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
+
         <meta charset="UTF-8">
-        <title>Upload Software</title>
+        <title>Resubmit Software</title>
+
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/vendor/vendor.css">
+
         <style>
 
-
             /* Container */
+
             .container{
                 width:100%;
                 max-width:700px;
                 margin:40px auto;
             }
 
+            /* Steps */
 
-            /* Step Header */
             .steps{
                 display:flex;
                 justify-content:space-between;
@@ -40,7 +39,6 @@
                 right:0;
                 height:2px;
                 background:#334155;
-                z-index:0;
             }
 
             .step{
@@ -70,12 +68,13 @@
             }
 
             /* Card */
+
             .card{
                 display:none;
                 background: linear-gradient(145deg,#1e293b,#111827);
                 padding:30px;
                 border-radius:14px;
-                box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+                box-shadow:0 10px 30px rgba(0,0,0,0.4);
             }
 
             .card.active{
@@ -90,7 +89,6 @@
                 border:1px solid #334155;
                 color:#fff;
                 border-radius:8px;
-                transition:0.3s;
             }
 
             input:focus, textarea:focus, select:focus{
@@ -104,6 +102,7 @@
             }
 
             /* Buttons */
+
             .btn-group{
                 text-align:right;
             }
@@ -127,9 +126,11 @@
             }
 
             .btn-submit{
-                background:#16a34a;
+                background:#f59e0b;
                 color:white;
             }
+
+            /* Upload */
 
             .file-box{
                 border:2px dashed #334155;
@@ -137,21 +138,6 @@
                 text-align:center;
                 border-radius:8px;
                 margin-bottom:15px;
-            }
-            .error-box{
-                background:rgba(239, 68, 68, 0.12);
-                border:1px solid rgba(239, 68, 68, 0.5);
-                color:rgba(255, 255, 255, 0.9);
-                padding:12px 16px;
-                border-radius:8px;
-                margin-bottom:20px;
-                display:flex;
-                align-items:center;
-                gap:10px;
-            }
-
-            .input-error{
-                border:1px solid #ef4444 !important;
             }
 
             .preview-img{
@@ -166,82 +152,35 @@
                 font-size:13px;
                 color:#94a3b8;
             }
-            .genre-grid{
-                display:grid;
-                grid-template-columns:repeat(auto-fill, minmax(140px,1fr));
-                gap:14px;
+
+            /* Error */
+
+            .error-box{
+                background:rgba(239,68,68,0.12);
+                border:1px solid rgba(239,68,68,0.5);
+                padding:12px;
+                border-radius:8px;
                 margin-bottom:20px;
-            }
-
-            .genre-card{
-                background:#0f172a;
-                border:1px solid #334155;
-                border-radius:10px;
-                padding:14px;
-                text-align:center;
-                cursor:pointer;
-                transition:0.25s;
-                position:relative;
-            }
-
-            .genre-card:hover{
-                border-color:#6366f1;
-                transform:translateY(-2px);
-            }
-
-            /* Ẩn checkbox */
-            .genre-card input{
-                display:none;
-            }
-
-            /* text */
-            .genre-name{
-                font-size:14px;
-                color:#cbd5e1;
-                font-weight:500;
-            }
-
-            /* khi checked → đổi text */
-            .genre-card input:checked + .genre-name{
-                color:white;
-            }
-
-            /* trick: highlight cả card */
-            .genre-card input:checked + .genre-name::before{
-                content:"";
-                position:absolute;
-                inset:0;
-                border-radius:10px;
-                background:linear-gradient(145deg,#4f46e5,#6366f1);
-                z-index:-1;
-            }
-
-            /* text */
-            .genre-name{
-                font-size:14px;
-                color:#cbd5e1;
-                font-weight:500;
-            }
-
-            /* SELECTED STYLE */
-            .genre-card input:checked + .genre-name{
-                color:#fff;
-            }
-            .genre-card.active{
-                background:linear-gradient(145deg,#4f46e5,#6366f1);
-                border-color:#6366f1;
             }
 
         </style>
     </head>
+
     <body>
+
         <div class="layout">
+
             <jsp:include page="layout/side_bar.jsp"/>
+
             <div class="main">
                 <div class="container">
 
+                    <h2>Resubmit Product</h2>
+
                     <!-- STEP HEADER -->
+
                     <div class="steps">
+
                         <div class="step active" id="step1-indicator">
                             <div class="step-circle">1</div>
                             <div class="step-title">Basic Info</div>
@@ -256,127 +195,151 @@
                             <div class="step-circle">3</div>
                             <div class="step-title">Media & Files</div>
                         </div>
+
                     </div>
+
                     <c:if test="${not empty error}">
                         <div class="error-box">
                             <i class="fa-solid fa-circle-exclamation"></i>
                             ${error}
                         </div>
                     </c:if>
+
                     <form method="post"
-                          action="${pageContext.request.contextPath}/vendor/upload_product"
+                          action="${pageContext.request.contextPath}/vendor/resubmit_product"
                           enctype="multipart/form-data">
 
+                        <input type="hidden" name="softwareId" value="${param.softwareId != null ? param.softwareId : softwareId}">
+
                         <!-- STEP 1 -->
+
                         <div class="card active" id="step1">
+
                             <h3>Basic Information</h3>
 
                             <label>Product Name *</label>
                             <input type="text"
                                    name="productName"
                                    id="productName"
-                                   value="${param.productName}"
-                                   class="${errorField == 'productName' ? 'input-error' : ''}">
+                                   value="${param.productName != null ? param.productName : software.name}">
 
                             <label>Version *</label>
                             <input type="text"
                                    name="version"
                                    id="version"
-                                   value="${param.version}"
-                                   placeholder="Example: 1.0">
+                                   value="${param.version != null ? param.version : software.softwareVersion.versionName}">
 
                             <label>Category *</label>
+
                             <select name="category" id="category">
 
-                                <option value="">Select Category</option>
-
-                                <option value="1" ${param.category == '1' ? 'selected' : ''}>
+                                <option value="1"
+                                        ${(param.category == '1') || (param.category == null && software.category.categoryName == 'APP') ? 'selected' : ''}>
                                     APP
                                 </option>
 
-                                <option value="2" ${param.category == '2' ? 'selected' : ''}>
+                                <option value="2"
+                                        ${(param.category == '2') || (param.category == null && software.category.categoryName == 'GAME') ? 'selected' : ''}>
                                     GAME
                                 </option>
 
                             </select>
-                            <label>Genres *</label>
 
-                            <div class="genre-grid">
+                            <label>Price *</label>
 
-                                <c:forEach var="g" items="${listGenre}">
-                                    <label class="genre-card">
-                                        <input type="checkbox" name="genres" value="${g.genreId}">
-                                        <span class="genre-name">${g.name}</span>
-                                    </label>
-                                </c:forEach>
-
-                            </div>
-
-                            <small style="color:#94a3b8;">
-                                Hold Ctrl (Windows) or Cmd (Mac) to select multiple
-                            </small>
-                            <br/>
-                            <br/>
-                            <label>Price (USD) *</label>
                             <input type="number"
                                    name="price"
                                    id="price"
-                                   value="${param.price}">
+                                   value="${param.price != null ? param.price : software.price}">
 
                             <div class="btn-group">
                                 <button type="button" class="btn-next" onclick="nextStep(1)">Next</button>
                             </div>
+
                         </div>
 
-
                         <!-- STEP 2 -->
+
                         <div class="card" id="step2">
+
                             <h3>Product Description</h3>
 
                             <label>Short Description *</label>
-                            <textarea name="shortDescription" id="shortDescription" rows="2">${param.shortDescription}</textarea>
+
+                            <textarea name="shortDescription" id="shortDescription" rows="2">${not empty param.shortDescription ? param.shortDescription : software.shortDescription}</textarea>
 
                             <label>Full Description *</label>
-                            <textarea name="description" id="description" rows="4">${param.description}</textarea>
+
+                            <textarea name="description" id="description" rows="4">${not empty param.description ? param.description : software.softwareDetail.description}</textarea>
 
                             <label>Release Note</label>
-                            <textarea name="releaseNote" id="releaseNote" rows="3">${param.releaseNote}</textarea>
+
+                            <textarea name="releaseNote" id="releaseNote" rows="3">${not empty param.releaseNote ? param.releaseNote : software.softwareVersion.releaseNote}</textarea>
 
                             <label>System Requirement</label>
-                            <textarea name="systemRequire" id="systemRequire" rows="2">${param.systemRequire}</textarea>
+
+                            <textarea name="systemRequire" id="systemRequire" rows="2">${not empty param.systemRequire ? param.systemRequire : software.softwareDetail.sysRequirement}</textarea>
 
                             <div class="btn-group">
-                                <button type="button" class="btn-prev" onclick="prevStep(2)">Previous</button>
-                                <button type="button" class="btn-next" onclick="nextStep(2)">Next</button>
+
+                                <button type="button" class="btn-prev" onclick="prevStep(2)">
+                                    Previous
+                                </button>
+
+                                <button type="button" class="btn-next" onclick="nextStep(2)">
+                                    Next
+                                </button>
+
                             </div>
+
                         </div>
 
-
                         <!-- STEP 3 -->
+
                         <div class="card" id="step3">
+
                             <h3>Media & Files</h3>
 
                             <div class="file-box">
-                                <label>Software File *</label>
+
+                                <label>Upload New Software File (optional)</label>
+
                                 <input type="file" name="softwareFile" id="softwareFile">
+
                                 <div id="softwareFileName" class="file-name"></div>
+
                             </div>
 
                             <div class="file-box">
-                                <label>Thumbnail Image *</label>
+
+                                <label>Change Thumbnail (optional)</label>
+
                                 <input type="file" name="thumbnail" id="thumbnail">
+
                                 <img id="thumbPreview" class="preview-img">
+
                             </div>
 
                             <div class="file-box">
-                                <label>Additional Images</label>
+
+                                <label>Upload Additional Images</label>
+
                                 <input type="file" name="additionalImages" multiple>
+
                             </div>
 
                             <div class="btn-group">
-                                <button type="button" class="btn-prev" onclick="prevStep(3)">Previous</button>
-                                <button type="submit" class="btn-submit">Upload Product</button>
+
+                                <button type="button" class="btn-prev" onclick="prevStep(3)">
+                                    Previous
+                                </button>
+
+                                <button type="submit" class="btn-submit">
+                                    Resubmit Product
+                                </button>
+
                             </div>
+
                         </div>
 
                     </form>
@@ -384,12 +347,9 @@
                 </div>
             </div>
         </div>
+
         <script>
-            document.querySelectorAll('.genre-card input').forEach(input => {
-                input.addEventListener('change', function () {
-                    this.parentElement.classList.toggle('active', this.checked);
-                });
-            });
+
             function nextStep(step) {
 
                 if (step === 1) {
@@ -413,7 +373,6 @@
                 document.getElementById("step" + (step + 1) + "-indicator").classList.add("active");
             }
 
-
             function prevStep(step) {
 
                 document.getElementById("step" + step).classList.remove("active");
@@ -426,6 +385,7 @@
 
 
             // Preview thumbnail
+
             document.getElementById("thumbnail").addEventListener("change", function () {
 
                 const file = this.files[0];
@@ -479,6 +439,7 @@
                 }
 
             };
+
 
         </script>
 

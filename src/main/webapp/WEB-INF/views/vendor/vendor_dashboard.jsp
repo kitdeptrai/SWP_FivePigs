@@ -34,7 +34,7 @@
                             </svg>
                         </div>
                         <p class="card-title">Revenue</p>
-                        <h2>${sumRevenue*85/100}</h2>
+                        <h2>${sumRevenue}</h2>
                         <span class="success-text">After 15% commission</span>
                     </div>
 
@@ -91,7 +91,7 @@
                     <!-- Download Chart -->
                     <div class="panel">
                         <div class="box">
-                            <h3>Download Performance (Last 4 Weeks)</h3>
+                            <h3>Top Downloaded Products</h3>
                             <canvas id="downloadChart" height="140"></canvas>
                         </div>
                     </div>
@@ -99,7 +99,7 @@
                 </div>
                 <div class="table-card">
                     <div class="table-header">
-                        <h3>Top Performing Apps</h3>
+                        <h3>Top Revenue Apps</h3>
                         <a href="#" class="view-all">View All Products</a>
                     </div>
 
@@ -169,31 +169,39 @@
         </script>
 
         <script>
+
             const downloadLabels = [];
             const downloadData = [];
 
-            <c:forEach var="e" items="${downloadByWeek}">
-            downloadLabels.push("Week ${e.key+1}");
-            downloadData.push(${e.value});
+            <c:forEach var="item" items="${topDownloads}">
+            downloadLabels.push("${item.name}");
+            downloadData.push(${item.downloadCount});
             </c:forEach>
 
             new Chart(document.getElementById('downloadChart'), {
+
                 type: 'bar',
+
                 data: {
                     labels: downloadLabels,
                     datasets: [{
                             label: 'Downloads',
                             data: downloadData,
-                            borderWidth: 2,
-                            tension: 0.3,
+                            borderWidth: 2
                         }]
                 },
+
                 options: {
+                    indexAxis: 'y', // horizontal chart nhìn đẹp hơn
                     scales: {
-                        y: {beginAtZero: true}
+                        x: {
+                            beginAtZero: true
+                        }
                     }
                 }
+
             });
+
         </script>
 
     </body>

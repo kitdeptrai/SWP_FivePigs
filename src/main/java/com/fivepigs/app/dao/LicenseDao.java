@@ -7,6 +7,7 @@ package com.fivepigs.app.dao;
 import com.fivepigs.app.config.Db;
 import com.fivepigs.app.model.License;
 import com.fivepigs.app.model.Software;
+import com.fivepigs.app.model.SoftwarePricing;
 import com.fivepigs.app.model.User;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -28,6 +29,10 @@ public class LicenseDao {
                 + "    l.license_id,\n"
                 + "    l.license_key,\n"
                 + "    s.name AS software_name,\n"
+                + "    sp.plan_name,\n"
+                + "    sp.price,\n"
+                + "    sp.max_users,\n"
+                + "    COUNT(lu.license_user_id) AS used_users,\n"
                 + "    u.full_name AS customer_name,\n"
                 + "    u.email,\n"
                 + "    l.purchase_date,\n"
@@ -35,32 +40,55 @@ public class LicenseDao {
                 + "    l.status\n"
                 + "FROM License l\n"
                 + "JOIN Software s ON l.software_id = s.software_id\n"
-                + "JOIN Users u ON l.customer_id = u.user_id\n"
+                + "JOIN Software_Pricing sp ON l.pricing_id = sp.pricing_id\n"
+                + "JOIN Users u ON l.owner_id = u.user_id\n"
+                + "LEFT JOIN License_User lu ON l.license_id = lu.license_id AND lu.status = 'ACTIVE'\n"
                 + "WHERE s.vendor_id = ?\n"
+                + "GROUP BY l.license_id\n"
                 + "ORDER BY l.license_id DESC;";
 
-        try (Connection c = Db.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setInt(1, vendorId);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    License li = new License();
-                    User user = new User();
-                    Software sw = new Software();
-                    li.setLicenseId(rs.getInt("license_id"));
-                    li.setLicenseKey(rs.getString("license_key"));
-                    user.setEmail(rs.getString("email"));
-                    user.setFullName(rs.getString("customer_name"));
-                    sw.setName(rs.getString("software_name"));
-                    li.setSoftware(sw);
-                    li.setUser(user);
-                    li.setPurchaseDate(rs.getObject("purchase_date", LocalDateTime.class));
-                    li.setExpireDate(rs.getObject("expire_date", LocalDateTime.class));
-                    li.setStatus(rs.getString("status"));
-                    list.add(li);
-                }
+       
+
+    try (Connection c = Db.getConnection();
+         PreparedStatement ps = c.prepareStatement(sql)) {
+
+        ps.setInt(1, vendorId);
+
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                License li = new License();
+                User user = new User();
+                Software sw = new Software();
+                SoftwarePricing swp=new SoftwarePricing();
+                li.setLicenseId(rs.getInt("license_id"));
+                li.setLicenseKey(rs.getString("license_key"));
+
+                // Software
+                sw.setName(rs.getString("software_name"));
+                li.setSoftware(sw);
+
+                // User
+                user.setFullName(rs.getString("customer_name"));
+                user.setEmail(rs.getString("email"));
+                li.setUser(user);
+                li.setSoftwarePricing(swp);
+
+                // Pricing info (NEW)
+                
+                swp.setPlanName(rs.getString("plan_name"));
+                swp.setMaxUsers(rs.getInt("max_users"));
+                li.setUsedUsers(rs.getInt("used_users"));
+
+                // Date + status
+                li.setPurchaseDate(rs.getObject("purchase_date", LocalDateTime.class));
+                li.setExpireDate(rs.getObject("expire_date", LocalDateTime.class));
+                li.setStatus(rs.getString("status"));
+
+                list.add(li);
             }
         }
-        return list;
+    }
+    return list;
     }
 
     public Integer getTotalLicenseByVendor(int vendorId) throws SQLException {
