@@ -29,15 +29,16 @@ public class AppServlet extends HttpServlet {
         String selectedOrder = normalizeOrder(request.getParameter("order"));
 
         try {
-            List<Software> softwareList = sdao.getSoftwareByCategoryWithIcon("2");
+            List<Software> softwareList = sdao.getSoftwareByCategoryWithIcon("1");
             Map<String, List<Software>> sections = new LinkedHashMap<>();
             List<String> genres = new ArrayList<>();
             List<Software> genreResults = new ArrayList<>();
 
             try {
-                genres = sdao.getGenresByCategory(2);
+                genres = sdao.getGenresByCategory(1);
                 if (selectedGenre == null) {
                     for (String genre : genres) {
+<<<<<<< HEAD
                         List<Software> list = sdao.getSoftwareByCategoryAndGenre(2, genre);
                         sortSoftwareList(list, selectedSort, selectedOrder);
                         sections.put(genre, list);
@@ -45,6 +46,13 @@ public class AppServlet extends HttpServlet {
                 } else {
                     genreResults = sdao.getSoftwareByCategoryAndGenre(2, selectedGenre);
                     sortSoftwareList(genreResults, selectedSort, selectedOrder);
+=======
+                        List<Software> list = sdao.getSoftwareByCategoryAndGenre(1, genre);
+                        sections.put(genre, list);
+                    }
+                } else {
+                    genreResults = sdao.getSoftwareByCategoryAndGenre(1, selectedGenre);
+>>>>>>> 297f69ecf976d61b608f7e7aa424e93bcd05b3f2
                 }
             } catch (SQLException ignored) {
                 request.setAttribute("appWarning", "Thieu bang genre/software_genre, dang hien thi danh sach app mac dinh.");

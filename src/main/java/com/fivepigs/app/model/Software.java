@@ -51,6 +51,8 @@ public class Software {
     private ReviewerProcess reviewerProcess;
     private SoftwareVersion softwareVersion;
     private SoftwareDetail softwareDetail;
+    private String iconUrl;
+    private SoftwarePricing softwarePricing;
 
     private Date reviewDate;
     private String recommendation;
@@ -60,8 +62,13 @@ public class Software {
     
     private String imageUrl;
      private Double qualityScore;
+<<<<<<< HEAD
   private String iconUrl;
 
+=======
+  
+    
+>>>>>>> 297f69ecf976d61b608f7e7aa424e93bcd05b3f2
     public String getImageUrl() {
         return imageUrl;
     }
@@ -104,6 +111,14 @@ public void setCategoryName(String categoryName) {
     this.categoryName = categoryName;
 }
 
+    public SoftwarePricing getSoftwarePricing() {
+        return softwarePricing;
+    }
+
+    public void setSoftwarePricing(SoftwarePricing softwarePricing) {
+        this.softwarePricing = softwarePricing;
+    }
+
 
 
   
@@ -137,6 +152,11 @@ public void setCategoryName(String categoryName) {
     public void setIconUrl(String iconUrl) {
         this.iconUrl = iconUrl;
     }
+<<<<<<< HEAD
+=======
+    
+    
+>>>>>>> 297f69ecf976d61b608f7e7aa424e93bcd05b3f2
 
     public SoftwareImage getSoftwareImage() {
     return softwareImage;

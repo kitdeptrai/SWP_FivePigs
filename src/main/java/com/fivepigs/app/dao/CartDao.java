@@ -12,6 +12,7 @@ import java.util.UUID;
 public class CartDao {
 
     public List<Software> getCartItems(int userId) throws SQLException {
+<<<<<<< HEAD
         String sql = "SELECT s.software_id, s.name, s.is_free, s.avg_rating, img.image_url AS icon_url, " +
                 "       COALESCE(cd.pricing_id, " +
                 "           (SELECT sp.pricing_id FROM fivepigs.software_pricing sp WHERE sp.software_id = s.software_id AND sp.is_active = 1 AND UPPER(COALESCE(sp.plan_name, '')) <> 'DEMO' ORDER BY sp.price ASC, sp.pricing_id ASC LIMIT 1)" +
@@ -37,10 +38,27 @@ public class CartDao {
                 "  ON s.software_id = img.software_id AND img.is_thumbnail = 1 " +
                 "WHERE c.customer_id = ? " +
                 "ORDER BY cd.cart_detail_id DESC";
+=======
+        String sql = """
+    SELECT s.software_id,
+           s.name,
+           s.is_free,
+           s.avg_rating,
+           sp.price,
+           img.image_url AS icon_url
+    FROM fivepigs.cart c
+    JOIN fivepigs.cart_detail cd ON c.cart_id = cd.cart_id
+    JOIN fivepigs.software s ON s.software_id = cd.software_id
+    LEFT JOIN fivepigs.software_pricing sp ON cd.pricing_id = sp.pricing_id
+    LEFT JOIN fivepigs.software_image img 
+        ON s.software_id = img.software_id AND img.is_thumbnail = 1
+    WHERE c.customer_id = ?
+    ORDER BY cd.cart_detail_id DESC
+""";
+>>>>>>> 297f69ecf976d61b608f7e7aa424e93bcd05b3f2
 
         List<Software> items = new ArrayList<>();
-        try (Connection c = Db.getConnection();
-             PreparedStatement st = c.prepareStatement(sql)) {
+        try (Connection c = Db.getConnection(); PreparedStatement st = c.prepareStatement(sql)) {
             st.setInt(1, userId);
             try (ResultSet rs = st.executeQuery()) {
                 while (rs.next()) {
@@ -57,7 +75,7 @@ public class CartDao {
                     sw.setPrice(rs.getDouble("display_price"));
                     sw.setIsFree(rs.getInt("is_free"));
                     sw.setAvgRating(rs.getDouble("avg_rating"));
-                    
+
                     items.add(sw);
                 }
             }
@@ -116,11 +134,10 @@ public class CartDao {
     }
 
     public void removeFromCart(int userId, int softwareId) throws SQLException {
-        String sql = "DELETE cd FROM fivepigs.cart_detail cd " +
-                "JOIN fivepigs.cart c ON c.cart_id = cd.cart_id " +
-                "WHERE c.customer_id = ? AND cd.software_id = ?";
-        try (Connection c = Db.getConnection();
-             PreparedStatement st = c.prepareStatement(sql)) {
+        String sql = "DELETE cd FROM fivepigs.cart_detail cd "
+                + "JOIN fivepigs.cart c ON c.cart_id = cd.cart_id "
+                + "WHERE c.customer_id = ? AND cd.software_id = ?";
+        try (Connection c = Db.getConnection(); PreparedStatement st = c.prepareStatement(sql)) {
             st.setInt(1, userId);
             st.setInt(2, softwareId);
             st.executeUpdate();
@@ -164,7 +181,11 @@ public class CartDao {
                     double price = item.getIsFree() != null && item.getIsFree() == 1 ? 0.0 : safePrice(item.getPrice());
 
                     try (PreparedStatement st = c.prepareStatement(
+<<<<<<< HEAD
                             "INSERT INTO fivepigs.order_detail(order_id, software_id, price, pricing_id) VALUES(?, ?, ?, ?)")) {
+=======
+                            "INSERT INTO fivepigs.order_detail(order_id, software_id, price) VALUES(?, ?, ?)")) {
+>>>>>>> 297f69ecf976d61b608f7e7aa424e93bcd05b3f2
                         st.setInt(1, orderId);
                         st.setInt(2, item.getSoftwareId());
                         st.setDouble(3, price);
@@ -181,9 +202,14 @@ public class CartDao {
                         Timestamp expireAt = resolveExpireAt(item.getDurationDays());
                         int licenseId;
                         try (PreparedStatement st = c.prepareStatement(
+<<<<<<< HEAD
                                 "INSERT INTO fivepigs.license(license_key, pricing_id, software_id, owner_id, max_users, purchase_date, expire_date, status) " +
                                         "VALUES(?, ?, ?, ?, ?, NOW(), ?, 'ACTIVE')",
                                 Statement.RETURN_GENERATED_KEYS)) {
+=======
+                                "INSERT INTO fivepigs.license(license_key, software_id, customer_id, purchase_date, expire_date, status) "
+                                + "VALUES(?, ?, ?, NOW(), NULL, 'ACTIVE')")) {
+>>>>>>> 297f69ecf976d61b608f7e7aa424e93bcd05b3f2
                             st.setString(1, generateLicenseKey());
                             if (item.getPricingId() == null) {
                                 st.setNull(2, Types.INTEGER);
@@ -234,6 +260,7 @@ public class CartDao {
     }
 
     public double getCartTotal(int userId) throws SQLException {
+<<<<<<< HEAD
         String sql = "SELECT COALESCE(SUM(CASE WHEN s.is_free = 1 THEN 0 ELSE COALESCE(selected_pricing.price, " +
                 "           (SELECT MIN(sp.price) FROM fivepigs.software_pricing sp WHERE sp.software_id = s.software_id AND sp.is_active = 1 AND UPPER(COALESCE(sp.plan_name, '')) <> 'DEMO'), 0) END), 0) AS total " +
                 "FROM fivepigs.cart c " +
@@ -243,6 +270,14 @@ public class CartDao {
                 "WHERE c.customer_id = ?";
         try (Connection c = Db.getConnection();
              PreparedStatement st = c.prepareStatement(sql)) {
+=======
+        String sql = "SELECT COALESCE(SUM(CASE WHEN s.is_free = 1 THEN 0 ELSE s.price END), 0) AS total "
+                + "FROM fivepigs.cart c "
+                + "JOIN fivepigs.cart_detail cd ON c.cart_id = cd.cart_id "
+                + "JOIN fivepigs.software s ON s.software_id = cd.software_id "
+                + "WHERE c.customer_id = ?";
+        try (Connection c = Db.getConnection(); PreparedStatement st = c.prepareStatement(sql)) {
+>>>>>>> 297f69ecf976d61b608f7e7aa424e93bcd05b3f2
             st.setInt(1, userId);
             try (ResultSet rs = st.executeQuery()) {
                 if (rs.next()) {
@@ -308,6 +343,7 @@ public class CartDao {
     }
 
     private List<Software> getCartItemsTx(Connection c, int cartId) throws SQLException {
+<<<<<<< HEAD
         String sql = "SELECT s.software_id, s.name, s.is_free, " +
                 "       COALESCE(cd.pricing_id, " +
                 "           (SELECT sp.pricing_id FROM fivepigs.software_pricing sp WHERE sp.software_id = s.software_id AND sp.is_active = 1 AND UPPER(COALESCE(sp.plan_name, '')) <> 'DEMO' ORDER BY sp.price ASC, sp.pricing_id ASC LIMIT 1)" +
@@ -329,6 +365,18 @@ public class CartDao {
                 "JOIN fivepigs.software s ON s.software_id = cd.software_id " +
                 "LEFT JOIN fivepigs.software_pricing selected_pricing ON cd.pricing_id = selected_pricing.pricing_id " +
                 "WHERE cd.cart_id = ?";
+=======
+        String sql = """
+    SELECT s.software_id,
+           s.name,
+           s.is_free,
+           sp.price
+    FROM fivepigs.cart_detail cd
+    JOIN fivepigs.software s ON s.software_id = cd.software_id
+    LEFT JOIN fivepigs.software_pricing sp ON cd.pricing_id = sp.pricing_id
+    WHERE cd.cart_id = ?
+""";
+>>>>>>> 297f69ecf976d61b608f7e7aa424e93bcd05b3f2
 
         List<Software> items = new ArrayList<>();
         try (PreparedStatement st = c.prepareStatement(sql)) {
