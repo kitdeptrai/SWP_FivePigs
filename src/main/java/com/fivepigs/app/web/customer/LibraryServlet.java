@@ -1,7 +1,9 @@
 package com.fivepigs.app.web.customer;
 
 import com.fivepigs.app.dao.SoftwareDao;
+import com.fivepigs.app.dao.LicenseDao;
 import com.fivepigs.app.dao.UserSoftwareStateDao;
+import com.fivepigs.app.model.License;
 import com.fivepigs.app.model.Software;
 import com.fivepigs.app.model.User;
 import jakarta.servlet.ServletException;
@@ -13,6 +15,7 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -32,14 +35,21 @@ public class LibraryServlet extends HttpServlet {
         }
 
         SoftwareDao softwareDao = new SoftwareDao();
+        LicenseDao licenseDao = new LicenseDao();
         UserSoftwareStateDao stateDao = new UserSoftwareStateDao();
+        String selectedSort = normalizeSort(request.getParameter("sort"), "date");
+        String selectedOrder = normalizeOrder(request.getParameter("order"), "desc");
 
         try {
             List<Software> myLibrary = softwareDao.getLibraryByUserIdWithIcon(userId);
             Map<Integer, Boolean> downloadedMap = stateDao.getDownloadedMapByUser(userId);
+            Map<Integer, License> ownedLicenseMap = licenseDao.getOwnedLicenseMapByOwner(userId);
 
             request.setAttribute("libraryList", myLibrary);
             request.setAttribute("downloadedMap", downloadedMap);
+            request.setAttribute("ownedLicenseMap", ownedLicenseMap);
+            request.setAttribute("selectedSort", selectedSort);
+            request.setAttribute("selectedOrder", selectedOrder);
 
             request.getRequestDispatcher("/WEB-INF/views/customer/library.jsp")
                     .forward(request, response);
@@ -72,5 +82,19 @@ public class LibraryServlet extends HttpServlet {
         }
 
         return null;
+    }
+
+    private String normalizeSort(String sort, String fallback) {
+        if ("name".equalsIgnoreCase(sort) || "date".equalsIgnoreCase(sort)) {
+            return sort.toLowerCase();
+        }
+        return fallback;
+    }
+
+    private String normalizeOrder(String order, String fallback) {
+        if ("asc".equalsIgnoreCase(order) || "desc".equalsIgnoreCase(order)) {
+            return order.toLowerCase();
+        }
+        return fallback;
     }
 }

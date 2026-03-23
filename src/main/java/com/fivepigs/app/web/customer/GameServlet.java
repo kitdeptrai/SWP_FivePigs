@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +42,8 @@ public class GameServlet extends HttpServlet {
         request.setAttribute("activePage", "games");
         SoftwareDao sdao = new SoftwareDao();
         String selectedGenre = normalizeGenre(request.getParameter("genre"));
+        String selectedSort = normalizeSort(request.getParameter("sort"));
+        String selectedOrder = normalizeOrder(request.getParameter("order"));
 
         try {
             List<Software> softwareList = sdao.getSoftwareByCategoryWithIcon("2");
@@ -64,6 +67,7 @@ public class GameServlet extends HttpServlet {
             }
 
             if (selectedGenre == null && sections.isEmpty()) {
+                sortSoftwareList(softwareList, selectedSort, selectedOrder);
                 sections.put("All Games", softwareList != null ? softwareList : new ArrayList<>());
             }
 
@@ -73,12 +77,16 @@ public class GameServlet extends HttpServlet {
 
             request.setAttribute("genres", genres);
             request.setAttribute("selectedGenre", selectedGenre);
+            request.setAttribute("selectedSort", selectedSort);
+            request.setAttribute("selectedOrder", selectedOrder);
             request.setAttribute("genreResults", genreResults);
             request.setAttribute("sections", sections);
             request.setAttribute("softwareToShow", softwareList);
         } catch (SQLException e) {
             request.setAttribute("genres", new ArrayList<String>());
             request.setAttribute("selectedGenre", selectedGenre);
+            request.setAttribute("selectedSort", selectedSort);
+            request.setAttribute("selectedOrder", selectedOrder);
             request.setAttribute("genreResults", new ArrayList<Software>());
             request.setAttribute("sections", new LinkedHashMap<String, List<Software>>());
             request.setAttribute("softwareToShow", new ArrayList<Software>());
@@ -103,6 +111,39 @@ public class GameServlet extends HttpServlet {
             return null;
         }
         return trimmed;
+    }
+
+    private String normalizeSort(String sort) {
+        if ("price".equalsIgnoreCase(sort) || "name".equalsIgnoreCase(sort)) {
+            return sort.toLowerCase();
+        }
+        return "name";
+    }
+
+    private String normalizeOrder(String order) {
+        if ("desc".equalsIgnoreCase(order)) {
+            return "desc";
+        }
+        return "asc";
+    }
+
+    private void sortSoftwareList(List<Software> list, String sort, String order) {
+        if (list == null || list.isEmpty()) {
+            return;
+        }
+
+        Comparator<Software> comparator;
+        if ("price".equals(sort)) {
+            comparator = Comparator.comparing(sw -> sw.getPrice() == null ? 0.0 : sw.getPrice());
+        } else {
+            comparator = Comparator.comparing(sw -> sw.getName() == null ? "" : sw.getName().toLowerCase());
+        }
+
+        if ("desc".equals(order)) {
+            comparator = comparator.reversed();
+        }
+
+        list.sort(comparator.thenComparing(Software::getSoftwareId, Comparator.nullsLast(Integer::compareTo)));
     }
 
     @Override

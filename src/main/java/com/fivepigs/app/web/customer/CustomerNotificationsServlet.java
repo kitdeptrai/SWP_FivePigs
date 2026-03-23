@@ -26,9 +26,11 @@ public class CustomerNotificationsServlet extends HttpServlet {
             return;
         }
 
-        List<Notification> notifications = notificationDao.getByUser(user.getUserId());
+        String selectedOrder = normalizeOrder(request.getParameter("order"));
+        List<Notification> notifications = notificationDao.getByUser(user.getUserId(), selectedOrder);
         request.setAttribute("activePage", "notifications");
         request.setAttribute("notifications", notifications);
+        request.setAttribute("selectedOrder", selectedOrder);
         request.getRequestDispatcher("/WEB-INF/views/customer/notifications.jsp").forward(request, response);
     }
 
@@ -41,10 +43,18 @@ public class CustomerNotificationsServlet extends HttpServlet {
         }
 
         String action = request.getParameter("action");
+        String selectedOrder = normalizeOrder(request.getParameter("order"));
         if ("markAllRead".equals(action)) {
             notificationDao.markAllRead(user.getUserId());
+        } else if ("delete".equals(action)) {
+            Integer notificationId = parseInt(request.getParameter("notificationId"));
+            if (notificationId != null) {
+                notificationDao.delete(notificationId);
+            }
+        } else if ("deleteAll".equals(action)) {
+            notificationDao.deleteAll(user.getUserId());
         }
-        response.sendRedirect(request.getContextPath() + "/notifications");
+        response.sendRedirect(request.getContextPath() + "/notifications?order=" + selectedOrder);
     }
 
     private User resolveSessionUser(HttpSession session) {
@@ -52,5 +62,20 @@ public class CustomerNotificationsServlet extends HttpServlet {
             return null;
         }
         return (User) session.getAttribute("user");
+    }
+
+    private String normalizeOrder(String order) {
+        return "asc".equalsIgnoreCase(order) ? "asc" : "desc";
+    }
+
+    private Integer parseInt(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        try {
+            return Integer.valueOf(value.trim());
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 }

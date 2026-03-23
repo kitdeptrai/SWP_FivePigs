@@ -25,7 +25,7 @@
         <span class="logo-text">FIVEPIGS</span>
     </div>
 
-    <a href="${pageContext.request.contextPath}/home" class="menu-item <%= activePage.equals("home") ? "active" : "" %>">
+    <a href="${pageContext.request.contextPath}/customer_dashboard" class="menu-item <%= activePage.equals("home") ? "active" : "" %>">
         <i class="fa-solid fa-house"></i> Home
     </a>
 

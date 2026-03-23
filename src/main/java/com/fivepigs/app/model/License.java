@@ -7,6 +7,9 @@ package com.fivepigs.app.model;
 import java.sql.Date;
 import java.time.LocalDateTime;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  * @author MinhPD
@@ -33,11 +36,14 @@ public class License {
     private Integer pricingId;
     private Integer maxUsers;
     private Integer customerId;
+    private Integer ownerId;
+    private Integer assignedCount;
+    private String planName;
     private LocalDateTime purchaseDate;
     private LocalDateTime expireDate;
     private String status;
-    private String ownerId;
     private Software software;
+    private List<User> assignedUsers = new ArrayList<>();
     private User user;
     private Integer usedUsers;
     private SoftwarePricing softwarePricing;
@@ -69,6 +75,10 @@ public class License {
 
     public void setUsedUsers(Integer usedUsers) {
         this.usedUsers = usedUsers;
+    }
+
+    public Integer getOwnerId() {
+        return ownerId;
     }
 
     public SoftwarePricing getSoftwarePricing() {
@@ -111,6 +121,26 @@ public class License {
         this.customerId = customerId;
     }
 
+    public void setOwnerId(Integer ownerId) {
+        this.ownerId = ownerId;
+    }
+
+    public Integer getAssignedCount() {
+        return assignedCount;
+    }
+
+    public void setAssignedCount(Integer assignedCount) {
+        this.assignedCount = assignedCount;
+    }
+
+    public String getPlanName() {
+        return planName;
+    }
+
+    public void setPlanName(String planName) {
+        this.planName = planName;
+    }
+
     public LocalDateTime getPurchaseDate() {
         return purchaseDate;
     }
@@ -151,22 +181,20 @@ public class License {
         this.maxUsers = maxUsers;
     }
 
-    public String getOwnerId() {
-        return ownerId;
-    }
-
-    public void setOwnerId(String ownerId) {
-        this.ownerId = ownerId;
-    }
-
-    
-
     public Software getSoftware() {
         return software;
     }
 
     public void setSoftware(Software software) {
         this.software = software;
+    }
+
+    public List<User> getAssignedUsers() {
+        return assignedUsers;
+    }
+
+    public void setAssignedUsers(List<User> assignedUsers) {
+        this.assignedUsers = assignedUsers;
     }
 
 }

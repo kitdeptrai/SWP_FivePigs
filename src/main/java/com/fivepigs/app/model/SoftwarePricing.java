@@ -1,10 +1,8 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package com.fivepigs.app.model;
 
 import java.time.LocalDateTime;
+
 
 /**
  *
@@ -23,13 +21,19 @@ public class SoftwarePricing {
 //    FOREIGN KEY (software_id) REFERENCES Software(software_id)
 //);
     
+
     private Integer pricingId;
     private Integer softwareId;
     private String planName;
     private Integer maxUsers;
     private Double price;
+
+    private Integer durationDays;
     private Integer isActive;
+    private LocalDateTime createdAt;
+
     private LocalDateTime createdDate;
+
 
     public Integer getPricingId() {
         return pricingId;
@@ -71,12 +75,31 @@ public class SoftwarePricing {
         this.price = price;
     }
 
+
+    public Integer getDurationDays() {
+        return durationDays;
+    }
+
+    public void setDurationDays(Integer durationDays) {
+        this.durationDays = durationDays;
+    }
+
+
     public Integer getIsActive() {
         return isActive;
     }
 
     public void setIsActive(Integer isActive) {
         this.isActive = isActive;
+    }
+
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
     public LocalDateTime getCreatedDate() {
@@ -87,5 +110,5 @@ public class SoftwarePricing {
         this.createdDate = createdDate;
     }
     
-    
+
 }
