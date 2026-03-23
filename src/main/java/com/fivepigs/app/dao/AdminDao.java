@@ -97,17 +97,21 @@ public class AdminDao {
     }
 
     public List<RevenueByMonthRow> getRevenueByMonth() {
-        String sql = "SELECT MONTH(order_date) AS month, COALESCE(SUM(total_amount), 0) AS revenue " +
-                "FROM orders " +
-                "WHERE payment_status_id = 1 " +
-                "GROUP BY MONTH(order_date) " +
-                "ORDER BY MONTH(order_date)";
+        String sql = "SELECT * FROM (" +
+                "SELECT DATE_FORMAT(o.order_date, '%Y-%m') AS month_label, COALESCE(SUM(o.total_amount), 0) AS revenue " +
+                "FROM orders o " +
+                "JOIN payment_status ps ON o.payment_status_id = ps.payment_status_id " +
+                "WHERE UPPER(ps.status_name) = 'PAID' " +
+                "GROUP BY DATE_FORMAT(o.order_date, '%Y-%m') " +
+                "ORDER BY month_label DESC " +
+                "LIMIT 3" +
+                ") recent_months ORDER BY month_label ASC";
         List<RevenueByMonthRow> rows = new ArrayList<>();
         try (Connection conn = Db.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
-                rows.add(new RevenueByMonthRow(rs.getInt("month"), rs.getDouble("revenue")));
+                rows.add(new RevenueByMonthRow(rs.getString("month_label"), rs.getDouble("revenue")));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -116,13 +120,9 @@ public class AdminDao {
     }
 
     public List<TopAppRow> getTop5AppsBestSeller() {
-        String sql = "SELECT s.name AS app_name, COUNT(od.order_detail_id) AS purchase_count, COALESCE(SUM(od.price), 0) AS total_revenue " +
-                "FROM order_detail od " +
-                "JOIN software s ON s.software_id = od.software_id " +
-                "JOIN orders o ON o.order_id = od.order_id " +
-                "WHERE o.payment_status_id = 1 " +
-                "GROUP BY s.software_id, s.name " +
-                "ORDER BY purchase_count DESC " +
+        String sql = "SELECT s.name AS app_name, s.download_count " +
+                "FROM software s " +
+                "ORDER BY s.download_count DESC, s.name ASC " +
                 "LIMIT 5";
         List<TopAppRow> rows = new ArrayList<>();
         try (Connection conn = Db.getConnection();
@@ -131,39 +131,8 @@ public class AdminDao {
             while (rs.next()) {
                 rows.add(new TopAppRow(
                         rs.getString("app_name"),
-                        rs.getInt("purchase_count"),
-                        rs.getDouble("total_revenue")
+                        rs.getInt("download_count")
                 ));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return rows;
-    }
-
-    public List<ActivityRow> getRecentActivities(int limit) {
-        String sql = "SELECT u.full_name AS user_name, r.reason, r.created_at " +
-                "FROM report r " +
-                "JOIN users u ON r.reporter_id = u.user_id " +
-                "ORDER BY r.created_at DESC " +
-                "LIMIT ?";
-        List<ActivityRow> rows = new ArrayList<>();
-        try (Connection conn = Db.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, limit);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    String reason = rs.getString("reason");
-                    String action = "submitted a report";
-                    if (reason != null && !reason.isBlank()) {
-                        action = "submitted a report: " + reason;
-                    }
-                    rows.add(new ActivityRow(
-                            rs.getString("user_name"),
-                            action,
-                            rs.getTimestamp("created_at")
-                    ));
-                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -1034,17 +1003,17 @@ public class AdminDao {
     // ===== Helper data rows =====
 
     public static class RevenueByMonthRow {
-        private final int month;
+        private final String month;
         private final double revenue;
         private int percent;
 
-        public RevenueByMonthRow(int month, double revenue) {
+        public RevenueByMonthRow(String month, double revenue) {
             this.month = month;
             this.revenue = revenue;
             this.percent = 0;
         }
 
-        public int getMonth() {
+        public String getMonth() {
             return month;
         }
 
@@ -1063,49 +1032,19 @@ public class AdminDao {
 
     public static class TopAppRow {
         private final String appName;
-        private final int purchaseCount;
-        private final double totalRevenue;
+        private final int downloadCount;
 
-        public TopAppRow(String appName, int purchaseCount, double totalRevenue) {
+        public TopAppRow(String appName, int downloadCount) {
             this.appName = appName;
-            this.purchaseCount = purchaseCount;
-            this.totalRevenue = totalRevenue;
+            this.downloadCount = downloadCount;
         }
 
         public String getAppName() {
             return appName;
         }
 
-        public int getPurchaseCount() {
-            return purchaseCount;
-        }
-
-        public double getTotalRevenue() {
-            return totalRevenue;
-        }
-    }
-
-    public static class ActivityRow {
-        private final String user;
-        private final String action;
-        private final java.sql.Timestamp time;
-
-        public ActivityRow(String user, String action, java.sql.Timestamp time) {
-            this.user = user;
-            this.action = action;
-            this.time = time;
-        }
-
-        public String getUser() {
-            return user;
-        }
-
-        public String getAction() {
-            return action;
-        }
-
-        public java.sql.Timestamp getTime() {
-            return time;
+        public int getDownloadCount() {
+            return downloadCount;
         }
     }
 

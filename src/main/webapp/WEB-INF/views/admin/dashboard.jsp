@@ -220,10 +220,11 @@
             <div>
                 <div class="section-card">
                     <h3>Monthly revenue</h3>
+                    <p style="margin:0 0 16px; color:#94a3b8; font-size:14px;">Last 3 paid months</p>
 
                     <c:forEach var="row" items="${revenueByMonth}">
                         <div class="bar-row">
-                            <span>Month ${row.month}</span>
+                            <span>${row.month}</span>
 
                             <div class="bar">
                                 <div class="bar-fill" style="width: ${row.percent}%"></div>
@@ -243,13 +244,13 @@
             <div>
                 <div class="section-card">
                     <h3>Top 5 Apps</h3>
+                    <p style="margin:0 0 16px; color:#94a3b8; font-size:14px;">Most downloaded apps</p>
 
                     <table>
                         <thead>
                         <tr>
                             <th>App</th>
-                            <th class="text-right">Sales</th>
-                            <th class="text-right">Revenue</th>
+                            <th class="text-right">Downloads</th>
                         </tr>
                         </thead>
 
@@ -257,36 +258,14 @@
                         <c:forEach var="app" items="${topAppsBestSeller}">
                             <tr>
                                 <td><b><c:out value="${app.appName}"/></b></td>
-                                <td class="text-right"><c:out value="${app.purchaseCount}"/></td>
-                                <td class="text-right">
-                                    <fmt:formatNumber value="${app.totalRevenue}" type="currency" currencySymbol="$"/>
-                                </td>
+                                <td class="text-right"><c:out value="${app.downloadCount}"/></td>
                             </tr>
                         </c:forEach>
                         <c:if test="${empty topAppsBestSeller}">
-                            <tr><td colspan="3" class="empty">No data available</td></tr>
+                            <tr><td colspan="2" class="empty">No data available</td></tr>
                         </c:if>
                         </tbody>
                     </table>
-                </div>
-
-                <div class="section-card">
-                    <h3>Recent Activities</h3>
-
-                    <c:forEach var="log" items="${recentActivities}">
-                        <div class="activity-item">
-                            <div class="dot"></div>
-
-                            <div>
-                                <b><c:out value="${log.user}"/></b> <c:out value="${log.action}"/>
-                                <div class="time"><fmt:formatDate value="${log.time}" pattern="dd/MM/yyyy HH:mm"/></div>
-                            </div>
-                        </div>
-                    </c:forEach>
-
-                    <c:if test="${empty recentActivities}">
-                        <div class="empty">No recent activity</div>
-                    </c:if>
                 </div>
             </div>
         </div>

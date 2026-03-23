@@ -11,7 +11,6 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 @WebServlet(name = "AdminDashboardServlet", urlPatterns = {"/admin/dashboard"})
@@ -62,8 +61,6 @@ public class AdminDashboardServlet extends DashboardServlet {
         AdminDao adminDao = new AdminDao();
 
         double commissionPercent = adminDao.getCommissionPercent();
-
-        // 1️⃣ System Overview Cards
         double totalRevenue = adminDao.getTotalRevenue();
         int totalApps = adminDao.getTotalProducts();
         int totalUsers = adminDao.getTotalUsers();
@@ -71,9 +68,11 @@ public class AdminDashboardServlet extends DashboardServlet {
         int newUsers = adminDao.getNewUsersToday();
         int totalDownloads = adminDao.getTotalDownloads();
 
-        // 2️⃣ Doanh thu theo tháng
         List<AdminDao.RevenueByMonthRow> revenueByMonth = adminDao.getRevenueByMonth();
-        double maxRevenue = revenueByMonth.stream().mapToDouble(AdminDao.RevenueByMonthRow::getRevenue).max().orElse(0);
+        double maxRevenue = revenueByMonth.stream()
+                .mapToDouble(AdminDao.RevenueByMonthRow::getRevenue)
+                .max()
+                .orElse(0);
         if (maxRevenue > 0) {
             for (AdminDao.RevenueByMonthRow row : revenueByMonth) {
                 int percent = (int) Math.round((row.getRevenue() / maxRevenue) * 100);
@@ -81,13 +80,8 @@ public class AdminDashboardServlet extends DashboardServlet {
             }
         }
 
-        // 3️⃣ Top 5 app bán chạy
         List<AdminDao.TopAppRow> topAppsBestSeller = adminDao.getTop5AppsBestSeller();
 
-        // 4️⃣ Recent activities
-        List<AdminDao.ActivityRow> recentActivities = adminDao.getRecentActivities(8);
-
-        // ====== Set attributes for JSP ======
         req.setAttribute("commissionPercent", commissionPercent);
         req.setAttribute("totalRevenue", totalRevenue);
         req.setAttribute("totalApps", totalApps);
@@ -95,14 +89,10 @@ public class AdminDashboardServlet extends DashboardServlet {
         req.setAttribute("pendingReports", pendingReports);
         req.setAttribute("newUsers", newUsers);
         req.setAttribute("totalDownloads", totalDownloads);
-
         req.setAttribute("revenueByMonth", revenueByMonth);
         req.setAttribute("topAppsBestSeller", topAppsBestSeller);
-        req.setAttribute("recentActivities", recentActivities == null ? new ArrayList<>() : recentActivities);
 
-        // reuse authorization + forward logic in DashboardServlet
         req.getRequestDispatcher("/WEB-INF/views/admin/dashboard.jsp").forward(req, resp);
-
     }
 
     @Override
