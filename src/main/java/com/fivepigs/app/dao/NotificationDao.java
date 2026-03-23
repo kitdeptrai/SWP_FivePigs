@@ -26,6 +26,7 @@ public class NotificationDao {
         return n;
     }
 
+    // 1. Lấy tất cả notification của user
     public List<Notification> getByUser(int userId) {
         List<Notification> list = new ArrayList<>();
         String sql = "SELECT * FROM Notification WHERE user_id = ? ORDER BY created_at DESC";
@@ -39,11 +40,13 @@ public class NotificationDao {
                     list.add(mapRow(rs));
                 }
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
         return list;
     }
+
 
     public List<Notification> filterByUser(int userId, String readFilter, String typeFilter, String keyword) {
         List<Notification> list = new ArrayList<>();
@@ -167,23 +170,6 @@ public class NotificationDao {
         return 0;
     }
 
-    // giữ method cũ nếu chỗ khác trong project vẫn đang dùng
-    public void insertNotification(int userId, String title, String content) {
-        String sql = """
-            INSERT INTO Notification(user_id, title, content, is_read, type, priority, related_url, created_at)
-            VALUES(?, ?, ?, 0, 'SUBMITTED', 'MEDIUM', NULL, NOW())
-        """;
-        try (Connection con = Db.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-
-            ps.setInt(1, userId);
-            ps.setString(2, title);
-            ps.setString(3, content);
-            ps.executeUpdate();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     // method mới: insert notification linh hoạt theo type / priority / related_url
     public void insertNotification(int userId, String title, String content,
@@ -251,7 +237,23 @@ public class NotificationDao {
         }
     }
 
-    public List<Notification> getTopByUser(int userId, int limit) {
+    
+public void insertNotification(int userId, String title, String content) {
+        String sql = "INSERT INTO Notification(user_id, title, content, is_read, created_at) VALUES(?, ?, ?, 0, NOW())";
+        try (Connection con = Db.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+            ps.setString(2, title);
+            ps.setString(3, content);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+     public List<Notification> getTopByUser(int userId, int limit) {
         List<Notification> list = new ArrayList<>();
         String sql = "SELECT * FROM Notification WHERE user_id = ? ORDER BY created_at DESC LIMIT ?";
 
