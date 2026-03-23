@@ -45,9 +45,14 @@
     <jsp:param name="activePage" value="home" />
 </jsp:include>
 
-<c:if test="${demoMsg == 'unavailable'}">
-    <div style="margin:0 0 16px 0;padding:12px 14px;border-radius:12px;background:#fff7e6;color:#9a6700;">
-        Demo is not available right now for this product.
+<c:if test="${not empty demoMsg}">
+    <div style="margin:0 0 16px 0;padding:12px 14px;border-radius:12px;${demoMsg == 'already_owned' || demoMsg == 'already_used' ? 'background:#fff7e6;color:#9a6700;' : 'background:#ffecec;color:#9a2c2c;'}">
+        <c:choose>
+            <c:when test="${demoMsg == 'unavailable'}">Demo trial is not available right now for this product.</c:when>
+            <c:when test="${demoMsg == 'already_owned'}">You already have access to this product, so there is no need to start a demo.</c:when>
+            <c:when test="${demoMsg == 'already_used'}">You already used the demo trial for this product.</c:when>
+            <c:otherwise>We could not start the demo trial right now.</c:otherwise>
+        </c:choose>
     </div>
 </c:if>
 
@@ -93,17 +98,60 @@
                     </c:if>
                 </div>
 
+                <c:if test="${not empty pricingOptions}">
+                    <form action="${pageContext.request.contextPath}/cart" method="POST" class="pricing-form">
+                        <input type="hidden" name="action" value="add">
+                        <input type="hidden" name="softwareId" value="${detail.softwareId}">
+                        <input type="hidden" name="redirect" value="${pageContext.request.contextPath}/product?pid=${detail.softwareId}">
+
+                        <div class="pricing-plan-grid">
+                            <c:forEach var="plan" items="${pricingOptions}" varStatus="status">
+                                <label class="pricing-plan-card">
+                                    <input type="radio" name="pricingId" value="${plan.pricingId}" ${status.first ? 'checked' : ''}>
+                                    <div class="pricing-plan-copy">
+                                        <div class="pricing-plan-top">
+                                            <strong>${plan.planName}</strong>
+                                            <span>
+                                                <c:choose>
+                                                    <c:when test="${detail.isFree == 1 || plan.price == 0}">Free</c:when>
+                                                    <c:otherwise>$${plan.price}</c:otherwise>
+                                                </c:choose>
+                                            </span>
+                                        </div>
+                                        <div class="pricing-plan-meta">
+                                            <span>${plan.maxUsers} user<c:if test="${plan.maxUsers != 1}">s</c:if></span>
+                                            <span>
+                                                <c:choose>
+                                                    <c:when test="${empty plan.durationDays}">No expiry</c:when>
+                                                    <c:otherwise>${plan.durationDays} day<c:if test="${plan.durationDays != 1}">s</c:if></c:otherwise>
+                                                </c:choose>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </label>
+                            </c:forEach>
+                        </div>
+
+                        <button type="submit" class="install-btn">Add To Cart</button>
+                    </form>
+                </c:if>
+
+                <c:if test="${empty pricingOptions}">
                 <form action="${pageContext.request.contextPath}/cart" method="POST" style="display:inline;">
                     <input type="hidden" name="action" value="add">
                     <input type="hidden" name="softwareId" value="${detail.softwareId}">
                     <input type="hidden" name="redirect" value="${pageContext.request.contextPath}/product?pid=${detail.softwareId}">
                     <button type="submit" class="install-btn">Add To Cart</button>
                 </form>
+                </c:if>
 
-                <c:if test="${hasDemo}">
-                    <a href="${pageContext.request.contextPath}/demo/download?softwareId=${detail.softwareId}" class="install-btn" style="text-decoration:none;background:#f1f2f6;color:#333;box-shadow:none;margin-left:10px;padding:12px 15px;display:inline-flex;align-items:center;gap:8px;">
-                        <i class="fa-solid fa-play"></i> Try Demo
-                    </a>
+                <c:if test="${hasDemoPlan}">
+                    <form action="${pageContext.request.contextPath}/trial/start" method="post" style="display:inline;">
+                        <input type="hidden" name="softwareId" value="${detail.softwareId}">
+                        <button type="submit" class="install-btn" style="background:#f1f2f6;color:#333;box-shadow:none;margin-left:10px;padding:12px 15px;display:inline-flex;align-items:center;gap:8px;">
+                            <i class="fa-solid fa-play"></i> Try Demo
+                        </button>
+                    </form>
                 </c:if>
             </div>
 
@@ -283,10 +331,10 @@
                     </span>
                 </div>
                 <div class="spec-row">
-                    <span class="spec-label">Language</span>
+                    <span class="spec-label">System Requirements</span>
                     <span class="spec-value">
                         <c:choose>
-                            <c:when test="${not empty detail.softwareDetail.language}">${detail.softwareDetail.language}</c:when>
+                            <c:when test="${not empty detail.softwareDetail.sysRequirement}">${detail.softwareDetail.sysRequirement}</c:when>
                             <c:otherwise>Updating</c:otherwise>
                         </c:choose>
                     </span>

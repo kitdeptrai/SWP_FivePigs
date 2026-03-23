@@ -1,5 +1,6 @@
 package com.fivepigs.app.web.reviewer;
 
+import com.fivepigs.app.dao.ApprovalDao;
 import com.fivepigs.app.dao.NotificationDao;
 import com.fivepigs.app.dao.ReviewScoreDao;
 import com.fivepigs.app.dao.SoftwareDao;
@@ -15,6 +16,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.util.List;
 
 @WebServlet(name = "ReviewSoftwareServlet", urlPatterns = {"/review_software"})
 public class ReviewSoftwareServlet extends HttpServlet {
@@ -133,6 +135,56 @@ public class ReviewSoftwareServlet extends HttpServlet {
                         + "\". The software did not pass the review and has been rejected.";
                 notificationType = "REJECTED";
                 notificationPriority = "HIGH";
+                
+                if (software != null && software.getVendorId() != null) {
+                    notificationDao.insertNotification(
+                            software.getVendorId(),
+                            "Software Rejected - " + softwareName,
+                            "Unfortunately, your software \"" + softwareName + "\" did not pass the review and has been rejected.",
+                            "REJECTED",
+                            "HIGH",
+                            request.getContextPath() + "/vendor_software_detail?id=" + softwareId
+                    );
+                }
+            }
+
+            softwareDao.updateSoftwareStatus(softwareId, nextStatus);
+
+            notificationDao.insertNotification(
+                    reviewerId,
+                    notificationTitle,
+                    notificationContent,
+                    notificationType,
+                    notificationPriority,
+                    request.getContextPath() + "/reviewer_history"
+            );
+
+            // Notify all APPROVAL users when software passes review and goes to PENDING_APPROVAL
+            if ("APPROVED".equals(decision)) {
+                try {
+                    ApprovalDao approvalDao = new ApprovalDao();
+                    ReviewScoreDao rsDao = new ReviewScoreDao();
+                    List<Integer> approvalUserIds = approvalDao.getApprovalUserIds();
+                    String reviewer = user.getFullName() != null ? user.getFullName() : ("Reviewer #" + reviewerId);
+                    double ts = (uiUxScore + technicalScore + performanceScore + documentationScore) / 4.0;
+                    String approvalTitle = "New Review Report Ready - " + softwareName;
+                    String approvalContent = "Reviewer \"" + reviewer + "\" has completed the review for \""
+                            + softwareName + "\". Overall score: " + String.format("%.1f", ts) + "/10. "
+                            + "No Malware: " + (noMalware == 1 ? "Pass" : "Fail")
+                            + " | No Copyright: " + (noCopyright == 1 ? "Pass" : "Fail")
+                            + " | No Spam: " + (noSpam == 1 ? "Pass" : "Fail")
+                            + ". Review note: " + (reviewNote != null && !reviewNote.isEmpty() ? reviewNote : "(none)")
+                            + ". Awaiting your final decision.";
+                    String approvalUrl = request.getContextPath() + "/approval_pending_detail?softwareId=" + softwareId;
+                    for (int approvalUserId : approvalUserIds) {
+                        notificationDao.insertNotification(
+                                approvalUserId, approvalTitle, approvalContent,
+                                "PENDING_APPROVAL", "HIGH", approvalUrl
+                        );
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace(); // log but don't break the flow
+                }
             }
 
             softwareDao.updateSoftwareStatus(softwareId, nextStatus);

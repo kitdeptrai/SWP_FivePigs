@@ -49,27 +49,55 @@ window.onclick = function (event) {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
+    const reportModal = document.getElementById("libraryReportModal");
+    const reportOverlay = document.getElementById("libraryReportOverlay");
+    const reportSoftwareId = document.getElementById("libraryReportSoftwareId");
+    const reportSubtitle = document.getElementById("libraryReportSubtitle");
+    const reportReason = document.getElementById("libraryReportReason");
+
+    function openReportModal(softwareId, softwareName) {
+        if (!reportModal || !reportOverlay || !reportSoftwareId) return;
+        reportSoftwareId.value = softwareId || "";
+        if (reportSubtitle) {
+            reportSubtitle.textContent = softwareName
+                ? `Tell us what is wrong with ${softwareName}.`
+                : "Tell us what is wrong with this product.";
+        }
+        if (reportReason) {
+            reportReason.value = "";
+        }
+        reportModal.classList.add("active");
+        reportOverlay.classList.add("active");
+        reportModal.setAttribute("aria-hidden", "false");
+    }
+
+    function closeReportModal() {
+        if (!reportModal || !reportOverlay) return;
+        reportModal.classList.remove("active");
+        reportOverlay.classList.remove("active");
+        reportModal.setAttribute("aria-hidden", "true");
+    }
+
     document.querySelectorAll(".library-report-trigger").forEach(function (trigger) {
         trigger.addEventListener("click", function () {
-            const card = trigger.closest(".lib-card");
-            if (!card) return;
-
-            const reportBox = card.querySelector(".library-report-box");
-            if (!reportBox) return;
-
-            reportBox.classList.toggle("is-open");
+            openReportModal(
+                trigger.dataset.softwareId || "",
+                trigger.dataset.softwareName || ""
+            );
         });
     });
 
-    document.querySelectorAll(".library-report-cancel").forEach(function (cancelBtn) {
-        cancelBtn.addEventListener("click", function () {
-            const card = cancelBtn.closest(".lib-card");
-            if (!card) return;
+    document.querySelectorAll("[data-close-report-modal]").forEach(function (button) {
+        button.addEventListener("click", closeReportModal);
+    });
 
-            const reportBox = card.querySelector(".library-report-box");
-            if (!reportBox) return;
+    if (reportOverlay) {
+        reportOverlay.addEventListener("click", closeReportModal);
+    }
 
-            reportBox.classList.remove("is-open");
-        });
+    document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") {
+            closeReportModal();
+        }
     });
 });

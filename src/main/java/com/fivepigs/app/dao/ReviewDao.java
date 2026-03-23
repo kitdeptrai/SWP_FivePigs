@@ -51,8 +51,13 @@ public class ReviewDao {
     }
 
     public boolean hasOwnedLicense(int userId, int softwareId) throws SQLException {
-        String sql = "SELECT 1 FROM fivepigs.license WHERE customer_id = ? AND software_id = ? AND " +
-                "(status IS NULL OR UPPER(status) <> 'REVOKED') " +
+        String sql = "SELECT 1 " +
+                "FROM fivepigs.license_user lu " +
+                "JOIN fivepigs.license l ON lu.license_id = l.license_id " +
+                "WHERE lu.user_id = ? AND l.software_id = ? " +
+                "AND (lu.status IS NULL OR UPPER(lu.status) = 'ACTIVE') " +
+                "AND (l.status IS NULL OR UPPER(l.status) <> 'REVOKED') " +
+                "AND (l.expire_date IS NULL OR l.expire_date >= NOW()) " +
                 "LIMIT 1";
         try (Connection c = Db.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, userId);
