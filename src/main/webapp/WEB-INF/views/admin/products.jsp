@@ -15,7 +15,7 @@
             --sidebar-bg: #0f172a;
             --card-bg: #ffffff;
             --text-main: #334155;
-            --bg-gray: #f1f5f9;
+            --bg-gray: #f5f7fb;
             --accent: #3b82f6;
         }
 
@@ -23,7 +23,7 @@
             background-color: var(--bg-gray);
             color: var(--text-main);
             margin: 0;
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            font-family: 'Inter', sans-serif;
         }
 
         .layout {
@@ -85,11 +85,17 @@
         }
 
         .card {
-            background: var(--card-bg);
-            padding: 24px;
-            border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            border: 1px solid #e2e8f0;
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            border: 1px solid #e5e7eb;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.12);
         }
 
         table {
@@ -100,18 +106,22 @@
 
         th {
             text-align: left;
-            padding: 12px;
-            background-color: var(--bg-gray);
-            color: #475569;
+            color: #666;
             font-weight: 600;
+            padding: 10px;
+            background: transparent;
             font-size: 14px;
         }
 
         td {
-            padding: 12px;
-            border-bottom: 1px solid #e2e8f0;
+            padding: 10px;
+            border-top: 1px solid #eee;
             font-size: 14px;
             vertical-align: top;
+        }
+
+        tr:hover {
+            background: #f9fafb;
         }
 
         .badge {
@@ -227,7 +237,7 @@
                                 <form method="post" action="${pageContext.request.contextPath}/admin/products/${p.status == 'ACTIVE' ? 'disable' : 'enable'}" style="margin:0;" onsubmit="return confirm('${p.status == 'ACTIVE' ? 'Are you sure you want to disable this product?' : 'Are you sure you want to enable this product?'}');">
                                     <input type="hidden" name="softwareId" value="${p.softwareId}" />
                                     <button type="submit" style="padding:6px 10px; border-radius:6px; border:none; background:${p.status == 'ACTIVE' ? '#f97316' : '#22c55e'}; color:#fff; font-weight:600;">
-                                        ${p.status == 'ACTIVE' ? 'Disable' : 'Enable'}
+                                            ${p.status == 'ACTIVE' ? 'Disable' : 'Enable'}
                                     </button>
                                 </form>
                             </div>

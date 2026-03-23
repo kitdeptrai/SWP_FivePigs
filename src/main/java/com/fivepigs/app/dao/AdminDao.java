@@ -171,6 +171,52 @@ public class AdminDao {
         return rows;
     }
 
+    public double getCommissionPercent() {
+        String sql = "SELECT config_value FROM fivepigs.system_config WHERE config_key = 'commission_percent' LIMIT 1";
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                String raw = rs.getString("config_value");
+                if (raw != null && !raw.isBlank()) {
+                    try {
+                        double percent = Double.parseDouble(raw.trim());
+                        if (percent < 0) {
+                            return 0;
+                        }
+                        return Math.min(percent, 20);
+                    } catch (NumberFormatException ignored) {
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 10.0;
+    }
+
+    public void setCommissionPercent(double commissionPercent, Integer userId) throws SQLException {
+        double normalizedPercent = Math.max(0, Math.min(20, commissionPercent));
+
+        String updateSql = "UPDATE fivepigs.system_config SET config_value = ? WHERE config_key = 'commission_percent'";
+        String insertSql = "INSERT INTO fivepigs.system_config(config_key, config_value) VALUES('commission_percent', ?)";
+
+        try (Connection conn = Db.getConnection()) {
+            try (PreparedStatement updatePs = conn.prepareStatement(updateSql)) {
+                updatePs.setString(1, Double.toString(normalizedPercent));
+                int updatedRows = updatePs.executeUpdate();
+                if (updatedRows > 0) {
+                    return;
+                }
+            }
+
+            try (PreparedStatement insertPs = conn.prepareStatement(insertSql)) {
+                insertPs.setString(1, Double.toString(normalizedPercent));
+                insertPs.executeUpdate();
+            }
+        }
+    }
+
     // ===== Users/Employees Management =====
 
     public boolean emailExists(String email) {
