@@ -112,7 +112,7 @@ public class ProductServlet extends HttpServlet {
         return detail.getCreatedAt();
     }
 
-    private Integer resolveFileSize(Software detail) {
+    private Long resolveFileSize(Software detail) {
         SoftwareVersion version = detail.getSoftwareVersion();
         return version == null ? null : version.getFileSize();
     }
@@ -144,7 +144,7 @@ public class ProductServlet extends HttpServlet {
         return dateTime.format(DATE_FORMAT);
     }
 
-    private String formatFileSize(Integer fileSize) {
+    private String formatFileSize(Long fileSize) {
         if (fileSize == null || fileSize <= 0) {
             return "Updating";
         }

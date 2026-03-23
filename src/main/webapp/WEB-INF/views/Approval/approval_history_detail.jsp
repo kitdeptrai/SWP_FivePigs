@@ -143,7 +143,7 @@
             <div class="history-card">
                 <h3>Approval Decision</h3>
                 <div class="decision-approved">
-                    APPROVED
+                    <span>${historyDetail.approvalProcess.decision}</span>
                 </div>
 
                 <div class="review-notes-box">

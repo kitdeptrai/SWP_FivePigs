@@ -302,7 +302,8 @@ public class ApprovalDao {
                          c.category_name,
                          u.full_name,
                          sd.description,
-                         sv.version_name
+                         sv.version_name,
+                         sa.decision
                      FROM Software s
                      JOIN Users u 
                          ON u.user_id = s.vendor_id
@@ -312,7 +313,9 @@ public class ApprovalDao {
                          ON sd.software_id = s.software_id
                      LEFT JOIN Software_Version sv 
                          ON sv.software_id = s.software_id
-                         AND sv.is_active = 1
+                     AND sv.is_active = 1
+                     LEFT JOIN Software_Approval sa
+                        ON sa.software_id = s.software_id       
                      WHERE s.software_id = ?;
                      """;
 
@@ -323,6 +326,7 @@ public class ApprovalDao {
                     Software s = new Software();
                     SoftwareDetail sd = new SoftwareDetail();
                     SoftwareVersion sv = new SoftwareVersion();
+                    ApprovalProcess ap = new ApprovalProcess();
                     Category c = new Category();
                     User u = new User();
 
@@ -331,11 +335,13 @@ public class ApprovalDao {
                     u.setFullName(rs.getString("full_name"));
                     sd.setDescription(rs.getString("description"));
                     sv.setVersionName(rs.getString("version_name"));
+                    ap.setDecision(rs.getString("decision"));
 
                     s.setUser(u);
                     s.setCategory(c);
                     s.setSoftwareDetail(sd);
                     s.setSoftwareVersion(sv);
+                    s.setApprovalProcess(ap);
 
                     return s;
                 }

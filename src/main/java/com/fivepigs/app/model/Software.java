@@ -60,15 +60,7 @@ public class Software {
     
     private String imageUrl;
      private Double qualityScore;
-    private String iconUrl;
-
-    public String getIconUrl() {
-        return iconUrl;
-    }
-
-    public void setIconUrl(String iconUrl) {
-        this.iconUrl = iconUrl;
-    }
+  
 
     public String getImageUrl() {
         return imageUrl;
@@ -134,7 +126,17 @@ public void setCategoryName(String categoryName) {
         this.appName = appName;
         this.approvalProcess = ap;
         this.reviewerProcess = rp;
+        
+        
     }
+
+    public SoftwareImage getSoftwareImage() {
+    return softwareImage;
+}
+
+public void setSoftwareImage(SoftwareImage softwareImage) {
+    this.softwareImage = softwareImage;
+}
 
     public SoftwareDetail getSoftwareDetail() {
         return softwareDetail;
@@ -152,7 +154,13 @@ public void setCategoryName(String categoryName) {
         this.softwareVersion = softwareVersion;
     }
 
+    public Category getCategory() {
+        return category;
+    }
 
+    public void setCategory(Category category) {
+        this.category = category;
+    }
 
     public User getUser() {
         return user;
@@ -161,29 +169,7 @@ public void setCategoryName(String categoryName) {
     public void setUser(User user) {
         this.user = user;
     }
-    
-    
 
-    public Category getCategory() {
-        return category;
-    }
-
-    public void setCategory(Category category) {
-        this.category = category;
-    }
-    
-    
-
-    public SoftwareImage getSoftwareImage() {
-        return softwareImage;
-    }
-
-    public void setSoftwareImage(SoftwareImage softwareImage) {
-        this.softwareImage = softwareImage;
-    }
-
-    
-    
     public ApprovalProcess getApprovalProcess() {
         return approvalProcess;
     }
@@ -211,6 +197,8 @@ public void setCategoryName(String categoryName) {
     public String getName() {
         return name;
     }
+
+   
 
     public void setName(String name) {
         this.name = name;
