@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <c:set var="activeMenu" value="notifications" />
 
@@ -71,25 +72,56 @@
                 <div class="noti-filters">
                     <div class="filter-label"><i class="fa-solid fa-filter"></i> Filters:</div>
 
-                    <button type="button" class="chip active" data-read="all">All</button>
-                    <button type="button" class="chip" data-read="unread">Unread (${unreadCount})</button>
-                    <button type="button" class="chip" data-read="read">Read</button>
+                    <a class="chip ${selectedRead eq 'all' ? 'active' : ''}"
+                       href="${pageContext.request.contextPath}/reviewer_notifications?read=all&type=${selectedType}&keyword=${keyword}">
+                        All
+                    </a>
+
+                    <a class="chip ${selectedRead eq 'unread' ? 'active' : ''}"
+                       href="${pageContext.request.contextPath}/reviewer_notifications?read=unread&type=${selectedType}&keyword=${keyword}">
+                        Unread (${unreadCount})
+                    </a>
+
+                    <a class="chip ${selectedRead eq 'read' ? 'active' : ''}"
+                       href="${pageContext.request.contextPath}/reviewer_notifications?read=read&type=${selectedType}&keyword=${keyword}">
+                        Read
+                    </a>
 
                     <div class="filter-divider"></div>
 
-                    <button type="button" class="chip active" data-type="all">All Types</button>
-                    <button type="button" class="chip" data-type="New Assignments">New Assignments</button>
-                    <button type="button" class="chip" data-type="In Progress">In Progress</button>
-                    <button type="button" class="chip" data-type="Completed">Completed</button>
-                    <button type="button" class="chip" data-type="Updates">Updates</button>
-                    <button type="button" class="chip" data-type="System">System</button>
+                    <a class="chip ${selectedType eq 'all' ? 'active' : ''}"
+                       href="${pageContext.request.contextPath}/reviewer_notifications?read=${selectedRead}&type=all&keyword=${keyword}">
+                        All Types
+                    </a>
+
+                    <a class="chip ${selectedType eq 'SUBMITTED' ? 'active' : ''}"
+                       href="${pageContext.request.contextPath}/reviewer_notifications?read=${selectedRead}&type=SUBMITTED&keyword=${keyword}">
+                        Submitted
+                    </a>
+
+                    <a class="chip ${selectedType eq 'APPROVED' ? 'active' : ''}"
+                       href="${pageContext.request.contextPath}/reviewer_notifications?read=${selectedRead}&type=APPROVED&keyword=${keyword}">
+                        Approved
+                    </a>
+
+                    <a class="chip ${selectedType eq 'REJECTED' ? 'active' : ''}"
+                       href="${pageContext.request.contextPath}/reviewer_notifications?read=${selectedRead}&type=REJECTED&keyword=${keyword}">
+                        Rejected
+                    </a>
+
+                    <a class="chip ${selectedType eq 'PENDING_APPROVAL' ? 'active' : ''}"
+                       href="${pageContext.request.contextPath}/reviewer_notifications?read=${selectedRead}&type=PENDING_APPROVAL&keyword=${keyword}">
+                        Pending Approval
+                    </a>
                 </div>
 
-                <form class="noti-search-wrapper" onsubmit="return false;">
+                <form class="noti-search-wrapper" method="get"
+                      action="${pageContext.request.contextPath}/reviewer_notifications">
+                    <input type="hidden" name="read" value="${selectedRead}">
+                    <input type="hidden" name="type" value="${selectedType}">
                     <div class="noti-search-box">
                         <i class="fa-solid fa-magnifying-glass"></i>
                         <input type="text"
-                               id="searchInput"
                                name="keyword"
                                value="${keyword}"
                                placeholder="Search notifications..." />
@@ -102,18 +134,15 @@
                         <div class="noti-card">
                             <div class="noti-body">
                                 <div class="noti-title">No notifications</div>
-                                <div class="noti-desc">You have no notifications yet.</div>
+                                <div class="noti-desc">No matching notifications found.</div>
                             </div>
                         </div>
                     </c:if>
 
                     <c:forEach var="n" items="${notifications}">
-                        <div class="noti-card notification-card"
-                             data-read="${n.read}"
-                             data-type="${n.type}"
-                             data-title="${fn:toLowerCase(n.title)}"
-                             data-content="${fn:toLowerCase(n.content)}">
+                        <fmt:formatDate var="formattedCreatedAt" value="${n.createdAt}" pattern="dd/MM/yyyy HH:mm" />
 
+                        <div class="noti-card ${!n.read ? 'unread-card' : ''}">
                             <div class="noti-left">
                                 <i class="fa-regular fa-clock"></i>
                             </div>
@@ -124,10 +153,10 @@
                                         <span class="noti-title">${n.title}</span>
 
                                         <c:choose>
-                                            <c:when test="${n.priority eq 'High' || n.priority eq 'Critical'}">
+                                            <c:when test="${n.priority eq 'HIGH' || n.priority eq 'High' || n.priority eq 'CRITICAL' || n.priority eq 'Critical'}">
                                                 <span class="badge b-high">High Priority</span>
                                             </c:when>
-                                            <c:when test="${n.priority eq 'Medium'}">
+                                            <c:when test="${n.priority eq 'MEDIUM' || n.priority eq 'Medium'}">
                                                 <span class="badge b-med">Medium</span>
                                             </c:when>
                                             <c:otherwise>
@@ -138,9 +167,27 @@
                                         <c:if test="${!n.read}">
                                             <span class="badge b-unread">Unread</span>
                                         </c:if>
+
+                                        <c:choose>
+                                            <c:when test="${n.type eq 'SUBMITTED'}">
+                                                <span class="badge b-med">Submitted</span>
+                                            </c:when>
+                                            <c:when test="${n.type eq 'APPROVED'}">
+                                                <span class="badge b-low">Approved</span>
+                                            </c:when>
+                                            <c:when test="${n.type eq 'REJECTED'}">
+                                                <span class="badge b-high">Rejected</span>
+                                            </c:when>
+                                            <c:when test="${n.type eq 'PENDING_APPROVAL'}">
+                                                <span class="badge b-med">Pending Approval</span>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <span class="badge b-low">Other</span>
+                                            </c:otherwise>
+                                        </c:choose>
                                     </div>
 
-                                    <div class="noti-time">${n.createdAt}</div>
+                                    <div class="noti-time">${formattedCreatedAt}</div>
                                 </div>
 
                                 <div class="noti-desc">${n.content}</div>
@@ -148,15 +195,14 @@
                                 <div class="noti-actions">
                                     <button type="button"
                                             class="link-action"
-                                            onclick="openDetails(
-                                                            '${n.notificationId}',
-                                                            '${fn:escapeXml(n.title)}',
-                                                            '${fn:escapeXml(n.content)}',
-                                                            '${n.priority}',
-                                                            '${n.type}',
-                                                            '${n.createdAt}',
-                                                            '${n.relatedUrl}'
-                                                            )">
+                                            data-id="${n.notificationId}"
+                                            data-title="${fn:escapeXml(n.title)}"
+                                            data-content="${fn:escapeXml(n.content)}"
+                                            data-priority="${n.priority}"
+                                            data-type="${n.type}"
+                                            data-time="${formattedCreatedAt}"
+                                            data-related-url="${fn:escapeXml(n.relatedUrl)}"
+                                            onclick="openDetails(this)">
                                         View Details <i class="fa-solid fa-chevron-right"></i>
                                     </button>
 
@@ -191,7 +237,6 @@
             </main>
         </div>
 
-        <!-- Modal đặt ngoài main để tránh ảnh hưởng layout -->
         <div id="detailsModal" class="noti-modal" onclick="closeIfBackdrop(event)">
             <div class="noti-modal-box">
                 <button type="button" class="noti-modal-close" onclick="closeModal()">✕</button>
@@ -204,7 +249,7 @@
                         <div id="mTitle" class="modal-title"></div>
                         <div class="modal-badges">
                             <span id="mPriority" class="badge b-high">High Priority</span>
-                            <span id="mType" class="badge b-low">System</span>
+                            <span id="mType" class="badge b-low">Type</span>
                         </div>
                     </div>
                 </div>
@@ -236,74 +281,57 @@
         </div>
 
         <script>
-            let readFilter = "all";
-            let typeFilter = "all";
             let currentRelatedUrl = "";
 
-            document.querySelectorAll(".chip").forEach(btn => {
-                btn.addEventListener("click", () => {
-                    if (btn.dataset.read) {
-                        document.querySelectorAll(".chip[data-read]").forEach(b => b.classList.remove("active"));
-                        btn.classList.add("active");
-                        readFilter = btn.dataset.read;
-                    }
-
-                    if (btn.dataset.type) {
-                        document.querySelectorAll(".chip[data-type]").forEach(b => b.classList.remove("active"));
-                        btn.classList.add("active");
-                        typeFilter = btn.dataset.type;
-                    }
-
-                    applyFilters();
-                });
-            });
-
-            document.getElementById("searchInput").addEventListener("keyup", applyFilters);
-
-            function applyFilters() {
-                const q = (document.getElementById("searchInput").value || "").toLowerCase().trim();
-                const cards = document.querySelectorAll(".notification-card");
-
-                cards.forEach(card => {
-                    const isRead = card.getAttribute("data-read") === "true";
-                    const type = card.getAttribute("data-type") || "";
-                    const title = card.getAttribute("data-title") || "";
-                    const content = card.getAttribute("data-content") || "";
-
-                    let okRead = true;
-                    if (readFilter === "unread")
-                        okRead = !isRead;
-                    if (readFilter === "read")
-                        okRead = isRead;
-
-                    const okType = (typeFilter === "all") ? true : (type === typeFilter);
-                    const okSearch = (q === "") ? true : (title.includes(q) || content.includes(q));
-
-                    card.style.display = (okRead && okType && okSearch) ? "flex" : "none";
-                });
+            function mapType(type) {
+                if (type === "SUBMITTED") return "Submitted";
+                if (type === "APPROVED") return "Approved";
+                if (type === "REJECTED") return "Rejected";
+                if (type === "PENDING_APPROVAL") return "Pending Approval";
+                return "Other";
             }
 
-            function openDetails(id, title, content, priority, type, time, relatedUrl) {
-                document.getElementById("mTitle").innerText = title || "";
-                document.getElementById("mContent").innerText = content || "";
-                document.getElementById("mTime").innerText = time || "";
-                document.getElementById("mStatus").innerText = "Active";
+            function mapStatus(type) {
+                if (type === "SUBMITTED") return "Waiting for Review";
+                if (type === "APPROVED") return "Approved";
+                if (type === "REJECTED") return "Rejected";
+                if (type === "PENDING_APPROVAL") return "Waiting for Final Approval";
+                return "Active";
+            }
 
-                currentRelatedUrl = relatedUrl || "";
+            function openDetails(btn) {
+                const title = btn.dataset.title || "";
+                const content = btn.dataset.content || "";
+                const priority = btn.dataset.priority || "";
+                const type = btn.dataset.type || "";
+                const time = btn.dataset.time || "";
+                const relatedUrl = btn.dataset.relatedUrl || "";
 
-                const pri = (priority || "Low").toLowerCase();
+                document.getElementById("mTitle").innerText = title;
+                document.getElementById("mContent").innerText = content;
+                document.getElementById("mTime").innerText = time;
+                document.getElementById("mStatus").innerText = mapStatus(type);
+
+                currentRelatedUrl = relatedUrl;
+
+                const pri = priority.toLowerCase();
                 const priEl = document.getElementById("mPriority");
                 priEl.className = "badge " + (
                         (pri === "high" || pri === "critical") ? "b-high" :
                         (pri === "medium") ? "b-med" : "b-low"
-                        );
+                );
                 priEl.innerText =
                         (pri === "high" || pri === "critical") ? "High Priority" :
                         (pri === "medium") ? "Medium" : "Low";
 
                 const typeEl = document.getElementById("mType");
-                typeEl.className = "badge b-low";
-                typeEl.innerText = type || "System";
+                typeEl.className =
+                        "badge " + (
+                                (type === "REJECTED") ? "b-high" :
+                                (type === "SUBMITTED" || type === "PENDING_APPROVAL") ? "b-med" :
+                                "b-low"
+                        );
+                typeEl.innerText = mapType(type);
 
                 const goBtn = document.getElementById("goBtn");
                 if (!currentRelatedUrl) {
@@ -331,7 +359,7 @@
 
             function goRelated() {
                 if (currentRelatedUrl) {
-                    window.location.href = "${pageContext.request.contextPath}" + currentRelatedUrl;
+                    window.location.href = currentRelatedUrl;
                 }
             }
 
