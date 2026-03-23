@@ -22,7 +22,21 @@
     <jsp:include page="/WEB-INF/views/customer/header.jsp"></jsp:include>
 
     <div id="library" class="content-section active-section">
-        <h2 style="margin-bottom: 20px; font-size: 44px; font-weight: 800;">My Library</h2>
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:20px;">
+            <h2 style="margin:0; font-size: 44px; font-weight: 800;">My Library</h2>
+            <form method="get" action="${pageContext.request.contextPath}/library" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:#fff;padding:10px 12px;border-radius:14px;box-shadow:0 4px 16px rgba(15,23,42,0.05);">
+                <label for="librarySort" style="font-weight:700;color:#374151;">Sort</label>
+                <select id="librarySort" name="sort" style="border:1px solid #dbe1ec;border-radius:10px;padding:8px 10px;">
+                    <option value="date" ${selectedSort == 'date' ? 'selected' : ''}>Purchase date</option>
+                    <option value="name" ${selectedSort == 'name' ? 'selected' : ''}>Name</option>
+                </select>
+                <select name="order" style="border:1px solid #dbe1ec;border-radius:10px;padding:8px 10px;">
+                    <option value="desc" ${selectedOrder == 'desc' ? 'selected' : ''}>Descending</option>
+                    <option value="asc" ${selectedOrder == 'asc' ? 'selected' : ''}>Ascending</option>
+                </select>
+                <button type="submit" class="install-btn" style="padding:8px 14px;box-shadow:none;">Apply</button>
+            </form>
+        </div>
 
         <c:if test="${param.msg == 'not_owned'}">
             <div style="background:#ffecec;color:#9a2c2c;border-radius:10px;padding:10px 12px;margin-bottom:14px;">You do not own this software.</div>
@@ -92,7 +106,7 @@
                                 <h4 style="font-size:25px; line-height:1.0; margin-bottom:6px; font-weight:800;">${sw.name}</h4>
                                 <c:choose>
                                     <c:when test="${downloadedMap[sw.softwareId]}">
-                                        <p style="font-size:15px; color:#2f855a; font-weight:700;">Owned ï¿½ Downloaded</p>
+                                        <p style="font-size:15px; color:#2f855a; font-weight:700;">Downloaded</p>
                                     </c:when>
                                     <c:otherwise>
                                         <p style="font-size:15px; color:#5a67d8; font-weight:700;">Owned</p>

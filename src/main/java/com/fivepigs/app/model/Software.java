@@ -60,7 +60,7 @@ public class Software {
     
     private String imageUrl;
      private Double qualityScore;
-  
+  private String iconUrl;
 
     public String getImageUrl() {
         return imageUrl;
@@ -128,6 +128,14 @@ public void setCategoryName(String categoryName) {
         this.reviewerProcess = rp;
         
         
+    }
+
+    public String getIconUrl() {
+        return iconUrl;
+    }
+
+    public void setIconUrl(String iconUrl) {
+        this.iconUrl = iconUrl;
     }
 
     public SoftwareImage getSoftwareImage() {

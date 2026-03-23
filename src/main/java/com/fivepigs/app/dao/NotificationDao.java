@@ -28,8 +28,13 @@ public class NotificationDao {
 
     // 1. Lấy tất cả notification của user
     public List<Notification> getByUser(int userId) {
+        return getByUser(userId, "desc");
+    }
+
+    public List<Notification> getByUser(int userId, String dateOrder) {
         List<Notification> list = new ArrayList<>();
-        String sql = "SELECT * FROM Notification WHERE user_id = ? ORDER BY created_at DESC";
+        String orderBy = "ASC".equalsIgnoreCase(dateOrder) ? "ASC" : "DESC";
+        String sql = "SELECT * FROM Notification WHERE user_id = ? ORDER BY created_at " + orderBy + ", notification_id " + orderBy;
 
         try (Connection con = Db.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {

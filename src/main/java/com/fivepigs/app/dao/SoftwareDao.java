@@ -650,7 +650,7 @@ public class SoftwareDao {
                     swVersion.setFileUrl(rs.getString("file_url"));
                     swVersion.setReleaseNote(rs.getString("version_release_note"));
                     Number fileSizeValue = (Number) rs.getObject("file_size");
-                    swVersion.setFileSize(fileSizeValue == null ? null : fileSizeValue.intValue());
+                    swVersion.setFileSize(fileSizeValue == null ? null : fileSizeValue.longValue());
                     swVersion.setCreatedAt(rs.getObject("version_created_at", LocalDateTime.class));
                     Object isActiveValue = rs.getObject("is_active");
                     if (isActiveValue instanceof Boolean booleanValue) {
@@ -991,8 +991,19 @@ public class SoftwareDao {
 
 
     public List<Software> getLibraryByUserIdWithIcon(int userId) throws SQLException {
+        return getLibraryByUserIdWithIcon(userId, "date", "desc");
+    }
+
+    public List<Software> getLibraryByUserIdWithIcon(int userId, String sortBy, String sortDir) throws SQLException {
+        String orderBy = "lib.last_purchase DESC, s.software_id DESC";
+        if ("name".equalsIgnoreCase(sortBy)) {
+            orderBy = "LOWER(s.name) " + ("desc".equalsIgnoreCase(sortDir) ? "DESC" : "ASC") + ", s.software_id DESC";
+        } else if ("date".equalsIgnoreCase(sortBy)) {
+            orderBy = "lib.last_purchase " + ("asc".equalsIgnoreCase(sortDir) ? "ASC" : "DESC") + ", s.software_id DESC";
+        }
+
         String sql =
-                "SELECT s.*, " + CUSTOMER_PRICE_SQL + ", img.image_url AS icon_url " +
+                "SELECT s.*, " + CUSTOMER_PRICE_SQL + ", img.image_url AS icon_url, lib.last_purchase AS access_date " +
                         "FROM fivepigs.software s " +
                         "JOIN ( " +
                           "  SELECT l.software_id, MAX(l.purchase_date) AS last_purchase " +
@@ -1006,7 +1017,7 @@ public class SoftwareDao {
                         ") lib ON lib.software_id = s.software_id " +
                         "LEFT JOIN fivepigs.software_image img " +
                         "  ON s.software_id = img.software_id AND img.is_thumbnail = 1 " +
-                        "ORDER BY lib.last_purchase DESC, s.software_id DESC";
+                        "ORDER BY " + orderBy;
 
         List<Software> list = new ArrayList<>();
         try (Connection c = Db.getConnection();
@@ -1022,6 +1033,7 @@ public class SoftwareDao {
                     sw.setPrice(rs.getDouble("price"));
                     sw.setAvgRating(rs.getDouble("avg_rating"));
                     sw.setIconUrl(rs.getString("icon_url"));
+                    sw.setCreatedAt(rs.getObject("access_date", LocalDateTime.class));
                     list.add(sw);
                 }
             }

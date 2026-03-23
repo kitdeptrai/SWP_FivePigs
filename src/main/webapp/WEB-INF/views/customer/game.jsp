@@ -63,12 +63,12 @@
                         <p style="font-size:12px; opacity:0.7; margin-bottom:20px;">Top Seller this week</p>
                         <div style="margin-top:auto; background:rgba(255,255,255,0.1); padding:15px; border-radius:12px;">
                             <h4 style="margin-bottom:5px;">Black Ops 6</h4>
-                            <p style="font-size:12px; opacity:0.8;">Action • FPS</p>
+                            <p style="font-size:12px; opacity:0.8;">Action ï¿½ FPS</p>
                         </div>
                     </div>
                 </div>
 
-                <div class="genre-chip-row">
+                <div class="store-filter-toolbar" style="display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin:0 0 18px;"><div class="genre-chip-row" style="margin:0;">
                     <c:url var="allGamesUrl" value="/game" />
                     <a href="${allGamesUrl}" class="genre-chip ${empty selectedGenre ? 'active' : ''}">All</a>
                     <c:forEach var="genre" items="${genres}">
@@ -78,6 +78,22 @@
                         <a href="${genreFilterUrl}" class="genre-chip ${selectedGenre eq genre ? 'active' : ''}">${genre}</a>
                     </c:forEach>
                 </div>
+
+                <form method="get" action="${pageContext.request.contextPath}/game" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:0;background:#fff;padding:10px 12px;border-radius:14px;box-shadow:0 4px 16px rgba(15,23,42,0.05);">
+                    <c:if test="${not empty selectedGenre}">
+                        <input type="hidden" name="genre" value="${selectedGenre}">
+                    </c:if>
+                    <label for="gameSort" style="font-weight:700;color:#374151;">Sort</label>
+                    <select id="gameSort" name="sort" style="border:1px solid #dbe1ec;border-radius:10px;padding:8px 10px;">
+                        <option value="name" ${selectedSort == 'name' ? 'selected' : ''}>Name</option>
+                        <option value="price" ${selectedSort == 'price' ? 'selected' : ''}>Price</option>
+                    </select>
+                    <select name="order" style="border:1px solid #dbe1ec;border-radius:10px;padding:8px 10px;">
+                        <option value="asc" ${selectedOrder == 'asc' ? 'selected' : ''}>Ascending</option>
+                        <option value="desc" ${selectedOrder == 'desc' ? 'selected' : ''}>Descending</option>
+                    </select>
+                    <button type="submit" class="install-btn" style="padding:8px 14px;box-shadow:none;">Apply</button>
+                </form></div>
 
                 <c:choose>
                     <c:when test="${not empty selectedGenre}">
