@@ -7,8 +7,27 @@
                 <!DOCTYPE html>
                 <html>
 
+<<<<<<< HEAD
                 <head>
                     <title>Notifications</title>
+=======
+<<<<<<< HEAD
+                <head>
+                    <title>Notifications</title>
+=======
+   
+    <link rel="stylesheet"
+          href="${pageContext.request.contextPath}/assets/css/vendor/vendor.css">  
+    <link rel="stylesheet"
+          href="${pageContext.request.contextPath}/assets/reviewer/pending.css">
+    <link rel="stylesheet"
+          href="${pageContext.request.contextPath}/assets/css/vendor/notification.css">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+>>>>>>> 8b4619facd455dcc81189ce2fcf52be363bc86b0
+>>>>>>> 92309ceac73a122c960d4c3cb0a34d0aa5bc6856
 
 
                     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/vendor/vendor.css">

@@ -1,9 +1,15 @@
 package com.fivepigs.app.dao;
 
 import com.fivepigs.app.config.Db;
+
 import com.fivepigs.app.model.*;
 
 import java.sql.*;
+
+
+import java.sql.*;
+import com.fivepigs.app.model.*;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -40,7 +46,11 @@ public class SoftwareDao {
         return 0;
     }
 
-    public int countPendingReviewSoftware() throws SQLException {
+
+  
+
+     public int countPendingReviewSoftware() throws SQLException {
+
         String sql = "SELECT COUNT(*) AS total FROM Software WHERE status = 'PENDING_REVIEW'";
         try (Connection c = Db.getConnection();
              PreparedStatement ps = c.prepareStatement(sql);
@@ -51,6 +61,7 @@ public class SoftwareDao {
         }
         return 0;
     }
+
 
     public Integer completeReviewApp() throws SQLException {
         String sql = "SELECT COUNT(DISTINCT software_id) AS count FROM Review_Score";
@@ -97,33 +108,31 @@ public class SoftwareDao {
         return 0;
     }
 
+
     public List<Software> getPendingSoftware() throws SQLException {
         List<Software> list = new ArrayList<>();
+        
 
         String sql = """
-            SELECT s.software_id,
-                   s.name,
-                   s.short_description,
-                   """ + PRICE_SELECT + """
-                   ,
-                   s.status,
-                   s.created_at,
-                   sv.version_name AS version,
-                   c.category_name
-            FROM Software s
-            LEFT JOIN Category c
-                   ON s.category_id = c.category_id
-            LEFT JOIN Software_Version sv
-                   ON sv.software_id = s.software_id
-                  AND sv.is_active = 1
-            """ + PRICE_JOIN + """
-            WHERE s.status = 'PENDING_REVIEW'
-            ORDER BY s.created_at DESC
+        SELECT s.software_id,
+               s.name,
+               s.short_description,
+               s.price,
+               s.status,
+               s.created_at,
+               sv.version_name AS version,
+               c.category_name
+        FROM Software s
+        LEFT JOIN Category c ON s.category_id = c.category_id
+        LEFT JOIN Software_Version sv
+               ON sv.software_id = s.software_id
+              AND sv.is_active = 1
+        WHERE s.status = 'PENDING_REVIEW'
         """;
 
-        try (Connection conn = Db.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+   
+
+        try (Connection conn = Db.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 Software s = new Software();
@@ -682,7 +691,7 @@ public class SoftwareDao {
                     swVersion.setFileUrl(rs.getString("file_url"));
                     swVersion.setReleaseNote(rs.getString("version_release_note"));
                     Number fileSizeValue = (Number) rs.getObject("file_size");
-                    swVersion.setFileSize(fileSizeValue == null ? null : fileSizeValue.intValue());
+                    swVersion.setFileSize(fileSizeValue == null ? null : fileSizeValue.longValue());
                     swVersion.setCreatedAt(rs.getObject("version_created_at", LocalDateTime.class));
 
                     Object isActiveValue = rs.getObject("is_active");
@@ -972,7 +981,6 @@ public class SoftwareDao {
                     sw.setPrice(rs.getDouble("price"));
                     sw.setIsFree(rs.getInt("is_free"));
                     sw.setAvgRating(rs.getDouble("avg_rating"));
-                    sw.setIconUrl(rs.getString("icon_url"));
                     list.add(sw);
                 }
             }
@@ -1014,7 +1022,7 @@ public class SoftwareDao {
                     sw.setDownloadCount(rs.getInt("download_count"));
                     sw.setIsFree(rs.getInt("is_free"));
                     sw.setPrice(rs.getDouble("price"));
-                    sw.setIconUrl(rs.getString("icon_url"));
+                    
                     list.add(sw);
                 }
             }
@@ -1065,7 +1073,7 @@ public class SoftwareDao {
                     sw.setAvgRating(rs.getDouble("avg_rating"));
                     sw.setIsFree(rs.getInt("is_free"));
                     sw.setPrice(rs.getDouble("price"));
-                    sw.setIconUrl(rs.getString("icon_url"));
+                    
                     list.add(sw);
                 }
             }
@@ -1106,6 +1114,7 @@ public class SoftwareDao {
                     sw.setPrice(rs.getDouble("price"));
                     sw.setDownloadCount(rs.getInt("download_count"));
                     sw.setAvgRating(rs.getDouble("avg_rating"));
+                    
                     list.add(sw);
                 }
             }
@@ -1153,7 +1162,7 @@ public class SoftwareDao {
                     sw.setIsFree(rs.getInt("is_free"));
                     sw.setPrice(rs.getDouble("price"));
                     sw.setAvgRating(rs.getDouble("avg_rating"));
-                    sw.setIconUrl(rs.getString("icon_url"));
+                    
                     list.add(sw);
                 }
             }
@@ -1207,7 +1216,7 @@ public class SoftwareDao {
                     sw.setStatus(rs.getString("status"));
                     sw.setDownloadCount(rs.getInt("download_count"));
                     sw.setAvgRating(rs.getDouble("avg_rating"));
-                    sw.setIconUrl(rs.getString("icon_url"));
+                    
 
                     sections.computeIfAbsent(genreName, k -> new ArrayList<>()).add(sw);
                 }
@@ -1282,7 +1291,6 @@ public class SoftwareDao {
                     sw.setPrice(rs.getDouble("price"));
                     sw.setIsFree(rs.getInt("is_free"));
                     sw.setAvgRating(rs.getDouble("avg_rating"));
-                    sw.setIconUrl(rs.getString("icon_url"));
                     list.add(sw);
                 }
             }
@@ -1409,7 +1417,7 @@ public class SoftwareDao {
                     sw.setIsFree(rs.getInt("is_free"));
                     sw.setAvgRating(rs.getDouble("avg_rating"));
                     sw.setDownloadCount(rs.getInt("download_count"));
-                    sw.setIconUrl(rs.getString("icon_url"));
+                    
                     list.add(sw);
                 }
             }
