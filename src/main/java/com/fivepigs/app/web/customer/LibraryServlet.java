@@ -1,7 +1,9 @@
 package com.fivepigs.app.web.customer;
 
 import com.fivepigs.app.dao.SoftwareDao;
+import com.fivepigs.app.dao.LicenseDao;
 import com.fivepigs.app.dao.UserSoftwareStateDao;
+import com.fivepigs.app.model.License;
 import com.fivepigs.app.model.Software;
 import com.fivepigs.app.model.User;
 import jakarta.servlet.ServletException;
@@ -32,14 +34,17 @@ public class LibraryServlet extends HttpServlet {
         }
 
         SoftwareDao softwareDao = new SoftwareDao();
+        LicenseDao licenseDao = new LicenseDao();
         UserSoftwareStateDao stateDao = new UserSoftwareStateDao();
 
         try {
             List<Software> myLibrary = softwareDao.getLibraryByUserIdWithIcon(userId);
             Map<Integer, Boolean> downloadedMap = stateDao.getDownloadedMapByUser(userId);
+            Map<Integer, License> ownedLicenseMap = licenseDao.getOwnedLicenseMapByOwner(userId);
 
             request.setAttribute("libraryList", myLibrary);
             request.setAttribute("downloadedMap", downloadedMap);
+            request.setAttribute("ownedLicenseMap", ownedLicenseMap);
 
             request.getRequestDispatcher("/WEB-INF/views/customer/library.jsp")
                     .forward(request, response);

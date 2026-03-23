@@ -23,12 +23,7 @@
 
         <c:if test="${param.msg == 'updated'}"><div class="msg-box msg-success">Profile updated successfully.</div></c:if>
         <c:if test="${param.msg == 'invalid_name'}"><div class="msg-box msg-error">Full name must be 2-100 characters.</div></c:if>
-        <c:if test="${param.msg == 'invalid_phone'}"><div class="msg-box msg-error">Phone number must be 8-20 characters and only contain digits, spaces, + or -.</div></c:if>
         <c:if test="${param.msg == 'invalid_avatar'}"><div class="msg-box msg-error">Avatar must be a PNG, JPG, JPEG or WEBP image.</div></c:if>
-        <c:if test="${param.msg == 'invalid_dob'}"><div class="msg-box msg-error">Date of birth is not valid.</div></c:if>
-        <c:if test="${param.msg == 'invalid_gender'}"><div class="msg-box msg-error">Gender value is not valid.</div></c:if>
-        <c:if test="${param.msg == 'invalid_address'}"><div class="msg-box msg-error">Address must be 255 characters or fewer.</div></c:if>
-        <c:if test="${param.msg == 'invalid_bio'}"><div class="msg-box msg-error">Bio must be 1000 characters or fewer.</div></c:if>
         <c:if test="${param.msg == 'update_failed'}"><div class="msg-box msg-error">Cannot update profile right now.</div></c:if>
 
         <div class="profile-card">
@@ -55,37 +50,6 @@
                     <div>
                         <label class="field-label">Full Name</label>
                         <input type="text" name="fullName" value="${profileUser.fullName}" maxlength="100" required class="text-input">
-                    </div>
-
-                    <div>
-                        <label class="field-label">Phone</label>
-                        <input type="text" name="phone" value="${profileUser.phone}" maxlength="20" class="text-input" placeholder="Enter your phone number">
-                    </div>
-
-                    <div>
-                        <label class="field-label">Date of Birth</label>
-                        <input type="date" name="dateOfBirth" value="${profileUser.dateOfBirth}" class="text-input">
-                    </div>
-
-                    <div>
-                        <label class="field-label">Gender</label>
-                        <select name="gender" class="text-input">
-                            <option value="">Select gender</option>
-                            <option value="Male" ${profileUser.gender == 'Male' ? 'selected' : ''}>Male</option>
-                            <option value="Female" ${profileUser.gender == 'Female' ? 'selected' : ''}>Female</option>
-                            <option value="Other" ${profileUser.gender == 'Other' ? 'selected' : ''}>Other</option>
-                            <option value="Prefer not to say" ${profileUser.gender == 'Prefer not to say' ? 'selected' : ''}>Prefer not to say</option>
-                        </select>
-                    </div>
-
-                    <div class="profile-field-span-2">
-                        <label class="field-label">Address</label>
-                        <input type="text" name="address" value="${profileUser.address}" maxlength="255" class="text-input" placeholder="Enter your address">
-                    </div>
-
-                    <div class="profile-field-span-2">
-                        <label class="field-label">Bio</label>
-                        <textarea name="bio" maxlength="1000" class="text-input textarea-input" placeholder="Tell us a little about yourself">${profileUser.bio}</textarea>
                     </div>
 
                     <div>

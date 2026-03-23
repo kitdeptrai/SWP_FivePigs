@@ -49,14 +49,14 @@ public class GameServlet extends HttpServlet {
             List<Software> genreResults = new ArrayList<>();
 
             try {
-                genres = sdao.getGenresByCategory(3);
+                genres = sdao.getGenresByCategory(1);
                 if (selectedGenre == null) {
                     for (String genre : genres) {
-                        List<Software> list = sdao.getSoftwareByCategoryAndGenre(3, genre);
+                        List<Software> list = sdao.getSoftwareByCategoryAndGenre(1, genre);
                         sections.put(genre, list);
                     }
                 } else {
-                    genreResults = sdao.getSoftwareByCategoryAndGenre(3, selectedGenre);
+                    genreResults = sdao.getSoftwareByCategoryAndGenre(1, selectedGenre);
                 }
             } catch (SQLException ignored) {
                 request.setAttribute("gameWarning", "Thieu bang genre/software_genre, dang hien thi danh sach game mac dinh.");

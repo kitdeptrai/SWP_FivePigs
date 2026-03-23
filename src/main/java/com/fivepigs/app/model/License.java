@@ -6,6 +6,8 @@ package com.fivepigs.app.model;
 
 import java.sql.Date;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 /**
  *
  * @author MinhPD
@@ -26,11 +28,16 @@ public class License {
     private String licenseKey;
     private Integer softwareId;
     private Integer customerId;
+    private Integer ownerId;
+    private Integer maxUsers;
+    private Integer assignedCount;
+    private String planName;
     private LocalDateTime purchaseDate;
     private LocalDateTime expireDate;
     private String status;
     private User user;
     private Software software;
+    private List<User> assignedUsers = new ArrayList<>();
 
     public License() {
     }
@@ -77,6 +84,38 @@ public class License {
         this.customerId = customerId;
     }
 
+    public Integer getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(Integer ownerId) {
+        this.ownerId = ownerId;
+    }
+
+    public Integer getMaxUsers() {
+        return maxUsers;
+    }
+
+    public void setMaxUsers(Integer maxUsers) {
+        this.maxUsers = maxUsers;
+    }
+
+    public Integer getAssignedCount() {
+        return assignedCount;
+    }
+
+    public void setAssignedCount(Integer assignedCount) {
+        this.assignedCount = assignedCount;
+    }
+
+    public String getPlanName() {
+        return planName;
+    }
+
+    public void setPlanName(String planName) {
+        this.planName = planName;
+    }
+
     public LocalDateTime getPurchaseDate() {
         return purchaseDate;
     }
@@ -115,6 +154,14 @@ public class License {
 
     public void setSoftware(Software software) {
         this.software = software;
+    }
+
+    public List<User> getAssignedUsers() {
+        return assignedUsers;
+    }
+
+    public void setAssignedUsers(List<User> assignedUsers) {
+        this.assignedUsers = assignedUsers;
     }
 
     

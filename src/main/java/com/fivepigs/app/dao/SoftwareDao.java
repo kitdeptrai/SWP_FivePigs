@@ -572,7 +572,11 @@ public class SoftwareDao {
                 SELECT s.software_id,
                        s.name,
                        s.short_description,
-                       s.price,
+                       COALESCE((SELECT MIN(sp.price)
+                                 FROM fivepigs.software_pricing sp
+                                 WHERE sp.software_id = s.software_id
+                                   AND sp.is_active = 1
+                                   AND UPPER(COALESCE(sp.plan_name, '')) <> 'DEMO'), 0) AS price,
                        s.is_free,
                        s.download_count,
                        s.avg_rating,
@@ -585,7 +589,6 @@ public class SoftwareDao {
                        sd.description,
                        sd.system_requirement,
                        sd.release_note,
-                       sd.language,
                        sv.version_id,
                        sv.version_name,
                        sv.file_url,
@@ -639,7 +642,6 @@ public class SoftwareDao {
                     swDetail.setDescription(rs.getString("description"));
                     swDetail.setSysRequirement(rs.getString("system_requirement"));
                     swDetail.setReleaseNote(rs.getString("release_note"));
-                    swDetail.setLanguage(rs.getString("language"));
                     sw.setSoftwareDetail(swDetail);
 
                     swVersion.setVersionId((Integer) rs.getObject("version_id"));
@@ -700,8 +702,14 @@ public class SoftwareDao {
 
     //Software of Customer (Create by TKiet)
 
-    private final String Get_All_Product = "SELECT * FROM fivepigs.software";
-    private final String GET_SOFTWARE_BY_ID = "SELECT * FROM fivepigs.software\n" +
+    private final String CUSTOMER_PRICE_SQL =
+            "COALESCE((SELECT MIN(sp.price) " +
+                    "FROM fivepigs.software_pricing sp " +
+                    "WHERE sp.software_id = s.software_id " +
+                    "  AND sp.is_active = 1 " +
+                    "  AND UPPER(COALESCE(sp.plan_name, '')) <> 'DEMO'), 0) AS price";
+    private final String Get_All_Product = "SELECT s.*, " + CUSTOMER_PRICE_SQL + " FROM fivepigs.software s";
+    private final String GET_SOFTWARE_BY_ID = "SELECT s.*, " + CUSTOMER_PRICE_SQL + " FROM fivepigs.software s\n" +
             "WHERE software_id = ?";
     private final String Get_SoftwareImage_By_Id = "SELECT * FROM fivepigs.software_image\n" +
             "WHERE software_id = ?";
@@ -734,7 +742,7 @@ public class SoftwareDao {
 
     public List<Software> getSoftwareByCategory(int categoryId) throws SQLException {
         List<Software> list = new ArrayList<>();
-        String sql = "SELECT * FROM fivepigs.software WHERE category_id = ?";
+        String sql = "SELECT s.*, " + CUSTOMER_PRICE_SQL + " FROM fivepigs.software s WHERE category_id = ?";
 
         try (Connection c = Db.getConnection();
              PreparedStatement st = c.prepareStatement(sql)) {
@@ -856,7 +864,7 @@ public class SoftwareDao {
 
     public List<Software> getSoftwareByCategoryWithIcon(String categoryId) throws SQLException {
         String sql =
-                "SELECT s.*, si.image_url AS icon_url " +
+                "SELECT s.*, " + CUSTOMER_PRICE_SQL + ", si.image_url AS icon_url " +
                         "FROM fivepigs.software s " +
                         "LEFT JOIN fivepigs.software_image si " +
                         "  ON s.software_id = si.software_id AND si.is_thumbnail = 1 " +
@@ -887,7 +895,7 @@ public class SoftwareDao {
 
     public List<Software> getTopDownloadWithIcon(int limit) throws SQLException {
         String sql =
-                "SELECT s.*, img.image_url AS icon_url " +
+                "SELECT s.*, " + CUSTOMER_PRICE_SQL + ", img.image_url AS icon_url " +
                         "FROM fivepigs.software s " +
                         "LEFT JOIN fivepigs.software_image img " +
                         "  ON s.software_id = img.software_id AND img.is_thumbnail = 1 " +
@@ -917,7 +925,7 @@ public class SoftwareDao {
 
     public List<Software> getBestSellingWithIcon(int limit) throws SQLException {
         String sql =
-                "SELECT s.*, img.image_url AS icon_url, COALESCE(sales.sold_count, 0) AS sold_count " +
+                "SELECT s.*, " + CUSTOMER_PRICE_SQL + ", img.image_url AS icon_url, COALESCE(sales.sold_count, 0) AS sold_count " +
                         "FROM fivepigs.software s " +
                         "LEFT JOIN fivepigs.software_image img " +
                         "  ON s.software_id = img.software_id AND img.is_thumbnail = 1 " +
@@ -955,15 +963,16 @@ public class SoftwareDao {
 
     public List<Software> GetDownloadDemo(int a, int b) throws SQLException {
         String sql =
-                "SELECT * FROM fivepigs.software\n" +
-                        "Where download_count between ? and ?";
+                "SELECT s.*, " + CUSTOMER_PRICE_SQL + "\n" +
+                        "FROM fivepigs.software s\n" +
+                        "WHERE s.download_count BETWEEN ? AND ?";
 
         List<Software> list = new ArrayList<>();
         try (Connection c = Db.getConnection();
              PreparedStatement st = c.prepareStatement(sql)) {
 
             st.setInt(1, a);
-            st.setInt(1, b);
+            st.setInt(2, b);
             try (ResultSet rs = st.executeQuery()) {
                 while (rs.next()) {
                     Software sw = new Software();
@@ -971,9 +980,8 @@ public class SoftwareDao {
                     sw.setName(rs.getString("name"));
                     sw.setIsFree(rs.getInt("is_free"));
                     sw.setPrice(rs.getDouble("price"));
-                    sw.setDownloadCount(rs.getInt("downloadCount"));
+                    sw.setDownloadCount(rs.getInt("download_count"));
                     sw.setAvgRating(rs.getDouble("avg_rating"));
-                    sw.setIconUrl(rs.getString("icon_url"));
                     list.add(sw);
                 }
             }
@@ -984,14 +992,17 @@ public class SoftwareDao {
 
     public List<Software> getLibraryByUserIdWithIcon(int userId) throws SQLException {
         String sql =
-                "SELECT s.*, img.image_url AS icon_url " +
+                "SELECT s.*, " + CUSTOMER_PRICE_SQL + ", img.image_url AS icon_url " +
                         "FROM fivepigs.software s " +
                         "JOIN ( " +
-                        "  SELECT l.software_id, MAX(l.purchase_date) AS last_purchase " +
-                        "  FROM fivepigs.license l " +
-                        "  WHERE l.customer_id = ? " +
-                        "    AND (l.status IS NULL OR UPPER(l.status) <> 'REVOKED') " +
-                        "  GROUP BY l.software_id " +
+                          "  SELECT l.software_id, MAX(l.purchase_date) AS last_purchase " +
+                          "  FROM fivepigs.license_user lu " +
+                          "  JOIN fivepigs.license l ON lu.license_id = l.license_id " +
+                         "  WHERE lu.user_id = ? " +
+                         "    AND (lu.status IS NULL OR UPPER(lu.status) = 'ACTIVE') " +
+                         "    AND (l.status IS NULL OR UPPER(l.status) <> 'REVOKED') " +
+                         "    AND (l.expire_date IS NULL OR l.expire_date >= NOW()) " +
+                         "  GROUP BY l.software_id " +
                         ") lib ON lib.software_id = s.software_id " +
                         "LEFT JOIN fivepigs.software_image img " +
                         "  ON s.software_id = img.software_id AND img.is_thumbnail = 1 " +
@@ -1022,7 +1033,7 @@ public class SoftwareDao {
         Map<String, List<Software>> sections = new LinkedHashMap<>();
 
         String sql =
-                "SELECT g.name AS genre_name, s.*, si.image_url AS icon_url " +
+                "SELECT g.name AS genre_name, s.*, " + CUSTOMER_PRICE_SQL + ", si.image_url AS icon_url " +
                         "FROM fivepigs.software s " +
                         "JOIN fivepigs.software_genre sg ON s.software_id = sg.software_id " +
                         "JOIN fivepigs.genre g ON sg.genre_id = g.genre_id " +
@@ -1091,7 +1102,7 @@ public class SoftwareDao {
         List<Software> list = new ArrayList<>();
 
         String sql =
-                "SELECT s.*, si.image_url AS icon_url " +
+                "SELECT s.*, " + CUSTOMER_PRICE_SQL + ", si.image_url AS icon_url " +
                         "FROM fivepigs.software s " +
                         "JOIN fivepigs.software_genre sg ON s.software_id = sg.software_id " +
                         "JOIN fivepigs.genre g ON sg.genre_id = g.genre_id " +
@@ -1138,6 +1149,84 @@ public class SoftwareDao {
         return null;
     }
 
+    public List<SoftwarePricing> getActivePricingBySoftwareId(int softwareId) throws SQLException {
+        String sql = "SELECT pricing_id, software_id, plan_name, max_users, price, duration_days, is_active, created_at " +
+                "FROM fivepigs.software_pricing " +
+                "WHERE software_id = ? AND is_active = 1 " +
+                "  AND UPPER(COALESCE(plan_name, '')) <> 'DEMO' " +
+                "ORDER BY price ASC, pricing_id ASC";
+
+        List<SoftwarePricing> list = new ArrayList<>();
+        try (Connection c = Db.getConnection();
+             PreparedStatement st = c.prepareStatement(sql)) {
+            st.setInt(1, softwareId);
+            try (ResultSet rs = st.executeQuery()) {
+                while (rs.next()) {
+                    SoftwarePricing pricing = new SoftwarePricing();
+                    Number pricingIdValue = (Number) rs.getObject("pricing_id");
+                    pricing.setPricingId(pricingIdValue == null ? null : pricingIdValue.intValue());
+                    Number softwareIdValue = (Number) rs.getObject("software_id");
+                    pricing.setSoftwareId(softwareIdValue == null ? null : softwareIdValue.intValue());
+                    pricing.setPlanName(rs.getString("plan_name"));
+                    Number maxUsersValue = (Number) rs.getObject("max_users");
+                    pricing.setMaxUsers(maxUsersValue == null ? null : maxUsersValue.intValue());
+                    pricing.setPrice(rs.getDouble("price"));
+                    Number durationDaysValue = (Number) rs.getObject("duration_days");
+                    pricing.setDurationDays(durationDaysValue == null ? null : durationDaysValue.intValue());
+                    Object isActiveValue = rs.getObject("is_active");
+                    if (isActiveValue instanceof Boolean booleanValue) {
+                        pricing.setIsActive(booleanValue ? 1 : 0);
+                    } else if (isActiveValue instanceof Number numberValue) {
+                        pricing.setIsActive(numberValue.intValue());
+                    } else {
+                        pricing.setIsActive(null);
+                    }
+                    pricing.setCreatedAt(rs.getObject("created_at", LocalDateTime.class));
+                    list.add(pricing);
+                }
+            }
+        }
+        return list;
+    }
+
+    public SoftwarePricing getDemoPricingBySoftwareId(int softwareId) throws SQLException {
+        String sql = "SELECT pricing_id, software_id, plan_name, max_users, price, duration_days, is_active, created_at " +
+                "FROM fivepigs.software_pricing " +
+                "WHERE software_id = ? AND is_active = 1 AND UPPER(COALESCE(plan_name, '')) = 'DEMO' " +
+                "ORDER BY pricing_id ASC LIMIT 1";
+
+        try (Connection c = Db.getConnection();
+             PreparedStatement st = c.prepareStatement(sql)) {
+            st.setInt(1, softwareId);
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    SoftwarePricing pricing = new SoftwarePricing();
+                    Number pricingIdValue = (Number) rs.getObject("pricing_id");
+                    pricing.setPricingId(pricingIdValue == null ? null : pricingIdValue.intValue());
+                    Number softwareIdValue = (Number) rs.getObject("software_id");
+                    pricing.setSoftwareId(softwareIdValue == null ? null : softwareIdValue.intValue());
+                    pricing.setPlanName(rs.getString("plan_name"));
+                    Number maxUsersValue = (Number) rs.getObject("max_users");
+                    pricing.setMaxUsers(maxUsersValue == null ? null : maxUsersValue.intValue());
+                    pricing.setPrice(rs.getDouble("price"));
+                    Number durationDaysValue = (Number) rs.getObject("duration_days");
+                    pricing.setDurationDays(durationDaysValue == null ? null : durationDaysValue.intValue());
+                    Object isActiveValue = rs.getObject("is_active");
+                    if (isActiveValue instanceof Boolean booleanValue) {
+                        pricing.setIsActive(booleanValue ? 1 : 0);
+                    } else if (isActiveValue instanceof Number numberValue) {
+                        pricing.setIsActive(numberValue.intValue());
+                    } else {
+                        pricing.setIsActive(null);
+                    }
+                    pricing.setCreatedAt(rs.getObject("created_at", LocalDateTime.class));
+                    return pricing;
+                }
+            }
+        }
+        return null;
+    }
+
     public String getActiveFileUrlBySoftwareId(int softwareId) throws SQLException {
         String sql = "SELECT file_url FROM fivepigs.software_version " +
                 "WHERE software_id = ? AND is_active = 1 " +
@@ -1172,7 +1261,7 @@ public class SoftwareDao {
     }
 
     public List<Software> searchSoftwareWithIcon(String keyword, Integer categoryId, String genreName, int limit) throws SQLException {
-        String sql = "SELECT DISTINCT s.*, img.image_url AS icon_url " +
+        String sql = "SELECT DISTINCT s.*, " + CUSTOMER_PRICE_SQL + ", img.image_url AS icon_url " +
                 "FROM fivepigs.software s " +
                 "LEFT JOIN fivepigs.software_image img " +
                 "  ON s.software_id = img.software_id AND img.is_thumbnail = 1 " +
