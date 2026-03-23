@@ -1,6 +1,7 @@
 package com.fivepigs.app.service;
 
 import com.fivepigs.app.dao.AdminDao;
+import com.fivepigs.app.dao.NotificationDao;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -43,6 +44,17 @@ public class AdminService {
         }
 
         adminDao.setUserStatus(userId, normalizedStatus);
+
+        // Broadcast to admins
+        NotificationDao notifDao = new NotificationDao();
+        notifDao.broadcastToAdmins(
+            "User Status Updated",
+            "User ID " + userId + " status was changed to " + normalizedStatus + ".",
+            "USER_UPDATE",
+            "MEDIUM",
+            "/admin/employees"
+        );
+
         return null;
     }
 
@@ -234,6 +246,16 @@ public class AdminService {
         }
 
         adminDao.updateUser(userId, fullName.trim(), normalizedPhone, normalizedStatus, roleTrimmed);
+
+        NotificationDao notifDao = new NotificationDao();
+        notifDao.broadcastToAdmins(
+            "User Profile Updated",
+            "User ID " + userId + " (" + fullName.trim() + ") profile/status was updated.",
+            "USER_UPDATE",
+            "LOW",
+            "/admin/employees"
+        );
+
         return null;
     }
 

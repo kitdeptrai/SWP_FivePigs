@@ -616,6 +616,7 @@ public class SoftwareDao {
                    """ + PRICE_SELECT + """
                    ,
                    s.is_free,
+                   s.status,
                    s.download_count,
                    s.avg_rating,
                    s.created_at,
@@ -664,6 +665,7 @@ public class SoftwareDao {
                     sw.setShortDescription(rs.getString("short_description"));
                     sw.setPrice(rs.getDouble("price"));
                     sw.setIsFree(rs.getInt("is_free"));
+                    sw.setStatus(rs.getString("status"));
                     sw.setDownloadCount(rs.getInt("download_count"));
                     sw.setAvgRating(rs.getDouble("avg_rating"));
                     sw.setCreatedAt(rs.getObject("created_at", LocalDateTime.class));

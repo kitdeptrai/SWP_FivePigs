@@ -56,11 +56,21 @@
                 font-size:18px
             }
             .badge{
-                background:#064e3b;
-                color:#22c55e;
                 padding:6px 12px;
                 border-radius:20px;
                 font-size:12px;
+            }
+            .badge-active {
+                background:#064e3b;
+                color:#22c55e;
+            }
+            .badge-rejected {
+                background:#7f1d1d;
+                color:#f87171;
+            }
+            .badge-pending {
+                background:#78350f;
+                color:#fbbf24;
             }
 
             /* Charts */
@@ -339,7 +349,17 @@
                             <div style="color:#22c55e">$${infoSoftware.price*85/100} (Your earning)</div>
                         </div>
                     </div>
-                    <div class="badge">Approved</div>
+                    <c:choose>
+                        <c:when test="${infoSoftware.status eq 'ACTIVE' || infoSoftware.status eq 'APPROVED'}">
+                            <div class="badge badge-active">Approved</div>
+                        </c:when>
+                        <c:when test="${infoSoftware.status eq 'REJECTED'}">
+                            <div class="badge badge-rejected">Rejected</div>
+                        </c:when>
+                        <c:otherwise>
+                            <div class="badge badge-pending">Pending</div>
+                        </c:otherwise>
+                    </c:choose>
                     <div class="product-actions">
                         <a href="/vendor/version_management?softwareId=${infoSoftware.softwareId}" class="btn-version">
                             <i class="fa-solid fa-code-branch"></i>

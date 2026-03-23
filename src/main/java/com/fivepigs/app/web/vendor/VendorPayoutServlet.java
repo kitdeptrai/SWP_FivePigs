@@ -9,6 +9,7 @@ import com.fivepigs.app.dao.VendorDao;
 import com.fivepigs.app.model.Software;
 import com.fivepigs.app.model.User;
 import com.fivepigs.app.model.VendorPayout;
+import com.fivepigs.app.dao.NotificationDao;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -64,6 +65,16 @@ public class VendorPayoutServlet extends HttpServlet {
             String paymentAccount = request.getParameter("paymentAccount");
             VendorDao vdao = new VendorDao();
             vdao.createPayoutRequest(user.getUserId(), amount, paymentMethod, paymentAccount);
+
+            // Gửi thông báo đến Admin
+            NotificationDao notifDao = new NotificationDao();
+            notifDao.broadcastToAdmins(
+                "New Payout Request",
+                user.getFullName() + " requested a payout of $" + amount,
+                "PAYOUT_REQUEST",
+                "HIGH",
+                "/admin/payouts"
+            );
 
             response.sendRedirect(request.getContextPath() + "/vendor/payout");
         } catch (Exception e) {

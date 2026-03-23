@@ -68,8 +68,10 @@ public class LoginServlet extends HttpServlet {
             }
 
             HttpSession session = req.getSession();
+            String roleName = userService.getRoleName(user.getRoleId());
+            user.setRoleName(roleName);
             session.setAttribute("user", user);
-            session.setAttribute("roleName", userService.getRoleName(user.getRoleId()));
+            session.setAttribute("roleName", roleName);
 
             if (redirect != null) {
                 resp.sendRedirect(req.getContextPath() + redirect);

@@ -56,56 +56,94 @@ VALUES
 
 
 INSERT INTO Software
-(name, short_description, vendor_id, category_id, price, is_free, status, download_count, avg_rating, created_at)
+(name, short_description, vendor_id, category_id, is_free, status, download_count, avg_rating, created_at)
 VALUES
 
--- ===== APPS (Vendor 1) =====
-('Facebook', 'Social networking platform', 4, 1, 0.00, 1, 'ACTIVE', 85, 4.3, NOW()),
-('Instagram', 'Photo and video sharing app', 4, 1, 0.00, 1, 'ACTIVE', 72, 4.4, NOW()),
-('TikTok', 'Short-form video entertainment', 4, 1, 0.00, 1, 'ACTIVE', 90, 4.5, NOW()),
-('YouTube', 'Video streaming platform', 4, 1, 0.00, 1, 'ACTIVE', 88, 4.6, NOW()),
-('Spotify', 'Music streaming service', 4, 1, 0.00, 1, 'ACTIVE', 64, 4.5, NOW()),
-('Netflix', 'Movie and TV streaming app', 4, 1, 9.99, 0, 'ACTIVE', 41, 4.4, NOW()),
-('Zalo', 'Vietnam messaging app', 4, 1, 0.00, 1, 'ACTIVE', 55, 4.2, NOW()),
-('Telegram', 'Secure messaging platform', 4, 1, 0.00, 1, 'ACTIVE', 60, 4.6, NOW()),
+-- ===== APPS =====
+('Facebook', 'Social networking platform', 4, 1, 1, 'ACTIVE', 85, 4.3, NOW()),
+('Instagram', 'Photo and video sharing app', 4, 1, 1, 'ACTIVE', 72, 4.4, NOW()),
+('TikTok', 'Short-form video entertainment', 4, 1, 1, 'ACTIVE', 90, 4.5, NOW()),
+('YouTube', 'Video streaming platform', 4, 1, 1, 'ACTIVE', 88, 4.6, NOW()),
+('Spotify', 'Music streaming service', 4, 1, 1, 'ACTIVE', 64, 4.5, NOW()),
+('Netflix', 'Movie and TV streaming app', 4, 1, 0, 'ACTIVE', 41, 4.4, NOW()),
+('Zalo', 'Vietnam messaging app', 4, 1, 1, 'ACTIVE', 55, 4.2, NOW()),
+('Telegram', 'Secure messaging platform', 4, 1, 1, 'ACTIVE', 60, 4.6, NOW()),
 
--- ===== APPS (Vendor 3) =====
-('Google Maps', 'Navigation and maps service', 6, 1, 0.00, 1, 'ACTIVE', 78, 4.7, NOW()),
-('WhatsApp', 'Global messaging app', 6, 1, 0.00, 1, 'ACTIVE', 69, 4.5, NOW()),
+('Google Maps', 'Navigation and maps service', 6, 1, 1, 'ACTIVE', 78, 4.7, NOW()),
+('WhatsApp', 'Global messaging app', 6, 1, 1, 'ACTIVE', 69, 4.5, NOW()),
 
--- ===== GAMES (Vendor 2) =====
-('Resident Evil Requiem', 'Horror survival action game', 5, 2, 59.99, 0, 'ACTIVE', 33, 4.8, NOW()),
-('Grand Theft Auto V', 'Open-world action adventure game', 5, 2, 39.99, 0, 'ACTIVE', 48, 4.9, NOW()),
-('Call of Duty Warzone', 'Battle royale shooter game', 5, 2, 0.00, 1, 'ACTIVE', 70, 4.6, NOW()),
-('League of Legends', 'Multiplayer online battle arena game', 5, 2, 0.00, 1, 'ACTIVE', 75, 4.7, NOW()),
-('Dota 2', 'Competitive MOBA strategy game', 5, 2, 0.00, 1, 'ACTIVE', 58, 4.6, NOW()),
-('Minecraft', 'Sandbox building adventure game', 5, 2, 26.95, 0, 'ACTIVE', 44, 4.8, NOW()),
-('Fortnite', 'Online battle royale game', 5, 2, 0.00, 1, 'ACTIVE', 67, 4.5, NOW()),
-('Valorant', 'Tactical FPS shooter game', 5, 2, 0.00, 1, 'ACTIVE', 62, 4.6, NOW()),
+-- ===== GAMES =====
+('Resident Evil Requiem', 'Horror survival action game', 5, 2, 0, 'ACTIVE', 33, 4.8, NOW()),
+('Grand Theft Auto V', 'Open-world action adventure game', 5, 2, 0, 'ACTIVE', 48, 4.9, NOW()),
+('Call of Duty Warzone', 'Battle royale shooter game', 5, 2, 1, 'ACTIVE', 70, 4.6, NOW()),
+('League of Legends', 'Multiplayer online battle arena game', 5, 2, 1, 'ACTIVE', 75, 4.7, NOW()),
+('Dota 2', 'Competitive MOBA strategy game', 5, 2, 1, 'ACTIVE', 58, 4.6, NOW()),
+('Minecraft', 'Sandbox building adventure game', 5, 2, 0, 'ACTIVE', 44, 4.8, NOW()),
+('Fortnite', 'Online battle royale game', 5, 2, 1, 'ACTIVE', 67, 4.5, NOW()),
+('Valorant', 'Tactical FPS shooter game', 5, 2, 1, 'ACTIVE', 62, 4.6, NOW()),
 
--- ===== GAMES (Vendor 3) =====
-('PUBG Battlegrounds', 'Realistic battle royale game', 6, 2, 0.00, 1, 'ACTIVE', 59, 4.4, NOW()),
-('Elden Ring', 'Dark fantasy action RPG game', 6, 2, 59.99, 0, 'ACTIVE', 37, 4.9, NOW());
--- Resident Evil Requiem
--- Resident Evil Requiem (ID = 11)
+('PUBG Battlegrounds', 'Realistic battle royale game', 6, 2, 1, 'ACTIVE', 59, 4.4, NOW()),
+('Elden Ring', 'Dark fantasy action RPG game', 6, 2, 0, 'ACTIVE', 37, 4.9, NOW()),
 
-INSERT INTO Software
-(name, short_description, vendor_id, category_id, price, is_free, status, download_count, avg_rating, created_at)
+-- ===== NEW =====
+('Discord','Gaming and community communication platform',4,1,1,'PENDING_REVIEW',0,0,NOW()),
+('Snapchat','Multimedia messaging app',4,1,1,'PENDING_REVIEW',0,0,NOW()),
+('Zoom','Online video conferencing and meeting platform',6,1,1,'PENDING_REVIEW',0,0,NOW()),
+('Adobe Photoshop','Professional image editing software',6,1,0,'PENDING_REVIEW',0,0,NOW()),
+('Notion','Productivity workspace for notes and collaboration',4,1,0,'PENDING_REVIEW',0,0,NOW()),
+
+('Slack','Team collaboration and messaging platform',6,1,0,'PENDING_APPROVAL',0,0,NOW()),
+('Twitch','Live streaming platform for gamers',4,1,1,'PENDING_APPROVAL',0,0,NOW()),
+('Genshin Impact','Open world anime action RPG',5,2,1,'PENDING_APPROVAL',0,0,NOW()),
+('Cyberpunk 2077','Futuristic open world RPG game',5,2,0,'PENDING_APPROVAL',0,0,NOW()),
+('Among Us','Online multiplayer social deduction game',5,2,0,'PENDING_APPROVAL',0,0,NOW());
+
+INSERT INTO Software_Pricing (software_id, plan_name, max_users, price)
 VALUES
-('Discord','Gaming and community communication platform',4,1,0.00,1,'PENDING_REVIEW',0,0,NOW()),
-('Snapchat','Multimedia messaging app with disappearing messages',4,1,0.00,1,'PENDING_REVIEW',0,0,NOW()),
-('Zoom','Online video conferencing and meeting platform',6,1,0.00,1,'PENDING_REVIEW',0,0,NOW()),
-('Adobe Photoshop','Professional image editing software',6,1,29.99,0,'PENDING_REVIEW',0,0,NOW()),
-('Notion','Productivity workspace for notes and collaboration',4,1,8.99,0,'PENDING_REVIEW',0,0,NOW());
 
-INSERT INTO Software
-(name, short_description, vendor_id, category_id, price, is_free, status, download_count, avg_rating, created_at)
-VALUES
-('Slack','Team collaboration and messaging platform',6,1,6.99,0,'PENDING_APPROVAL',0,0,NOW()),
-('Twitch','Live streaming platform for gamers',4,1,0.00,1,'PENDING_APPROVAL',0,0,NOW()),
-('Genshin Impact','Open world anime action RPG',5,2,0.00,1,'PENDING_APPROVAL',0,0,NOW()),
-('Cyberpunk 2077','Futuristic open world RPG game',5,2,59.99,0,'PENDING_APPROVAL',0,0,NOW()),
-('Among Us','Online multiplayer social deduction game',5,2,4.99,0,'PENDING_APPROVAL',0,0,NOW());
+-- ===== FREE SOFTWARE (chỉ BASIC) =====
+(1,'BASIC',1,0),(2,'BASIC',1,0),(3,'BASIC',1,0),(4,'BASIC',1,0),
+(5,'BASIC',1,0),(7,'BASIC',1,0),(8,'BASIC',1,0),(9,'BASIC',1,0),
+(10,'BASIC',1,0),(13,'BASIC',1,0),(14,'BASIC',1,0),(15,'BASIC',1,0),
+(17,'BASIC',1,0),(18,'BASIC',1,0),(19,'BASIC',1,0),
+(21,'BASIC',1,0),(22,'BASIC',1,0),(23,'BASIC',1,0),
+(27,'BASIC',1,0),(28,'BASIC',1,0),
+
+-- ===== PAID SOFTWARE =====
+
+-- Netflix
+(6,'BASIC',1,9.99),
+(6,'TEAM',4,19.99),
+
+-- Resident Evil
+(11,'BASIC',1,59.99),
+
+-- GTA V
+(12,'BASIC',1,39.99),
+
+-- Minecraft
+(16,'BASIC',1,26.95),
+
+-- Elden Ring
+(20,'BASIC',1,59.99),
+
+-- Photoshop
+(24,'BASIC',1,29.99),
+(24,'PRO',3,59.99),
+
+-- Notion
+(25,'BASIC',1,8.99),
+
+
+-- Slack
+(26,'BASIC',1,6.99),
+(26,'TEAM',5,15.99),
+
+-- Cyberpunk
+(29,'BASIC',1,59.99),
+
+-- Among Us
+(30,'BASIC',1,4.99);
 
 INSERT INTO Software_Detail 
 (software_id, description, system_requirement, release_note)
@@ -297,6 +335,87 @@ VALUES
 'Multiplayer functionality and matchmaking tested.'
 );
 
+INSERT INTO Software_Version
+(software_id, version_name, release_note, file_size, is_active)
+VALUES
+
+-- ===== ACTIVE APPS =====
+(1,'1.0.0','Initial release',15000000,0),
+(1,'1.1.0','Bug fixes and UI improvements',15200000,1),
+
+(2,'1.0.0','First release',14000000,0),
+(2,'1.2.0','Performance improvements',14500000,1),
+
+(3,'1.0.0','Initial TikTok release',18000000,0),
+(3,'1.1.0','Improved recommendation algorithm',18200000,0),
+(3,'1.3.0','Security patch',18500000,1),
+
+(4,'1.0.0','First YouTube release',20000000,0),
+(4,'1.2.0','UI redesign',20500000,1),
+
+(5,'1.0.0','Spotify initial version',17000000,0),
+(5,'1.1.0','Improved music search',17500000,1),
+
+(6,'1.0.0','Netflix first release',21000000,0),
+(6,'1.2.0','Improved streaming quality',21500000,1),
+
+(7,'1.0.0','Zalo initial version',16000000,1),
+
+(8,'1.0.0','Telegram first version',15500000,0),
+(8,'1.1.0','Security improvements',15800000,1),
+
+(9,'1.0.0','Google Maps launch',22000000,0),
+(9,'1.3.0','Navigation improvement',22500000,1),
+
+(10,'1.0.0','WhatsApp initial version',16500000,0),
+(10,'1.1.0','Voice call improvements',17000000,1),
+
+-- ===== ACTIVE GAMES =====
+(11,'1.0.0','Resident Evil launch version',45000000,0),
+(11,'1.1.0','Gameplay fixes',46000000,1),
+
+(12,'1.0.0','GTA V release',55000000,0),
+(12,'1.2.0','New online features',57000000,1),
+
+(13,'1.0.0','Warzone initial version',48000000,0),
+(13,'1.3.0','New map update',50000000,1),
+
+(14,'1.0.0','League of Legends first version',43000000,0),
+(14,'1.1.0','Champion balance patch',43500000,0),
+(14,'1.2.0','Client improvements',44000000,1),
+
+(15,'1.0.0','Dota 2 release version',42000000,0),
+(15,'1.1.0','Gameplay patch',42500000,1),
+
+(16,'1.0.0','Minecraft initial release',39000000,0),
+(16,'1.1.0','New blocks and mobs',40000000,1),
+
+(17,'1.0.0','Fortnite launch version',47000000,0),
+(17,'1.1.0','Battle pass system added',48000000,1),
+
+(18,'1.0.0','Valorant first version',46000000,0),
+(18,'1.2.0','Agent balance patch',47000000,1),
+
+(19,'1.0.0','PUBG first version',50000000,0),
+(19,'1.1.0','Weapon balance update',51000000,1),
+
+(20,'1.0.0','Elden Ring launch',52000000,0),
+(20,'1.1.0','Difficulty balance patch',53000000,1),
+
+-- ===== PENDING_REVIEW =====
+(21,'1.0.0','Initial submission',12000000,1),
+(22,'1.0.0','Initial submission',11000000,1),
+(23,'1.0.0','Initial submission',15000000,1),
+(24,'1.0.0','Initial submission',25000000,1),
+(25,'1.0.0','Initial submission',9000000,1),
+
+-- ===== PENDING_APPROVAL =====
+(26,'1.0.0','Initial submission',13000000,1),
+(27,'1.0.0','Initial submission',14000000,1),
+(28,'1.0.0','Initial submission',30000000,1),
+(29,'1.0.0','Initial submission',52000000,1),
+(30,'1.0.0','Initial submission',7000000,1);
+
 INSERT INTO Software_Review_Process (software_id, reviewer_id, test_result)
 VALUES
 (26,2,'Team collaboration features tested successfully'),
@@ -306,53 +425,6 @@ VALUES
 (30,2,'Multiplayer and matchmaking system tested');
 
 
-<<<<<<< HEAD
-INSERT INTO Software_Image (software_id,image_url,is_thumbnail) VALUES
-(11,'images/RE9_icon.jpg',1),
-(11,'images/RE9_detail1.jpg',0),
-(11,'images/RE9_detail2.jpg',0),
-(11,'images/RE9_detail3.jpg',0),
-(11,'images/RE9_detail4.jpg',0);
-
--- Warzone (ID = 13)
-INSERT INTO Software_Image (software_id,image_url,is_thumbnail) VALUES
-(13,'images/Warzone_icon.png',1),
-(13,'images/Warzone_detail1.jpg',0),
-(13,'images/Warzone_detail2.jpg',0),
-(13,'images/Warzone_detail3.jpg',0),
-(13,'images/Warzone_detail4.jpg',0);
-
--- PUBG (ID = 19)
-INSERT INTO Software_Image (software_id,image_url,is_thumbnail) VALUES
-(19,'images/pubg_icon.png',1),
-(19,'images/pubg_detail1.png',0),
-(19,'images/pubg_detail2.webp',0),
-(19,'images/pubg_detail3.jpg',0),
-(19,'images/pubg_detail4.jpg',0);
-
--- Minecraft (ID = 16)
-INSERT INTO Software_Image (software_id,image_url,is_thumbnail) VALUES
-(16,'images/minecraft.webp',1),
-(16,'images/Minecraft_info1.jpg',0),
-(16,'images/Minecraft_info2.jpg',0),
-(16,'images/minecraft_info3.png',0),
-(16,'images/minecraft_info4.jpg',0);
-
--- Facebook (ID = 1)
-INSERT INTO Software_Image (software_id,image_url,is_thumbnail) VALUES
-(1,'images/facebook_icon.png',1),
-(1,'images/facebook_detail1.png',0),
-(1,'images/facebook_detail2.webp',0),
-(1,'images/facebook_detail3.jpg',0);
-
--- Instagram (ID = 2)
-INSERT INTO Software_Image (software_id,image_url,is_thumbnail) VALUES
-(2,'images/instagram_icon.jpg',1),
-(2,'images/ins_detail1.webp',0),
-(2,'images/ins_detail2.webp',0),
-(2,'images/ins_detail3.webp',0),
-(2,'images/ins_detail4.webp',0);
-=======
 -- Resident Evil Requiem (ID = 11)
 INSERT INTO Software_Image (software_id,image_url,is_thumbnail) VALUES
 (11,'uploads/images/RE9_icon.jpg',1),
@@ -399,7 +471,6 @@ INSERT INTO Software_Image (software_id,image_url,is_thumbnail) VALUES
 (2,'uploads/images/ins_detail2.webp',0),
 (2,'uploads/images/ins_detail3.webp',0),
 (2,'uploads/images/ins_detail4.webp',0);
->>>>>>> 5e4f8c2db8a6fed33530c9b498cdff4c8b7c02b5
 
 INSERT INTO Software_Review_Process (software_id, reviewer_id, test_result)
 VALUES
@@ -529,38 +600,6 @@ INSERT INTO Payment_Status (status_name) VALUES
 ('Refunded');
 
 
-INSERT INTO Orders (customer_id,payment_status_id,total_amount) VALUES
-(7,2,59.99),
-(8,2,26.95),
-(9,2,39.99),
-(10,2,0.00),
-(11,2,0.00),
-(12,2,59.99),
-(13,2,0.00),
-(14,2,39.99),
-(15,2,0.00),
-(16,2,0.00);
-
-INSERT INTO Order_Detail (order_id,software_id,price) VALUES
-
--- PAID SOFTWARE
-(1,11,59.99),   -- Resident Evil
-(2,16,26.95),   -- Minecraft
-(3,12,39.99),   -- GTA V
-(6,20,59.99),   -- Elden Ring
-(8,12,39.99),   -- GTA V
-
--- FREE SOFTWARE
-(4,1,0.00),     -- Facebook
-(5,5,0.00),     -- Spotify
-(7,7,0.00),     -- Zalo
-(9,2,0.00),     -- Instagram
-(10,18,0.00),   -- Valorant
-(1,13,0.00),    -- Warzone
-(3,15,0.00),    -- Dota2
-(6,17,0.00),    -- Fortnite
-(8,19,0.00);    -- PUBG
-
 
 INSERT INTO Review (software_id, customer_id, rating, comment) VALUES
 
@@ -664,7 +703,54 @@ INSERT INTO Review (software_id, customer_id, rating, comment) VALUES
 (20,7,5,'Amazing world'),
 (20,8,5,'Perfect gameplay');
 
--- Seed 20 vendor payout requests
+INSERT INTO Vendor_Payout
+(vendor_id, amount, payment_method, payment_account, status, processed_at)
+VALUES
+(4, 79.17, 'BANK', '123456789 - Vietcombank', 'PAID', NOW()),
+(5, 359.94, 'MOMO', '0901234567', 'PAID', NOW()),
+(6, 103.98, 'BANK', '987654321 - Techcombank', 'PENDING', NULL);
+
+
+INSERT INTO License 
+(license_key, pricing_id, software_id, owner_id, purchase_date, expire_date, status)
+VALUES
+
+-- ===== Netflix (BASIC) =====
+('LIC-NF-001',21,6,7,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'ACTIVE'),
+('LIC-NF-002',21,6,8,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'ACTIVE'),
+
+-- ===== Netflix (TEAM) =====
+('LIC-NF-T01',22,6,9,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'ACTIVE'),
+
+-- ===== Resident Evil =====
+('LIC-RE-001',23,11,10,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'ACTIVE'),
+('LIC-RE-002',23,11,11,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'ACTIVE'),
+
+-- ===== GTA V =====
+('LIC-GTA-001',24,12,12,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'ACTIVE'),
+('LIC-GTA-002',24,12,13,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'ACTIVE'),
+
+-- ===== Minecraft =====
+('LIC-MC-001',25,16,14,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'ACTIVE'),
+
+-- ===== Elden Ring =====
+('LIC-ER-001',26,20,15,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'ACTIVE'),
+
+-- ===== Photoshop =====
+('LIC-PS-001',27,24,16,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'ACTIVE'),
+('LIC-PS-PRO01',28,24,7,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'ACTIVE'),
+
+-- ===== Slack =====
+('LIC-SLK-001',30,26,10,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'ACTIVE'),
+('LIC-SLK-T01',31,26,11,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'ACTIVE'),
+
+-- ===== Cyberpunk =====
+('LIC-CYB-001',32,29,12,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'ACTIVE'),
+
+-- ===== Among Us =====
+('LIC-AM-001',33,30,13,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'ACTIVE');
+
+
 INSERT INTO Vendor_Payout 
 (payout_id, vendor_id, amount, payment_method, payment_account, status, processed_at, created_at)
 VALUES
@@ -704,74 +790,131 @@ VALUES
 (2009,1009,1,'APPROVE','PENDING','PAID','Approved monthly payout request','2026-02-09 11:51:00'),
 (2010,1010,1,'APPROVE','PENDING','PAID','Approved monthly payout request','2026-02-10 15:36:00');
 
+INSERT INTO Report (software_id, reporter_id, reason, status, created_at)
+VALUES
+(1, 6, 'Phần mềm bị crash khi mở ở Windows 11. Sau khi bấm Launch thì ứng dụng tự tắt.', 'ERROR_REVIEW', NOW()),
+(2, 7, 'Không thể đăng nhập dù nhập đúng tài khoản. Hệ thống báo lỗi unknown error.', 'ERROR_REVIEW', NOW()),
+(3, 8, 'Sau khi cài đặt xong, phần mềm không hiển thị giao diện chính.', 'ERROR_REVIEW', NOW());
 
-INSERT INTO Orders (customer_id,payment_status_id,total_amount) VALUES
-(7,2,59.99),
-(8,2,39.99),
-(9,2,26.95),
-(10,2,59.99),
-(11,2,39.99),
-(12,2,26.95),
-(13,2,59.99),
-(14,2,39.99),
-(15,2,26.95),
-(16,2,59.99),
+INSERT INTO Report (
+    software_id,
+    reporter_id,
+    reviewer_id,
+    reason,
+    status,
+    bug_confirmed,
+    reproduce_steps,
+    reviewer_note,
+    created_at,
+    processed_at
+)
+VALUES
+(
+    1,
+    6,
+    4,
+    'Phần mềm bị crash khi import file PDF lớn hơn 20MB.',
+    'ERROR_APPROVAL',
+    1,
+    '1. Tai app ve may
+2. Dang nhap tai khoan reviewer
+3. Chon chuc nang import PDF
+4. Upload file lon hon 20MB
+5. App bi vang ra ngay sau khi xu ly',
+    'Đã kiểm tra và xác nhận lỗi đúng như customer report. Có thể tái hiện ổn định.',
+    NOW(),
+    NOW()
+),
+(
+    2,
+    7,
+    4,
+    'Customer báo lỗi không lưu được project sau khi chỉnh sửa.',
+    'ERROR_REJECTED',
+    0,
+    '1. Tai app
+2. Mo project co san
+3. Chinh sua noi dung
+4. Bam Save
+5. He thong luu binh thuong',
+    'Không tái hiện được lỗi. Chức năng hoạt động bình thường trong môi trường test.',
+    NOW(),
+    NOW()
+);
 
-(7,2,39.99),
-(8,2,59.99),
-(9,2,26.95),
-(10,2,39.99),
-(11,2,59.99),
-(12,2,26.95),
-(13,2,39.99),
-(14,2,59.99),
-(15,2,26.95),
-(16,2,39.99);
+INSERT INTO Notification 
+(user_id, title, content, type, priority, related_url)
+VALUES 
 
-INSERT INTO Order_Detail (order_id,software_id,price) VALUES
-(1,11,59.99),
-(2,12,39.99),
-(3,16,26.95),
-(4,20,59.99),
-(5,12,39.99),
-(6,16,26.95),
-(7,11,59.99),
-(8,12,39.99),
-(9,16,26.95),
-(10,20,59.99),
+-- ===== PENDING_APPROVAL =====
+(3,
+'Software Awaiting Approval - Discord',
+'Software "Discord" has passed review and is waiting for your approval.',
+'PENDING_APPROVAL',
+'MEDIUM',
+'/approval_pending_detail?softwareId=21'),
 
-(11,12,39.99),
-(12,11,59.99),
-(13,16,26.95),
-(14,12,39.99),
-(15,20,59.99),
-(16,16,26.95),
-(17,12,39.99),
-(18,11,59.99),
-(19,16,26.95),
-(20,12,39.99);
+(3,
+'Software Awaiting Approval - Slack',
+'Software "Slack" is ready for approval after successful review.',
+'PENDING_APPROVAL',
+'MEDIUM',
+'/approval_pending_detail?softwareId=26'),
 
+(3,
+'Software Awaiting Approval - Genshin Impact',
+'"Genshin Impact" has completed review and is pending your decision.',
+'PENDING_APPROVAL',
+'MEDIUM',
+'/approval_pending_detail?softwareId=28'),
 
-INSERT INTO License (license_key,software_id,owner_id,purchase_date,expire_date,status) VALUES
-('LIC-RE9-AX92KD',11,7,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'Active'),
-('LIC-GTA5-2KD82S',12,8,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'Active'),
-('LIC-MC-92KDLS',16,9,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'Active'),
-('LIC-ER-92KD83',20,10,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'Active'),
-('LIC-GTA5-29DKS9',12,11,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'Active'),
-('LIC-MC-93KDL2',16,12,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'Active'),
-('LIC-RE9-12KD',11,13,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'Active'),
-('LIC-GTA5-9DK2',12,14,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'Active'),
-('LIC-MC-29SKD',16,15,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'Active'),
-('LIC-ER-99SKD',20,16,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'Active'),
+(3,
+'Software Awaiting Approval - Cyberpunk 2077',
+'"Cyberpunk 2077" is now waiting for approval.',
+'PENDING_APPROVAL',
+'MEDIUM',
+'/approval_pending_detail?softwareId=29'),
 
-('LIC-GTA5-82KDL',12,7,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'Active'),
-('LIC-RE9-92KD2',11,8,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'Active'),
-('LIC-MC-72KDL',16,9,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'Active'),
-('LIC-GTA5-72SKD',12,10,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'Active'),
-('LIC-ER-38SKD',20,11,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'Active'),
-('LIC-MC-92KDJ',16,12,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'Active'),
-('LIC-GTA5-82JDK',12,13,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'Active'),
-('LIC-RE9-12KDL',11,14,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'Active'),
-('LIC-MC-44SDK',16,15,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'Active'),
-('LIC-GTA5-88SKD',12,16,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'Active');
+(3,
+'Software Awaiting Approval - Zoom',
+'"Zoom" has been reviewed and is ready for approval.',
+'PENDING_APPROVAL',
+'MEDIUM',
+'/approval_pending_detail?softwareId=23'),
+
+-- ===== REJECTED =====
+(3,
+'Software Rejected by Reviewer - Snapchat',
+'"Snapchat" has been rejected during review. Please check details.',
+'REJECTED',
+'HIGH',
+'/approval_pending_detail?softwareId=22'),
+
+(3,
+'Software Rejected by Reviewer - Notion',
+'"Notion" was rejected due to performance issues.',
+'REJECTED',
+'HIGH',
+'/approval_pending_detail?softwareId=25'),
+
+(3,
+'Software Rejected by Reviewer - Twitch',
+'"Twitch" failed security checks during review.',
+'REJECTED',
+'HIGH',
+'/approval_pending_detail?softwareId=27'),
+
+(3,
+'Software Rejected by Reviewer - Photoshop',
+'"Adobe Photoshop" was rejected due to licensing issues.',
+'REJECTED',
+'HIGH',
+'/approval_pending_detail?softwareId=24'),
+
+(3,
+'Software Rejected by Reviewer - Discord',
+'"Discord" was rejected due to unstable build.',
+'REJECTED',
+'HIGH',
+'/approval_pending_detail?softwareId=21');
 

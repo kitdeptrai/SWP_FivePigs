@@ -17,6 +17,7 @@ public class User {
     private String bio;
     private String status;
     private LocalDateTime createdAt;
+    private String roleName;
 
     public User() {
     }
@@ -148,5 +149,13 @@ public class User {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getRoleName() {
+        return roleName;
+    }
+
+    public void setRoleName(String roleName) {
+        this.roleName = roleName;
     }
 }

@@ -30,6 +30,23 @@ import java.util.Map;
 
 public class ApprovalDao {
 
+    /**
+     * Returns user_id of all users with the APPROVAL role.
+     * Adjust the WHERE clause to match your actual role column/value.
+     */
+    public List<Integer> getApprovalUserIds() throws SQLException {
+        List<Integer> ids = new ArrayList<>();
+        String sql = "SELECT user_id FROM Users WHERE role = 'APPROVAL' OR role = 'approval'";
+        try (Connection c = Db.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                ids.add(rs.getInt("user_id"));
+            }
+        }
+        return ids;
+    }
+
     /* SAVE APPROVAL DECISION */
     public void saveApproval(
             int softwareId,

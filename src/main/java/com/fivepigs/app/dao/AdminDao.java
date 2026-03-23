@@ -14,6 +14,21 @@ public class AdminDao {
 
     // ===== Dashboard =====
 
+    public List<Integer> getAdminUserIds() {
+        String sql = "SELECT u.user_id FROM users u JOIN role r ON u.role_id = r.role_id WHERE LOWER(r.role_name) IN ('admin')";
+        List<Integer> adminIds = new ArrayList<>();
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                adminIds.add(rs.getInt("user_id"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return adminIds;
+    }
+
     public double getTotalRevenue() {
         String sql = "SELECT " +
                 "COALESCE((SELECT COUNT(*) * 5.0 " +
@@ -785,6 +800,23 @@ public class AdminDao {
     }
 
     // ===== CRUD =====
+
+    public void createEmployee(String fullName, String email, String phone, String roleName, String password) throws SQLException {
+        Integer roleId = getRoleIdByName(normalizeRoleName(roleName));
+        if (roleId == null) roleId = getRoleIdByName(roleName);
+        if (roleId == null) throw new SQLException("Role not found: " + roleName);
+
+        String sql = "INSERT INTO users(full_name, email, phone, password, role_id, status) VALUES(?,?,?,?,?,'ACTIVE')";
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, fullName);
+            ps.setString(2, email);
+            ps.setString(3, phone == null || phone.isBlank() ? null : phone.trim());
+            ps.setString(4, password);
+            ps.setInt(5, roleId);
+            ps.executeUpdate();
+        }
+    }
 
     public UserRow findUserById(int userId) {
         String sql = "SELECT u.user_id, u.full_name, u.email, u.phone, u.status, u.created_at, r.role_name " +

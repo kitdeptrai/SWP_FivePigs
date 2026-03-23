@@ -47,6 +47,7 @@ public class Software {
     private ReviewerProcess reviewerProcess;
     private SoftwareVersion softwareVersion;
     private SoftwareDetail softwareDetail;
+    private String iconUrl;
 
     private Date reviewDate;
     private String recommendation;
@@ -125,6 +126,16 @@ public void setCategoryName(String categoryName) {
         
         
     }
+
+    public String getIconUrl() {
+        return iconUrl;
+    }
+
+    public void setIconUrl(String iconUrl) {
+        this.iconUrl = iconUrl;
+    }
+    
+    
 
     public SoftwareImage getSoftwareImage() {
     return softwareImage;
