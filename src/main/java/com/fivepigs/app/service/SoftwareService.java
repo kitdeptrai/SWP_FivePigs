@@ -29,6 +29,11 @@ public class SoftwareService {
         return dao.createSoftware(software);
     }
 
+    public void addSoftwareGenres(int softwareId, String[] genreIds) throws Exception {
+        SoftwareDao dao = new SoftwareDao();
+        dao.insertSoftwareGenres(softwareId, genreIds);
+    }
+
     public void addSoftwareVersion(
             int softwareId,
             String versionName,
@@ -98,13 +103,13 @@ public class SoftwareService {
     public String validateFiles(Part softwareFile, Part thumbnail) {
 
         if (softwareFile == null || softwareFile.getSize() == 0) {
-            return "Ban phai upload file software (.zip)";
+            return "Ban phai upload file software (.txt)";
         }
 
         String fileName = softwareFile.getSubmittedFileName();
 
-        if (!fileName.toLowerCase().endsWith(".zip")) {
-            return "Software phai la file .zip";
+        if (!fileName.toLowerCase().endsWith(".txt")) {
+            return "Software phai la file .txt";
         }
 
         if (thumbnail == null || thumbnail.getSize() == 0) {
@@ -118,5 +123,47 @@ public class SoftwareService {
         }
 
         return null;
+    }
+
+    public String validateFiles(Part softwareFile) {
+
+        if (softwareFile == null || softwareFile.getSize() == 0) {
+            return "Ban phai upload file software (.txt)";
+        }
+
+        String fileName = softwareFile.getSubmittedFileName();
+
+        if (!fileName.toLowerCase().endsWith(".txt")) {
+            return "Software phai la file .txt";
+        }
+
+        return null;
+    }
+
+    public void resubmitSoftware(
+            int softwareId,
+            String name,
+            String shortDescription,
+            int categoryId,
+            double price,
+            String description,
+            String systemRequire,
+            String releaseNote
+    ) throws Exception {
+
+        dao.updateSoftware(
+                softwareId,
+                name,
+                shortDescription,
+                categoryId,
+                price
+        );
+
+        dao.updateSoftwareDetail(
+                softwareId,
+                description,
+                systemRequire,
+                releaseNote
+        );
     }
 }

@@ -482,40 +482,6 @@ public class SoftwareDao {
         return null;
     }
 
-    public Map<Integer, Double> downloadByWeek(int vendorId) throws SQLException {
-        String sql = "SELECT \n"
-                + "    FLOOR(DATEDIFF(CURDATE(), l.purchase_date) / 7) AS week_index,\n"
-                + "    COUNT(*) AS downloads\n"
-                + "FROM License l\n"
-                + "JOIN Software s ON l.software_id = s.software_id\n"
-                + "WHERE s.vendor_id = ?\n"
-                + "  AND l.purchase_date >= DATE_SUB(CURDATE(), INTERVAL 28 DAY)\n"
-                + "GROUP BY week_index\n"
-                + "HAVING week_index BETWEEN 0 AND 3";
-        Map<Integer, Double> downloadMap = new LinkedHashMap<>();
-        for (int i = 0; i < 4; i++) {
-            downloadMap.put(i, 0.0);
-        }
-
-        try (Connection c = Db.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
-
-            ps.setInt(1, vendorId);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    int weekIndex = rs.getInt("week_index"); // 0..3
-                    double downloads = rs.getDouble("downloads");
-
-                    downloadMap.put(
-                            weekIndex,
-                            downloadMap.get(weekIndex) + downloads
-                    );
-                }
-            }
-        }
-        return downloadMap;
-    }
-
     public Double avgRatingByVendorId(int vendorId) throws SQLException {
         String sql = "SELECT s.vendor_id,ROUND(AVG(r.rating), 2) AS avg_rating FROM Software s\n"
                 + "JOIN Review r ON s.software_id = r.software_id\n"
@@ -632,13 +598,20 @@ public class SoftwareDao {
     }
 
     public Software getSoftwareDetailBySoftwareId(int softwareId) throws SQLException {
-        String sql = "SELECT s.name,sv.version_name AS version,c.category_name,s.created_at,s.price,sd.description,sd.system_requirement,si.image_url AS thumbnail\n"
-                + "                FROM Software s\n"
-                + "                LEFT JOIN Software_Version sv ON s.software_id = sv.software_id AND sv.is_active = 1\n"
-                + "                LEFT JOIN Software_Detail sd ON s.software_id = sd.software_id\n"
-                + "                LEFT JOIN Category c ON s.category_id = c.category_id\n"
-                + "                LEFT JOIN Software_Image si ON s.software_id = si.software_id AND si.is_thumbnail = 1\n"
-                + "                WHERE s.software_id = ?;";
+        String sql = "SELECT s.status, s.name, s.short_description, "
+                + "sv.release_note, sv.version_name AS version, "
+                + "c.category_name, s.created_at, "
+                + "sp.price, "
+                + "sd.description, sd.system_requirement, "
+                + "si.image_url AS thumbnail "
+                + "FROM Software s "
+                + "LEFT JOIN Software_Version sv ON s.software_id = sv.software_id AND sv.is_active = 1 "
+                + "LEFT JOIN Software_Detail sd ON s.software_id = sd.software_id "
+                + "LEFT JOIN Category c ON s.category_id = c.category_id "
+                + "LEFT JOIN Software_Image si ON s.software_id = si.software_id AND si.is_thumbnail = 1 "
+                + "LEFT JOIN Software_Pricing sp ON s.software_id = sp.software_id "
+                + "    AND sp.plan_name = 'BASIC' AND sp.is_active = 1 "
+                + "WHERE s.software_id = ?";
 
         try (Connection c = Db.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, softwareId);
@@ -650,9 +623,11 @@ public class SoftwareDao {
                     SoftwareImage simg = new SoftwareImage();
 
                     Category cat = new Category();
-
+                    sw.setStatus(rs.getString("status"));
+                    sw.setShortDescription(rs.getString("short_description"));
                     sw.setName(rs.getString("name"));
                     swVersion.setVersionName(rs.getString("version"));
+                    swVersion.setReleaseNote(rs.getString("release_note"));
                     cat.setCategoryName(rs.getString("category_name"));
                     sw.setCreatedAt(rs.getObject("created_at", LocalDateTime.class));
                     sw.setPrice(rs.getDouble("price"));
@@ -686,27 +661,63 @@ public class SoftwareDao {
     //Upload Software
     public int createSoftware(Software software) throws SQLException {
 
-        String sql = "INSERT INTO Software(name, short_description, vendor_id, category_id, price) "
+        String insertSoftware = "INSERT INTO Software(name, short_description, vendor_id, category_id, is_free) "
                 + "VALUES (?, ?, ?, ?, ?)";
 
-        try (Connection conn = Db.getConnection(); PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        String insertPricing = "INSERT INTO Software_Pricing(software_id, plan_name, max_users, price) "
+                + "VALUES (?, ?, ?, ?)";
 
-            ps.setString(1, software.getName());
-            ps.setString(2, software.getShortDescription());
-            ps.setInt(3, software.getVendorId());
-            ps.setInt(4, software.getCategoryId());
-            ps.setDouble(5, software.getPrice());
+        try (Connection conn = Db.getConnection()) {
 
-            ps.executeUpdate();
+            conn.setAutoCommit(false);
 
-            ResultSet rs = ps.getGeneratedKeys();
+            try (
+                    PreparedStatement psSoftware = conn.prepareStatement(insertSoftware, Statement.RETURN_GENERATED_KEYS); PreparedStatement psPricing = conn.prepareStatement(insertPricing)) {
 
-            if (rs.next()) {
-                return rs.getInt(1);
+                // ===== INSERT SOFTWARE =====
+                psSoftware.setString(1, software.getName());
+                psSoftware.setString(2, software.getShortDescription());
+                psSoftware.setInt(3, software.getVendorId());
+                psSoftware.setInt(4, software.getCategoryId());
+                psSoftware.setInt(5, software.getIsFree());
+
+                psSoftware.executeUpdate();
+
+                ResultSet rs = psSoftware.getGeneratedKeys();
+
+                if (!rs.next()) {
+                    conn.rollback();
+                    throw new RuntimeException("Cannot create software");
+                }
+
+                int softwareId = rs.getInt(1);
+
+                // ===== INSERT BASIC =====
+                psPricing.setInt(1, softwareId);
+                psPricing.setString(2, "BASIC");
+                psPricing.setInt(3, 1);
+                psPricing.setDouble(4, software.getPrice());
+                psPricing.executeUpdate();
+
+                // ===== INSERT DEMO (nếu có giá) =====
+                if (software.getPrice() > 0) {
+
+                    psPricing.setInt(1, softwareId);
+                    psPricing.setString(2, "DEMO");
+                    psPricing.setInt(3, 1);
+                    psPricing.setDouble(4, 0); // demo free
+                    psPricing.executeUpdate();
+                }
+
+                conn.commit();
+
+                return softwareId;
+
+            } catch (Exception e) {
+                conn.rollback();
+                throw e;
             }
         }
-
-        throw new RuntimeException("Cannot create software");
     }
 
     public void createSoftwareDetail(
@@ -752,36 +763,239 @@ public class SoftwareDao {
             long fileSize
     ) throws SQLException {
 
-        String sql = "INSERT INTO Software_Version(software_id, version_name, file_url, release_note, file_size) "
-                + "VALUES (?, ?, ?, ?, ?)";
+        String deactivateSql = """
+        UPDATE Software_Version
+        SET is_active = 0
+        WHERE software_id = ?
+    """;
 
-        try (Connection conn = Db.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        String insertSql = """
+        INSERT INTO Software_Version
+        (software_id, version_name, file_url, release_note, file_size)
+        VALUES (?, ?, ?, ?, ?)
+    """;
 
-            ps.setInt(1, softwareId);
-            ps.setString(2, versionName);
-            ps.setString(3, fileUrl);
-            ps.setString(4, releaseNote);
-            ps.setLong(5, fileSize);
+        try (Connection conn = Db.getConnection()) {
 
-            ps.executeUpdate();
+            conn.setAutoCommit(false); // start transaction
+
+            try (
+                    PreparedStatement ps1 = conn.prepareStatement(deactivateSql); PreparedStatement ps2 = conn.prepareStatement(insertSql);) {
+
+                // deactivate old versions
+                ps1.setInt(1, softwareId);
+                ps1.executeUpdate();
+
+                // insert new version
+                ps2.setInt(1, softwareId);
+                ps2.setString(2, versionName);
+                ps2.setString(3, fileUrl);
+                ps2.setString(4, releaseNote);
+                ps2.setLong(5, fileSize);
+
+                ps2.executeUpdate();
+
+                conn.commit(); // success
+
+            } catch (Exception e) {
+
+                conn.rollback(); // nếu insert lỗi thì rollback
+                throw e;
+
+            }
         }
     }
 
-    public void changeStatusSoftware(int vendorId, int softwareId,String status) throws SQLException {
+    public void changeStatusSoftware(int softwareId, String status) throws SQLException {
 
         String sql = "UPDATE Software\n"
                 + "SET status = ?\n"
-                + "WHERE software_id = ?\n"
-                + "AND vendor_id = ?;";
+                + "WHERE software_id = ?\n";
 
         try (Connection conn = Db.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setInt(3, vendorId);
             ps.setInt(2, softwareId);
             ps.setString(1, status);
 
             ps.executeUpdate();
         }
     }
-    
+
+    public List<Software> getSoftwareVersionBySoftwareId(int softwareId) throws SQLException {
+        List<Software> list = new ArrayList<>();
+        String sql = "SELECT s.name,sv.version_id,sv.version_name,sv.release_note,sv.file_size,sv.created_at,sv.is_active\n"
+                + "FROM software s\n"
+                + "JOIN software_version sv ON s.software_id=sv.software_id\n"
+                + "WHERE s.software_id=?";
+        try (Connection c = Db.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, softwareId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Software sw = new Software();
+                    SoftwareVersion swVersion = new SoftwareVersion();
+                    sw.setName(rs.getString("name"));
+                    swVersion.setReleaseNote(rs.getString("release_note"));
+                    swVersion.setFileSize(rs.getInt("file_size"));
+                    swVersion.setVersionId(rs.getInt("version_id"));
+                    swVersion.setVersionName(rs.getString("version_name"));
+                    swVersion.setIsActive(rs.getInt("is_active"));
+                    swVersion.setCreatedAt(rs.getObject("created_at", LocalDateTime.class));
+                    sw.setSoftwareVersion(swVersion);
+                    list.add(sw);
+                }
+            }
+        }
+        return list;
+    }
+
+    public List<Software> getTopDownloads(int vendorId) throws SQLException {
+
+        List<Software> list = new ArrayList<>();
+
+        String sql = """
+        SELECT name, download_count
+        FROM Software
+        WHERE vendor_id = ?
+        ORDER BY download_count DESC
+        LIMIT 5
+    """;
+
+        try (Connection conn = Db.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, vendorId);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                Software sw = new Software();
+
+                sw.setName(rs.getString("name"));
+                sw.setDownloadCount(rs.getInt("download_count"));
+
+                list.add(sw);
+            }
+        }
+
+        return list;
+    }
+
+    public void updateSoftware(int id, String name,
+            String shortDesc, int categoryId, double price) throws SQLException {
+
+        String sql = """
+        UPDATE Software
+        SET name=?, short_description=?, category_id=?, price=?, status='PENDING_REVIEW'
+        WHERE software_id=?
+    """;
+
+        try (Connection conn = Db.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, name);
+            ps.setString(2, shortDesc);
+            ps.setInt(3, categoryId);
+            ps.setDouble(4, price);
+            ps.setInt(5, id);
+
+            ps.executeUpdate();
+        }
+    }
+
+    public void updateSoftwareDetail(int id,
+            String description,
+            String systemRequire,
+            String releaseNote) throws SQLException {
+
+        String sql = """
+        UPDATE Software_Detail
+        SET description=?, system_requirement=?, release_note=?
+        WHERE software_id=?
+    """;
+
+        try (Connection conn = Db.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, description);
+            ps.setString(2, systemRequire);
+            ps.setString(3, releaseNote);
+            ps.setInt(4, id);
+
+            ps.executeUpdate();
+        }
+    }
+
+    public void updateThumbnail(int softwareId, String imageUrl) throws SQLException {
+
+        String removeOld = """
+        UPDATE Software_Image
+        SET is_thumbnail=0
+        WHERE software_id=?
+    """;
+
+        String insertNew = """
+        INSERT INTO Software_Image(software_id,image_url,is_thumbnail)
+        VALUES(?,?,1)
+    """;
+
+        try (Connection conn = Db.getConnection()) {
+
+            conn.setAutoCommit(false);
+
+            try (
+                    PreparedStatement ps1 = conn.prepareStatement(removeOld); PreparedStatement ps2 = conn.prepareStatement(insertNew)) {
+
+                ps1.setInt(1, softwareId);
+                ps1.executeUpdate();
+
+                ps2.setInt(1, softwareId);
+                ps2.setString(2, imageUrl);
+                ps2.executeUpdate();
+
+                conn.commit();
+
+            } catch (Exception e) {
+
+                conn.rollback();
+                throw e;
+            }
+        }
+    }
+
+    public void activateVersion(int softwareId, int versionId) throws SQLException {
+        String reset = "UPDATE Software_Version SET is_active = 0 WHERE software_id = ?";
+        String set = "UPDATE Software_Version SET is_active = 1 WHERE version_id = ?";
+
+        try (Connection c = Db.getConnection()) {
+            c.setAutoCommit(false);
+
+            try (
+                    PreparedStatement ps1 = c.prepareStatement(reset); PreparedStatement ps2 = c.prepareStatement(set)) {
+                ps1.setInt(1, softwareId);
+                ps1.executeUpdate();
+
+                ps2.setInt(1, versionId);
+                ps2.executeUpdate();
+
+                c.commit();
+            } catch (Exception e) {
+                c.rollback();
+                throw e;
+            }
+        }
+    }
+
+    public void insertSoftwareGenres(int softwareId, String[] genreIds) throws SQLException {
+
+        String sql = "INSERT INTO Software_Genre(software_id, genre_id) VALUES (?, ?)";
+
+        try (Connection c = Db.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
+
+            for (String gid : genreIds) {
+                ps.setInt(1, softwareId);
+                ps.setInt(2, Integer.parseInt(gid));
+                ps.addBatch();
+            }
+
+            ps.executeBatch();
+        }
+    }
 }

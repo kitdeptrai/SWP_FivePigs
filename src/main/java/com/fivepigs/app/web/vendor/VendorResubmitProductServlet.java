@@ -4,10 +4,7 @@
  */
 package com.fivepigs.app.web.vendor;
 
-import com.fivepigs.app.config.Db;
-import com.fivepigs.app.dao.GenreDao;
 import com.fivepigs.app.dao.SoftwareDao;
-import com.fivepigs.app.model.Genre;
 import com.fivepigs.app.model.Software;
 import com.fivepigs.app.model.User;
 import com.fivepigs.app.service.SoftwareService;
@@ -22,46 +19,44 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part;
 import java.io.File;
-import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 /**
  *
  * @author MinhPD
  */
-@WebServlet(name = "UploadProductServlet", urlPatterns = {"/vendor/upload_product"})
+@WebServlet(name = "VendorResubmitProductServlet", urlPatterns = {"/vendor/resubmit_product"})
 @MultipartConfig(
         fileSizeThreshold = 1024 * 1024 * 2,
         maxFileSize = 1024 * 1024 * 200,
         maxRequestSize = 1024 * 1024 * 500
 )
-public class VendorUploadProductServlet extends HttpServlet {
+public class VendorResubmitProductServlet extends HttpServlet {
 
     private SoftwareService softwareService = new SoftwareService();
+    private SoftwareDao softwareDao = new SoftwareDao();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        try{
-        GenreDao gdao = new GenreDao();
-        List<Genre> listGenre = gdao.getAllGenre();
+        try {
+            Integer softwareId = Integer.parseInt(request.getParameter("softwareId"));
+            SoftwareDao swdao = new SoftwareDao();
+            Software software = swdao.getSoftwareDetailBySoftwareId(softwareId);
+            request.setAttribute("softwareId", softwareId);
 
-        request.setAttribute("listGenre", listGenre);
+            request.setAttribute("software", software);
 
-        request.getRequestDispatcher("/WEB-INF/views/vendor/upload_product.jsp").forward(request, response);
-        }catch(SQLException e){
-            
+            request.getRequestDispatcher("/WEB-INF/views/vendor/resubmit_product.jsp").forward(request, response);
+        } catch (SQLException e) {
+
         }
     }
 
     @Override
-    protected void doPost(HttpServletRequest request,
-            HttpServletResponse response)
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
         try {
 
             User user = getLoggedInUser(request, response);
@@ -69,7 +64,8 @@ public class VendorUploadProductServlet extends HttpServlet {
                 return;
             }
 
-            // ===== GET PARAMETERS =====
+            int softwareId = Integer.parseInt(request.getParameter("softwareId"));
+
             String name = request.getParameter("productName");
             String version = request.getParameter("version");
             String shortDesc = request.getParameter("shortDescription");
@@ -78,7 +74,7 @@ public class VendorUploadProductServlet extends HttpServlet {
             String systemRequire = request.getParameter("systemRequire");
             String categoryParam = request.getParameter("category");
             String priceParam = request.getParameter("price");
-            String[] genreIds = request.getParameterValues("genres");
+
             // ===== VALIDATE =====
             String validationError = softwareService.validateUpload(
                     name, description, priceParam, categoryParam
@@ -89,49 +85,47 @@ public class VendorUploadProductServlet extends HttpServlet {
                 return;
             }
 
+            int categoryId = Integer.parseInt(categoryParam);
+            double price = Double.parseDouble(priceParam);
+            
             Part softwareFile = request.getPart("softwareFile");
             Part thumbnail = request.getPart("thumbnail");
-
             String fileError = softwareService.validateFiles(softwareFile, thumbnail);
 
             if (fileError != null) {
                 showError(request, response, fileError, 3);
                 return;
             }
+            // ===== UPDATE SOFTWARE =====
+            softwareDao.updateSoftware(
+                    softwareId,
+                    name,
+                    shortDesc,
+                    categoryId,
+                    price
+            );
 
-            int categoryId = Integer.parseInt(categoryParam);
-            double price = Double.parseDouble(priceParam);
-            int isFree = (price == 0) ? 1 : 0;
-            // ===== INSERT SOFTWARE =====
-            Software software = new Software();
-            software.setName(name);
-            software.setShortDescription(shortDesc);
-            software.setVendorId(user.getUserId());
-            software.setCategoryId(categoryId);
-            software.setPrice(price);
-            software.setIsFree(isFree);
-            int softwareId = softwareService.createSoftware(software);
-            if (genreIds != null && genreIds.length > 0) {
-                softwareService.addSoftwareGenres(softwareId, genreIds);
-            }
-            // ===== INSERT SOFTWARE DETAIL =====
-            softwareService.createSoftwareDetail(
+            // ===== UPDATE DETAIL =====
+            softwareDao.updateSoftwareDetail(
                     softwareId,
                     description,
                     systemRequire,
                     releaseNote
             );
 
-            // ===== UPLOAD THUMBNAIL =====
-            String thumbnailPath = saveFile(request, thumbnail, "images/" + softwareId);
+            // ===== FILES =====
+            // ===== NEW THUMBNAIL =====
+            if (thumbnail != null && thumbnail.getSize() > 0) {
 
-            softwareService.addSoftwareImage(
-                    softwareId,
-                    thumbnailPath,
-                    true
-            );
+                String thumbnailPath = saveFile(request, thumbnail, "images/" + softwareId);
 
-            // ===== UPLOAD GALLERY IMAGES =====
+                softwareDao.updateThumbnail(
+                        softwareId,
+                        thumbnailPath
+                );
+            }
+
+            // ===== NEW GALLERY =====
             Collection<Part> parts = request.getParts();
 
             for (Part part : parts) {
@@ -148,25 +142,29 @@ public class VendorUploadProductServlet extends HttpServlet {
                 }
             }
 
-            // ===== UPLOAD SOFTWARE FILE =====
-            String softwarePath = saveFile(request, softwareFile, "software/" + softwareId);
+            // ===== NEW VERSION =====
+            if (softwareFile != null && softwareFile.getSize() > 0) {
 
-            softwareService.addSoftwareVersion(
-                    softwareId,
-                    version,
-                    softwarePath,
-                    releaseNote,
-                    softwareFile.getSize()
+                String softwarePath = saveFile(request, softwareFile, "software/" + softwareId);
+
+                softwareService.addSoftwareVersion(
+                        softwareId,
+                        version,
+                        softwarePath,
+                        releaseNote,
+                        softwareFile.getSize()
+                );
+            }
+
+            response.sendRedirect(
+                    request.getContextPath()
+                    + "/vendor/product_detail?softwareId=" + softwareId
             );
-
-            response.sendRedirect(request.getContextPath() + "/vendor/my_products");
 
         } catch (Exception e) {
 
             e.printStackTrace();
-
-            response.setContentType("text/plain");
-            e.printStackTrace(response.getWriter());
+            response.getWriter().println(e.getMessage());
         }
     }
 
@@ -191,7 +189,7 @@ public class VendorUploadProductServlet extends HttpServlet {
         request.setAttribute("error", message);
         request.setAttribute("errorStep", step);
 
-        request.getRequestDispatcher("/WEB-INF/views/vendor/upload_product.jsp")
+        request.getRequestDispatcher("/WEB-INF/views/vendor/resubmit_product.jsp")
                 .forward(request, response);
     }
 
@@ -208,9 +206,9 @@ public class VendorUploadProductServlet extends HttpServlet {
             dir.mkdirs();
         }
 
-        String originalName = filePart.getSubmittedFileName();
-
-        String fileName = System.currentTimeMillis() + "_" + originalName;
+        String fileName = System.currentTimeMillis()
+                + "_"
+                + filePart.getSubmittedFileName();
 
         String fullPath = uploadDir + File.separator + fileName;
 
@@ -218,10 +216,4 @@ public class VendorUploadProductServlet extends HttpServlet {
 
         return "uploads/" + folder + "/" + fileName;
     }
-
-    @Override
-    public String getServletInfo() {
-        return "Short description";
-    }
-
 }

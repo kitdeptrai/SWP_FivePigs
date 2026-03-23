@@ -1,4 +1,5 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 <%-- 
     Document   : product_detail
     Created on : Feb 16, 2026, 10:19:45 PM
@@ -317,6 +318,7 @@
             .btn-version:hover{
                 background:#4f46e5;
             }
+
         </style>
     </head>
 
@@ -335,16 +337,22 @@
                         <div class="product-meta">v${infoSoftware.softwareVersion.versionName} ? ${infoSoftware.category.categoryName} 
                             ?${createdDateFormatted}</div>
                         <div class="product-price">
-                            <div>$${infoSoftware.price}</div>
-                            <div style="color:#22c55e">$${infoSoftware.price*85/100} (Your earning)</div>
+                            <div style="color:#22c55e">$${infoSoftware.price}</div>
                         </div>
                     </div>
-                    <div class="badge">Approved</div>
-                    <div class="product-actions">
-                        <a href="/vendor/version_management?softwareId=${infoSoftware.softwareId}" class="btn-version">
+                    <div class="status ${fn:toLowerCase(infoSoftware.status)}">${infoSoftware.status}</div>
+                    <div class="product-actions" style="display:flex; gap:10px;">
+
+                        <a href="/vendor/version_management?softwareId=${softwareId}" class="btn-version">
                             <i class="fa-solid fa-code-branch"></i>
-                            Version Management
+                            Version
                         </a>
+
+                        <a href="/vendor/plan_management?softwareId=${softwareId}" class="btn-version">
+                            <i class="fa-solid fa-layer-group"></i>
+                            Plans
+                        </a>
+
                     </div>
                 </div>
 
@@ -422,10 +430,21 @@
                                     <p>${infoSoftware.category.categoryName}</p>
                                 </div>
 
+
                                 <div class="info-item">
                                     <span>Created At</span>
                                     <p>${infoSoftware.createdAt.toLocalDate()}</p>
                                 </div>
+                                <div class="info-item" style="grid-column: span 2;">
+                                    <span>Genres</span>
+
+                                    <div class="genre-list">
+                                        <c:forEach var="g" items="${listGenre}">
+                                            <p>${g.name}<p>
+                                            </c:forEach>
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
 
