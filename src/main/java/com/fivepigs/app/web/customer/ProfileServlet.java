@@ -123,11 +123,7 @@ public class ProfileServlet extends HttpServlet {
                 avatarPath = saved;
             }
 
-            boolean updated = userDao.updateProfile(latest.getUserId(), fullName, phone, avatarPath, dateOfBirth, gender, address, bio);
-            if (!updated) {
-                response.sendRedirect(request.getContextPath() + "/profile?msg=update_failed");
-                return;
-            }
+           
 
             User refreshed = userDao.findByEmail(sessionUser.getEmail());
             if (refreshed != null) {

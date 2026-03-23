@@ -1,12 +1,8 @@
-
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
-
 package com.fivepigs.app.web.reviewer;
 
+import com.fivepigs.app.dao.CategoryDao;
 import com.fivepigs.app.dao.SoftwareDao;
+import com.fivepigs.app.model.Category;
 import com.fivepigs.app.model.Software;
 import com.fivepigs.app.model.User;
 
@@ -20,42 +16,70 @@ import java.util.List;
 
 @WebServlet(name = "PendingReviewServlet", urlPatterns = {"/reviewer_pending"})
 public class PendingReviewServlet extends HttpServlet {
-@Override
-protected void doGet(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException {
 
-    User user = (User) request.getSession().getAttribute("user");
-    if (user == null) {
-        response.sendRedirect(request.getContextPath() + "/login");
-        return;
-    }
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
 
-    try {
-        String keyword = request.getParameter("keyword");
-
-        SoftwareDao dao = new SoftwareDao();
-        List<Software> list;
-
-        if (keyword != null && !keyword.trim().isEmpty()) {
-            list = dao.searchPendingSoftware(keyword);
-        } else {
-            list = dao.getPendingSoftware();
+        User user = (User) request.getSession().getAttribute("user");
+        if (user == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
         }
 
-        request.setAttribute("pendingList", list);
-        request.setAttribute("user", user);
+        try {
+            int reviewerId = user.getUserId();
 
-        request.getRequestDispatcher("/WEB-INF/views/reviewer/reviewer_pending.jsp").forward(request, response);
+            String keyword = request.getParameter("keyword");
+            String categoryIdRaw = request.getParameter("categoryId");
+            String priceType = request.getParameter("priceType");
 
-    } catch (SQLException e) {
-        e.printStackTrace();
-        response.sendError(500);
+            if (keyword == null) {
+                keyword = "";
+            } else {
+                keyword = keyword.trim();
+            }
+
+            Integer categoryId = null;
+            if (categoryIdRaw != null && !categoryIdRaw.trim().isEmpty()) {
+                try {
+                    categoryId = Integer.parseInt(categoryIdRaw);
+                } catch (NumberFormatException e) {
+                    categoryId = null;
+                }
+            }
+
+            if (priceType == null || priceType.trim().isEmpty()) {
+                priceType = "all";
+            }
+
+            SoftwareDao softwareDao = new SoftwareDao();
+            CategoryDao categoryDao = new CategoryDao();
+
+            List<Software> list = softwareDao.filterMyAssignedPendingReviews(
+                    reviewerId, keyword, categoryId, priceType
+            );
+
+            List<Category> categories = categoryDao.GETALLCATEGORY();
+
+            request.setAttribute("pendingList", list);
+            request.setAttribute("categories", categories);
+            request.setAttribute("selectedKeyword", keyword);
+            request.setAttribute("selectedCategoryId", categoryId);
+            request.setAttribute("selectedPriceType", priceType);
+            request.setAttribute("user", user);
+
+            request.getRequestDispatcher("/WEB-INF/views/reviewer/reviewer_pending.jsp")
+                    .forward(request, response);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            response.sendError(500);
+        }
     }
-}
-  
+
     @Override
     public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
-
+        return "Pending review page with filters";
+    }
 }

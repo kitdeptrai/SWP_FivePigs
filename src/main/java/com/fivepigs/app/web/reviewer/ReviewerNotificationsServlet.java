@@ -27,26 +27,40 @@ public class ReviewerNotificationsServlet extends HttpServlet {
 
         int userId = user.getUserId();
 
+        String read = request.getParameter("read");
+        String type = request.getParameter("type");
+        String keyword = request.getParameter("keyword");
+
+        if (read == null || read.isBlank()) read = "all";
+        if (type == null || type.isBlank()) type = "all";
+        if (keyword == null) keyword = "";
+
         NotificationDao dao = new NotificationDao();
-        List<Notification> list = dao.getByUser(userId);
 
-        int total = list.size();
-        int unread = 0;
-        int high = 0;
+        List<Notification> list = dao.filterByUser(userId, read, type, keyword);
 
-        for (Notification n : list) {
-            if (!n.isRead()) unread++;
+        int total = dao.countByUser(userId);
+        int unread = dao.countUnreadByUser(userId);
+        int high = dao.countHighPriorityByUser(userId);
 
-            String p = n.getPriority();
-            if (p != null && (p.equalsIgnoreCase("High") || p.equalsIgnoreCase("Critical"))) {
-                high++;
-            }
-        }
+        int countSubmitted = dao.countByType(userId, "SUBMITTED");
+        int countApproved = dao.countByType(userId, "APPROVED");
+        int countRejected = dao.countByType(userId, "REJECTED");
+        int countPendingApproval = dao.countByType(userId, "PENDING_APPROVAL");
 
         request.setAttribute("notifications", list);
         request.setAttribute("totalCount", total);
         request.setAttribute("unreadCount", unread);
         request.setAttribute("highCount", high);
+
+        request.setAttribute("countSubmitted", countSubmitted);
+        request.setAttribute("countApproved", countApproved);
+        request.setAttribute("countRejected", countRejected);
+        request.setAttribute("countPendingApproval", countPendingApproval);
+
+        request.setAttribute("selectedRead", read);
+        request.setAttribute("selectedType", type);
+        request.setAttribute("keyword", keyword);
 
         request.getRequestDispatcher("/WEB-INF/views/reviewer/reviewer_notifications.jsp")
                 .forward(request, response);

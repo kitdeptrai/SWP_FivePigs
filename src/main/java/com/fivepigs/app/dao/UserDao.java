@@ -49,9 +49,8 @@ public class UserDao {
     }
 
     public User findByEmail(String email) throws SQLException {
-        String sql = "SELECT u.user_id, u.full_name, u.email, u.password, u.role_id, u.status, u.created_at, r.role_name " +
+        String sql = "SELECT u.user_id, u.full_name, u.email, u.password, u.role_id, u.avatar, u.status, u.created_at " +
                      "FROM Users u " +
-                     "INNER JOIN Role r ON u.role_id = r.role_id " +
                      "WHERE u.email = ?";
         try (Connection c = Db.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
@@ -64,6 +63,7 @@ public class UserDao {
                     user.setEmail(rs.getString("email"));
                     user.setPassword(rs.getString("password"));
                     user.setRoleId(rs.getInt("role_id"));
+                    user.setAvatar(rs.getString("avatar"));
                     user.setStatus(rs.getString("status"));
                     if (rs.getTimestamp("created_at") != null) {
                         user.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
@@ -104,6 +104,40 @@ public class UserDao {
         try (Connection c = Db.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, roleId);
+            ps.setInt(2, userId);
+            ps.executeUpdate();
+        }
+    }
+
+    public boolean emailExistsExceptUserId(String email, int userId) throws SQLException {
+        String sql = "SELECT 1 FROM Users WHERE email = ? AND user_id <> ?";
+        try (Connection c = Db.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, email);
+            ps.setInt(2, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        }
+    }
+
+    public void updateReviewerProfile(int userId, String fullName, String email, String avatar) throws SQLException {
+        String sql = "UPDATE Users SET full_name = ?, email = ?, avatar = ? WHERE user_id = ?";
+        try (Connection c = Db.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, fullName);
+            ps.setString(2, email);
+            ps.setString(3, avatar);
+            ps.setInt(4, userId);
+            ps.executeUpdate();
+        }
+    }
+
+    public void updatePasswordByUserId(int userId, String newPassword) throws SQLException {
+        String sql = "UPDATE Users SET password = ? WHERE user_id = ?";
+        try (Connection c = Db.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, newPassword);
             ps.setInt(2, userId);
             ps.executeUpdate();
         }
