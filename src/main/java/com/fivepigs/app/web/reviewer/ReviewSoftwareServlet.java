@@ -1,9 +1,6 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
 package com.fivepigs.app.web.reviewer;
 
+import com.fivepigs.app.dao.NotificationDao;
 import com.fivepigs.app.dao.ReviewScoreDao;
 import com.fivepigs.app.dao.SoftwareDao;
 import com.fivepigs.app.model.ReviewScore;
@@ -12,7 +9,10 @@ import com.fivepigs.app.model.User;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.*;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 
@@ -81,15 +81,16 @@ public class ReviewSoftwareServlet extends HttpServlet {
 
             double totalScore = (uiUxScore + technicalScore + performanceScore + documentationScore) / 4.0;
 
-            String decision = totalScore >= 5.0
+            String decision = (totalScore >= 5.0
                     && noMalware == 1
                     && noCopyright == 1
-                    && noSpam == 1
+                    && noSpam == 1)
                             ? "APPROVED"
                             : "REJECTED";
 
             ReviewScoreDao reviewScoreDao = new ReviewScoreDao();
             SoftwareDao softwareDao = new SoftwareDao();
+            NotificationDao notificationDao = new NotificationDao();
 
             ReviewScore reviewScore = new ReviewScore();
             reviewScore.setSoftwareId(softwareId);
@@ -107,11 +108,54 @@ public class ReviewSoftwareServlet extends HttpServlet {
 
             reviewScoreDao.insertReviewScore(reviewScore);
 
+            Software software = softwareDao.getSoftwareById(softwareId);
+            String softwareName = (software != null && software.getName() != null)
+                    ? software.getName()
+                    : ("Software #" + softwareId);
+
+            String nextStatus;
+            String notificationTitle;
+            String notificationContent;
+            String notificationType;
+            String notificationPriority;
+
             if ("APPROVED".equals(decision)) {
-                softwareDao.updateSoftwareStatus(softwareId, "PENDING_APPROVAL");
+                nextStatus = "PENDING_APPROVAL";
+                notificationTitle = "Review completed - " + softwareName;
+                notificationContent = "You have completed the review for \"" + softwareName
+                        + "\". The software passed review and is now waiting for final approval.";
+                notificationType = "PENDING_APPROVAL";
+                notificationPriority = "MEDIUM";
             } else {
-                softwareDao.updateSoftwareStatus(softwareId, "REJECTED");
+                nextStatus = "REJECTED";
+                notificationTitle = "Review completed - " + softwareName;
+                notificationContent = "You have completed the review for \"" + softwareName
+                        + "\". The software did not pass the review and has been rejected.";
+                notificationType = "REJECTED";
+                notificationPriority = "HIGH";
+                
+                if (software != null && software.getVendorId() != null) {
+                    notificationDao.insertNotification(
+                            software.getVendorId(),
+                            "Software Rejected - " + softwareName,
+                            "Unfortunately, your software \"" + softwareName + "\" did not pass the review and has been rejected.",
+                            "REJECTED",
+                            "HIGH",
+                            request.getContextPath() + "/vendor_software_detail?id=" + softwareId
+                    );
+                }
             }
+
+            softwareDao.updateSoftwareStatus(softwareId, nextStatus);
+
+            notificationDao.insertNotification(
+                    reviewerId,
+                    notificationTitle,
+                    notificationContent,
+                    notificationType,
+                    notificationPriority,
+                    request.getContextPath() + "/reviewer_history"
+            );
 
             response.sendRedirect(request.getContextPath() + "/reviewer_history");
 
@@ -122,5 +166,4 @@ public class ReviewSoftwareServlet extends HttpServlet {
                     .forward(request, response);
         }
     }
-
 }

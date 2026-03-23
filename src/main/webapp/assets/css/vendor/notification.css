@@ -1,4 +1,22 @@
 /*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : Mar 23, 2026, 10:17:19 AM
+    Author     : thanh
+*/
+
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : Mar 22, 2026, 2:54:12 PM
+    Author     : thanh
+*/
+
+/*
     notifications.css
     Fixed for reviewer notification JSP
 */
@@ -166,11 +184,7 @@
     margin: 0 4px;
 }
 
-.notifications-page .chip,
-.notifications-page .chip:visited,
-.notifications-page .chip:hover,
-.notifications-page .chip:focus,
-.notifications-page .chip:active{
+.notifications-page .chip{
     appearance: none;
     border: 1px solid transparent;
     background: rgba(255,255,255,0.08);
@@ -182,20 +196,10 @@
     font-weight: 700;
     line-height: 1;
     transition: all .2s ease;
-    text-decoration: none !important;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    outline: none;
-}
-
-.notifications-page .chip *{
-    text-decoration: none !important;
 }
 
 .notifications-page .chip:hover{
     background: rgba(255,255,255,0.14);
-    color: #fff;
 }
 
 .notifications-page .chip.active{
