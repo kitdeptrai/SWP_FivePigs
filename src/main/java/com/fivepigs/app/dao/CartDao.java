@@ -22,9 +22,6 @@ public class CartDao {
                 "       COALESCE(selected_pricing.max_users, " +
                 "           (SELECT sp.max_users FROM fivepigs.software_pricing sp WHERE sp.software_id = s.software_id AND sp.is_active = 1 AND UPPER(COALESCE(sp.plan_name, '')) <> 'DEMO' ORDER BY sp.price ASC, sp.pricing_id ASC LIMIT 1)" +
                 "       ) AS max_users, " +
-                "       COALESCE(selected_pricing.duration_days, " +
-                "           (SELECT sp.duration_days FROM fivepigs.software_pricing sp WHERE sp.software_id = s.software_id AND sp.is_active = 1 AND UPPER(COALESCE(sp.plan_name, '')) <> 'DEMO' ORDER BY sp.price ASC, sp.pricing_id ASC LIMIT 1)" +
-                "       ) AS duration_days, " +
                 "       COALESCE(selected_pricing.price, " +
                 "           (SELECT MIN(sp.price) FROM fivepigs.software_pricing sp WHERE sp.software_id = s.software_id AND sp.is_active = 1 AND UPPER(COALESCE(sp.plan_name, '')) <> 'DEMO'), " +
                 "           0" +
@@ -52,8 +49,6 @@ public class CartDao {
                     sw.setPlanName(rs.getString("plan_name"));
                     Number maxUsersValue = (Number) rs.getObject("max_users");
                     sw.setPlanMaxUsers(maxUsersValue == null ? null : maxUsersValue.intValue());
-                    Number durationDaysValue = (Number) rs.getObject("duration_days");
-                    sw.setDurationDays(durationDaysValue == null ? null : durationDaysValue.intValue());
                     sw.setPrice(rs.getDouble("display_price"));
                     sw.setIsFree(rs.getInt("is_free"));
                     sw.setAvgRating(rs.getDouble("avg_rating"));
@@ -319,9 +314,6 @@ public class CartDao {
                 "       COALESCE(selected_pricing.max_users, " +
                 "           (SELECT sp.max_users FROM fivepigs.software_pricing sp WHERE sp.software_id = s.software_id AND sp.is_active = 1 AND UPPER(COALESCE(sp.plan_name, '')) <> 'DEMO' ORDER BY sp.price ASC, sp.pricing_id ASC LIMIT 1)" +
                 "       ) AS max_users, " +
-                "       COALESCE(selected_pricing.duration_days, " +
-                "           (SELECT sp.duration_days FROM fivepigs.software_pricing sp WHERE sp.software_id = s.software_id AND sp.is_active = 1 AND UPPER(COALESCE(sp.plan_name, '')) <> 'DEMO' ORDER BY sp.price ASC, sp.pricing_id ASC LIMIT 1)" +
-                "       ) AS duration_days, " +
                 "       COALESCE(selected_pricing.price, " +
                 "           (SELECT MIN(sp.price) FROM fivepigs.software_pricing sp WHERE sp.software_id = s.software_id AND sp.is_active = 1 AND UPPER(COALESCE(sp.plan_name, '')) <> 'DEMO'), " +
                 "           0" +
@@ -344,8 +336,6 @@ public class CartDao {
                     sw.setPlanName(rs.getString("plan_name"));
                     Number maxUsersValue = (Number) rs.getObject("max_users");
                     sw.setPlanMaxUsers(maxUsersValue == null ? null : maxUsersValue.intValue());
-                    Number durationDaysValue = (Number) rs.getObject("duration_days");
-                    sw.setDurationDays(durationDaysValue == null ? null : durationDaysValue.intValue());
                     sw.setPrice(rs.getDouble("display_price"));
                     sw.setIsFree(rs.getInt("is_free"));
                     items.add(sw);

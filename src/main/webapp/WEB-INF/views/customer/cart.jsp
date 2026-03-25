@@ -47,9 +47,7 @@
                                                 <c:if test="${not empty item.planMaxUsers}">
                                                     <span> • ${item.planMaxUsers} user<c:if test="${item.planMaxUsers != 1}">s</c:if></span>
                                                 </c:if>
-                                                <c:if test="${not empty item.durationDays}">
-                                                    <span> • ${item.durationDays} day<c:if test="${item.durationDays != 1}">s</c:if></span>
-                                                </c:if>
+                                                <span> � 365-day access</span>
                                                 <br>
                                             </c:if>
                                             <c:choose>
@@ -90,3 +88,4 @@
 </div>
 </body>
 </html>
+

@@ -8,7 +8,6 @@ public class SoftwarePricing {
     private String planName;
     private Integer maxUsers;
     private Double price;
-    private Integer durationDays;
     private Integer isActive;
     private LocalDateTime createdAt;
 
@@ -50,14 +49,6 @@ public class SoftwarePricing {
 
     public void setPrice(Double price) {
         this.price = price;
-    }
-
-    public Integer getDurationDays() {
-        return durationDays;
-    }
-
-    public void setDurationDays(Integer durationDays) {
-        this.durationDays = durationDays;
     }
 
     public Integer getIsActive() {

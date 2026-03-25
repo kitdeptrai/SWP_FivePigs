@@ -460,7 +460,7 @@ public class LicenseDao {
 
     private SoftwarePricing getDemoPricingForUpdate(Connection c, int softwareId) throws SQLException {
         String sql = """
-                SELECT pricing_id, software_id, plan_name, max_users, price, duration_days, is_active, created_at
+                SELECT pricing_id, software_id, plan_name, max_users, price, is_active, created_at
                 FROM Software_Pricing
                 WHERE software_id = ?
                   AND is_active = 1
@@ -481,8 +481,6 @@ public class LicenseDao {
                     Number maxUsersValue = (Number) rs.getObject("max_users");
                     pricing.setMaxUsers(maxUsersValue == null ? null : maxUsersValue.intValue());
                     pricing.setPrice(rs.getDouble("price"));
-                    Number durationDaysValue = (Number) rs.getObject("duration_days");
-                    pricing.setDurationDays(durationDaysValue == null ? null : durationDaysValue.intValue());
                     Object isActiveValue = rs.getObject("is_active");
                     if (isActiveValue instanceof Boolean booleanValue) {
                         pricing.setIsActive(booleanValue ? 1 : 0);
