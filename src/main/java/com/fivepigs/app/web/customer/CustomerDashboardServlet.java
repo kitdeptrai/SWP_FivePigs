@@ -37,13 +37,21 @@ public class CustomerDashboardServlet extends HttpServlet {
         SoftwareDao dao = new SoftwareDao();
         try {
             List<Software> trendList = dao.getTopDownloadWithIcon(12);
-
             List<Software> bestSellingList = dao.getBestSellingWithIcon(12);
+            Software randomHomeSoftware = dao.getRandomSoftwareWithIcon();
+            Software topApp = dao.getTopDownloadedByCategoryWithIcon(2);
+            Software topGame = dao.getTopDownloadedByCategoryWithIcon(1);
             request.setAttribute("trendList", trendList);
             request.setAttribute("bestSellingList", bestSellingList);
+            request.setAttribute("randomHomeSoftware", randomHomeSoftware);
+            request.setAttribute("topApp", topApp);
+            request.setAttribute("topGame", topGame);
         } catch (SQLException e) {
             request.setAttribute("trendList", new ArrayList<Software>());
             request.setAttribute("bestSellingList", new ArrayList<Software>());
+            request.setAttribute("randomHomeSoftware", null);
+            request.setAttribute("topApp", null);
+            request.setAttribute("topGame", null);
             request.setAttribute("homeWarning", "Khong tai duoc du lieu top downloads/best selling.");
         }
     }

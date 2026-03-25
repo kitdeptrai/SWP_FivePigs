@@ -127,6 +127,7 @@ public class CartDao {
         }
     }
 
+    //check plan name
     public int checkout(int userId) throws SQLException {
         try (Connection c = Db.getConnection()) {
             c.setAutoCommit(false);
@@ -178,7 +179,7 @@ public class CartDao {
 
                     if (!hasActivePaidLicense(c, userId, item.getSoftwareId())) {
                         Integer maxUsers = resolveMaxUsers(c, item.getPricingId());
-                        Timestamp expireAt = resolveExpireAt(item.getDurationDays());
+                        Timestamp expireAt = resolveExpireAt(item.getPlanName());
                         int licenseId;
                         try (PreparedStatement st = c.prepareStatement(
                                 "INSERT INTO fivepigs.license(license_key, pricing_id, software_id, owner_id, max_users, purchase_date, expire_date, status) " +
@@ -436,10 +437,10 @@ public class CartDao {
         return price == null ? 0.0 : price;
     }
 
-    private Timestamp resolveExpireAt(Integer durationDays) {
-        if (durationDays == null || durationDays <= 0) {
-            return null;
+    private Timestamp resolveExpireAt(String planName) {
+        if ("Demo".equalsIgnoreCase(planName == null ? "" : planName.trim())) {
+            return Timestamp.valueOf(LocalDateTime.now().plusDays(3));
         }
-        return Timestamp.valueOf(LocalDateTime.now().plusDays(durationDays));
+        return Timestamp.valueOf(LocalDateTime.now().plusDays(365));
     }
 }

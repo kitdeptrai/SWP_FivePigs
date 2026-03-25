@@ -123,7 +123,7 @@
                                             <span>
                                                 <c:choose>
                                                     <c:when test="${empty plan.durationDays}">No expiry</c:when>
-                                                    <c:otherwise>${plan.durationDays} day<c:if test="${plan.durationDays != 1}">s</c:if></c:otherwise>
+
                                                 </c:choose>
                                             </span>
                                         </div>

@@ -47,6 +47,8 @@ public class GameServlet extends HttpServlet {
 
         try {
             List<Software> softwareList = sdao.getSoftwareByCategoryWithIcon("1");
+            Software featuredGame = sdao.getTopDownloadedByCategoryWithIcon(1);
+            Software randomGame = sdao.getRandomSoftwareByCategoryWithIcon(1);
             Map<String, List<Software>> sections = new LinkedHashMap<>();
             List<String> genres = new ArrayList<>();
             List<Software> genreResults = new ArrayList<>();
@@ -84,6 +86,8 @@ public class GameServlet extends HttpServlet {
             request.setAttribute("genreResults", genreResults);
             request.setAttribute("sections", sections);
             request.setAttribute("softwareToShow", softwareList);
+            request.setAttribute("featuredGame", featuredGame);
+            request.setAttribute("randomGame", randomGame);
         } catch (SQLException e) {
             request.setAttribute("genres", new ArrayList<String>());
             request.setAttribute("selectedGenre", selectedGenre);
@@ -92,6 +96,8 @@ public class GameServlet extends HttpServlet {
             request.setAttribute("genreResults", new ArrayList<Software>());
             request.setAttribute("sections", new LinkedHashMap<String, List<Software>>());
             request.setAttribute("softwareToShow", new ArrayList<Software>());
+            request.setAttribute("featuredGame", null);
+            request.setAttribute("randomGame", null);
             request.setAttribute("gameWarning", "Khong tai duoc du lieu game tu database.");
         }
 

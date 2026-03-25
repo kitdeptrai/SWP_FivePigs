@@ -893,6 +893,109 @@ public class SoftwareDao {
         return list;
     }
 
+    public Software getRandomSoftwareWithIcon() throws SQLException {
+        String sql =
+                "SELECT s.*, " + CUSTOMER_PRICE_SQL + ", si.image_url AS icon_url " +
+                        "FROM fivepigs.software s " +
+                        "LEFT JOIN fivepigs.software_image si " +
+                        "  ON s.software_id = si.software_id AND si.is_thumbnail = 1 " +
+                        "ORDER BY RAND() LIMIT 1";
+
+        try (Connection c = Db.getConnection();
+             PreparedStatement st = c.prepareStatement(sql);
+             ResultSet rs = st.executeQuery()) {
+            if (rs.next()) {
+                return mapSoftwareCard(rs);
+            }
+        }
+        return null;
+    }
+
+    public Software getRandomSoftwareByCategoryWithIcon(int categoryId) throws SQLException {
+        String sql =
+                "SELECT s.*, " + CUSTOMER_PRICE_SQL + ", si.image_url AS icon_url " +
+                        "FROM fivepigs.software s " +
+                        "LEFT JOIN fivepigs.software_image si " +
+                        "  ON s.software_id = si.software_id AND si.is_thumbnail = 1 " +
+                        "WHERE s.category_id = ? " +
+                        "ORDER BY RAND() LIMIT 1";
+
+        try (Connection c = Db.getConnection();
+             PreparedStatement st = c.prepareStatement(sql)) {
+            st.setInt(1, categoryId);
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    return mapSoftwareCard(rs);
+                }
+            }
+        }
+        return null;
+    }
+
+    public Software getTopDownloadedByCategoryWithIcon(int categoryId) throws SQLException {
+        String sql =
+                "SELECT s.*, " + CUSTOMER_PRICE_SQL + ", si.image_url AS icon_url " +
+                        "FROM fivepigs.software s " +
+                        "LEFT JOIN fivepigs.software_image si " +
+                        "  ON s.software_id = si.software_id AND si.is_thumbnail = 1 " +
+                        "WHERE s.category_id = ? " +
+                        "ORDER BY s.download_count DESC, s.avg_rating DESC, s.software_id DESC " +
+                        "LIMIT 1";
+
+        try (Connection c = Db.getConnection();
+             PreparedStatement st = c.prepareStatement(sql)) {
+
+            st.setInt(1, categoryId);
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    Software sw = new Software();
+                    sw.setSoftwareId(rs.getInt("software_id"));
+                    sw.setName(rs.getString("name"));
+                    sw.setShortDescription(rs.getString("short_description"));
+                    sw.setPrice(rs.getDouble("price"));
+                    sw.setIsFree(rs.getInt("is_free"));
+                    sw.setAvgRating(rs.getDouble("avg_rating"));
+                    sw.setDownloadCount(rs.getInt("download_count"));
+                    sw.setIconUrl(rs.getString("icon_url"));
+                    return sw;
+                }
+            }
+        }
+        return null;
+    }
+
+    public Software getTopDownloadedWithIcon() throws SQLException {
+        String sql =
+                "SELECT s.*, " + CUSTOMER_PRICE_SQL + ", si.image_url AS icon_url " +
+                        "FROM fivepigs.software s " +
+                        "LEFT JOIN fivepigs.software_image si " +
+                        "  ON s.software_id = si.software_id AND si.is_thumbnail = 1 " +
+                        "ORDER BY s.download_count DESC, s.avg_rating DESC, s.software_id DESC " +
+                        "LIMIT 1";
+
+        try (Connection c = Db.getConnection();
+             PreparedStatement st = c.prepareStatement(sql);
+             ResultSet rs = st.executeQuery()) {
+            if (rs.next()) {
+                return mapSoftwareCard(rs);
+            }
+        }
+        return null;
+    }
+
+    private Software mapSoftwareCard(ResultSet rs) throws SQLException {
+        Software sw = new Software();
+        sw.setSoftwareId(rs.getInt("software_id"));
+        sw.setName(rs.getString("name"));
+        sw.setShortDescription(rs.getString("short_description"));
+        sw.setPrice(rs.getDouble("price"));
+        sw.setIsFree(rs.getInt("is_free"));
+        sw.setAvgRating(rs.getDouble("avg_rating"));
+        sw.setDownloadCount(rs.getInt("download_count"));
+        sw.setIconUrl(rs.getString("icon_url"));
+        return sw;
+    }
+
     public List<Software> getTopDownloadWithIcon(int limit) throws SQLException {
         String sql =
                 "SELECT s.*, " + CUSTOMER_PRICE_SQL + ", img.image_url AS icon_url " +
