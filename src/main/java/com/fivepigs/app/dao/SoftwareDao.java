@@ -1695,29 +1695,32 @@ public class SoftwareDao {
 
     public Software getSoftwareById(int softwareId) throws SQLException {
         String sql = """
-            SELECT s.software_id,
-                   s.name,
-                   s.short_description,
-                   s.vendor_id,
-                   s.created_at,
-                   c.category_name,
-                   u.full_name AS vendor_name,
-                   sv.version_name AS version,
-                   si.image_url
-            FROM Software s
-            LEFT JOIN Category c
-                   ON s.category_id = c.category_id
-            LEFT JOIN Users u
-                   ON s.vendor_id = u.user_id
-            LEFT JOIN Software_Version sv
-                   ON sv.software_id = s.software_id
-                  AND sv.is_active = 1
-            LEFT JOIN Software_Image si
-                   ON s.software_id = si.software_id
-                  AND si.is_thumbnail = 1
-            WHERE s.software_id = ?
-            LIMIT 1
-            """;
+        SELECT s.software_id,
+               s.name,
+               s.short_description,
+               """ + PRICE_SELECT + """
+               ,
+               s.created_at,
+               c.category_name,
+               u.full_name AS vendor_name,
+               sv.version_name AS version,
+               sv.file_url,
+               si.image_url
+        FROM Software s
+        LEFT JOIN Category c
+               ON s.category_id = c.category_id
+        LEFT JOIN Users u
+               ON s.vendor_id = u.user_id
+        LEFT JOIN Software_Version sv
+               ON sv.software_id = s.software_id
+              AND sv.is_active = 1
+        LEFT JOIN Software_Image si
+               ON s.software_id = si.software_id
+              AND si.is_thumbnail = 1
+        """ + PRICE_JOIN + """
+        WHERE s.software_id = ?
+        LIMIT 1
+    """;
 
         try (Connection conn = Db.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -1729,12 +1732,10 @@ public class SoftwareDao {
                     s.setSoftwareId(rs.getInt("software_id"));
                     s.setName(rs.getString("name"));
                     s.setShortDescription(rs.getString("short_description"));
-                    s.setVendorId(rs.getInt("vendor_id"));
-
-                    // ❌ bỏ price hoàn toàn
-                    // s.setPrice(...);
+                    s.setPrice(rs.getDouble("price"));
                     s.setCategoryName(rs.getString("category_name"));
                     s.setVersion(rs.getString("version"));
+                    s.setFileUrl(rs.getString("file_url"));
                     s.setImageUrl(rs.getString("image_url"));
 
                     Timestamp ts = rs.getTimestamp("created_at");
@@ -1961,5 +1962,5 @@ public class SoftwareDao {
         }
         return null;
     }
-
+    
 }

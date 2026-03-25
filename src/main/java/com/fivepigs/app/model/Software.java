@@ -27,6 +27,7 @@ public class Software {
 //    download_count INT DEFAULT 0,
 //    avg_rating DECIMAL(2,1) DEFAULT 0,
 //    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+
     private Integer softwareId;
     private String name;
     private String shortDescription;
@@ -59,9 +60,18 @@ public class Software {
     private String categoryName;
     private String version;
     private String language;
-    
+
     private String imageUrl;
-     private Double qualityScore;
+    private Double qualityScore;
+    private String fileUrl;
+
+    public String getFileUrl() {
+        return fileUrl;
+    }
+
+    public void setFileUrl(String fileUrl) {
+        this.fileUrl = fileUrl;
+    }
 
     public String getImageUrl() {
         return imageUrl;
@@ -78,32 +88,30 @@ public class Software {
     public void setQualityScore(Double qualityScore) {
         this.qualityScore = qualityScore;
     }
-    
-    
-    
+
     public String getVersion() {
-    return version;
-}
+        return version;
+    }
 
-public void setVersion(String version) {
-    this.version = version;
-}
+    public void setVersion(String version) {
+        this.version = version;
+    }
 
-public String getLanguage() {
-    return language;
-}
+    public String getLanguage() {
+        return language;
+    }
 
-public void setLanguage(String language) {
-    this.language = language;
-}
-   
-public String getCategoryName() {
-    return categoryName;
-}
+    public void setLanguage(String language) {
+        this.language = language;
+    }
 
-public void setCategoryName(String categoryName) {
-    this.categoryName = categoryName;
-}
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
+    }
 
     public SoftwarePricing getSoftwarePricing() {
         return softwarePricing;
@@ -113,9 +121,6 @@ public void setCategoryName(String categoryName) {
         this.softwarePricing = softwarePricing;
     }
 
-
-
-  
     public Software() {
     }
 
@@ -135,8 +140,7 @@ public void setCategoryName(String categoryName) {
         this.appName = appName;
         this.approvalProcess = ap;
         this.reviewerProcess = rp;
-        
-        
+
     }
 
     public String getIconUrl() {
@@ -148,12 +152,12 @@ public void setCategoryName(String categoryName) {
     }
 
     public SoftwareImage getSoftwareImage() {
-    return softwareImage;
-}
+        return softwareImage;
+    }
 
-public void setSoftwareImage(SoftwareImage softwareImage) {
-    this.softwareImage = softwareImage;
-}
+    public void setSoftwareImage(SoftwareImage softwareImage) {
+        this.softwareImage = softwareImage;
+    }
 
     public SoftwareDetail getSoftwareDetail() {
         return softwareDetail;
@@ -214,8 +218,6 @@ public void setSoftwareImage(SoftwareImage softwareImage) {
     public String getName() {
         return name;
     }
-
-   
 
     public void setName(String name) {
         this.name = name;
@@ -333,7 +335,6 @@ public void setSoftwareImage(SoftwareImage softwareImage) {
         this.revenue = revenue;
     }
 
-
     public String getAppName() {
         return appName;
     }
@@ -342,14 +343,13 @@ public void setSoftwareImage(SoftwareImage softwareImage) {
         this.appName = appName;
     }
 
-
-   
-public String getFormattedCreatedAt() {
-    if (createdAt == null) return "";
-    DateTimeFormatter formatter =
-            DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    return createdAt.format(formatter);
-}
-
+    public String getFormattedCreatedAt() {
+        if (createdAt == null) {
+            return "";
+        }
+        DateTimeFormatter formatter
+                = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        return createdAt.format(formatter);
+    }
 
 }
