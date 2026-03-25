@@ -34,12 +34,40 @@
 
             <div class="fixed-layout-grid">
                 <div class="left-column" style="height: var(--sidebar-total-height);">
+                    <c:set var="randomAppImage" value="${pageContext.request.contextPath}/assets/images/default_icon.png"/>
+                    <c:if test="${not empty randomApp and not empty randomApp.iconUrl}">
+                        <c:set var="randomAppImage" value="${pageContext.request.contextPath}/assets/${randomApp.iconUrl}"/>
+                    </c:if>
                     <div class="featured-banner"
-                         style="height:100%; background-image: url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2070&auto=format&fit=crop'); padding:0; background-size:cover; background-position:center; background-repeat:no-repeat; overflow:hidden;">
-                        <div style="background: linear-gradient(to top, #4a148c, transparent); height:100%; width:100%; display:flex; flex-direction:column; justify-content:flex-end; padding:30px;">
-                            <h1 style="font-size: 40px; margin-bottom: 10px;">Top Productivity Apps</h1>
-                            <p style="opacity: 0.9; max-width: 500px; margin-bottom: 20px;">Upgrade your workflow with best tools.</p>
-                            <button style="padding: 12px 30px; border: none; background: white; color: #4a148c; font-weight: 700; border-radius: 8px; cursor: pointer; width:fit-content;">Explore</button>
+                         style="height:100%; background-image: linear-gradient(to top, rgba(74,20,140,0.88), rgba(74,20,140,0.18)), url('${randomAppImage}'); padding:0; background-size:cover; background-position:center; background-repeat:no-repeat; overflow:hidden;">
+                        <div style="height:100%; width:100%; display:flex; flex-direction:column; justify-content:flex-end; padding:30px;">
+                            <c:choose>
+                                <c:when test="${not empty randomApp}">
+                                    <div style="display:flex; align-items:center; gap:16px; margin-bottom:18px;">
+                                        <img src="${randomAppImage}" alt="${randomApp.name}" style="width:78px; height:78px; object-fit:cover; border-radius:18px; border:2px solid rgba(255,255,255,0.22); background:rgba(255,255,255,0.12);">
+                                        <div style="font-size:12px; font-weight:700; letter-spacing:1px; text-transform:uppercase; opacity:0.92;">Random app spotlight</div>
+                                    </div>
+                                    <h1 style="font-size: 40px; margin-bottom: 10px;">${randomApp.name}</h1>
+                                    <p style="opacity: 0.9; max-width: 500px; margin-bottom: 20px;">
+                                        <c:choose>
+                                            <c:when test="${not empty randomApp.shortDescription}">
+                                                ${randomApp.shortDescription}
+                                            </c:when>
+                                            <c:otherwise>
+                                                Explore one of the latest apps available on FIVEPIGS.
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </p>
+                                    <a href="${pageContext.request.contextPath}/product?pid=${randomApp.softwareId}"
+                                       style="padding: 10px 25px; border: none; background: white; color: #6b70ff; font-weight: 700; border-radius: 8px; cursor: pointer; width: fit-content; text-decoration:none; display:inline-flex;">View product</a>
+                                </c:when>
+                                <c:otherwise>
+                                    <h1 style="font-size: 40px; margin-bottom: 10px;">Top Productivity Apps</h1>
+                                    <p style="opacity: 0.9; max-width: 500px; margin-bottom: 20px;">Upgrade your workflow with best tools.</p>
+                                    <a href="${pageContext.request.contextPath}/search?q=Tool"
+                                       style="padding: 10px 25px; border: none; background: white; color: #6b70ff; font-weight: 700; border-radius: 8px; cursor: pointer; width: fit-content; text-decoration:none; display:inline-flex;">Explore</a>
+                                </c:otherwise>
+                            </c:choose>
                         </div>
                     </div>
                 </div>
@@ -47,8 +75,43 @@
                     <h3 style="margin-bottom:10px;">Featured</h3>
                     <p style="font-size:12px; opacity:0.8; margin-bottom:20px;">Most downloaded this week</p>
                     <div style="margin-top:auto; background:rgba(255,255,255,0.15); padding:15px; border-radius:12px;">
-                        <h4 style="margin-bottom:5px;">Microsoft 365</h4>
-                        <p style="font-size:12px; opacity:0.8;">Productivity � Office</p>
+                        <c:choose>
+                            <c:when test="${not empty featuredApp}">
+                                <a href="${pageContext.request.contextPath}/product?pid=${featuredApp.softwareId}" style="display:flex; gap:14px; align-items:center; text-decoration:none; color:inherit;">
+                                    <c:choose>
+                                        <c:when test="${not empty featuredApp.iconUrl}">
+                                            <img src="${pageContext.request.contextPath}/assets/${featuredApp.iconUrl}" alt="${featuredApp.name}" style="width:68px; height:68px; object-fit:cover; border-radius:16px; background:rgba(255,255,255,0.12);">
+                                        </c:when>
+                                        <c:otherwise>
+                                            <img src="${pageContext.request.contextPath}/assets/images/default_icon.png" alt="${featuredApp.name}" style="width:68px; height:68px; object-fit:cover; border-radius:16px; background:rgba(255,255,255,0.12);">
+                                        </c:otherwise>
+                                    </c:choose>
+                                    <div>
+                                        <h4 style="margin-bottom:5px;">${featuredApp.name}</h4>
+                                        <p style="font-size:12px; opacity:0.8; margin-bottom:8px;">
+                                            <c:choose>
+                                                <c:when test="${not empty featuredApp.shortDescription}">
+                                                    ${featuredApp.shortDescription}
+                                                </c:when>
+                                                <c:otherwise>
+                                                    ${featuredApp.downloadCount} downloads
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </p>
+                                        <div style="font-size:12px; font-weight:700;">
+                                            <c:choose>
+                                                <c:when test="${featuredApp.isFree == 1}">Free</c:when>
+                                                <c:otherwise>${featuredApp.price} VND</c:otherwise>
+                                            </c:choose>
+                                        </div>
+                                    </div>
+                                </a>
+                            </c:when>
+                            <c:otherwise>
+                                <h4 style="margin-bottom:5px;">No featured app</h4>
+                                <p style="font-size:12px; opacity:0.8;">There is no app data to display right now.</p>
+                            </c:otherwise>
+                        </c:choose>
                     </div>
                 </div>
             </div>
@@ -180,3 +243,5 @@
 <script src="${pageContext.request.contextPath}/assets/js/script.js"></script>
 </body>
 </html>
+
+

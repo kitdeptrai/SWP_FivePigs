@@ -46,20 +46,24 @@ public class GameServlet extends HttpServlet {
         String selectedOrder = normalizeOrder(request.getParameter("order"));
 
         try {
-            List<Software> softwareList = sdao.getSoftwareByCategoryWithIcon("2");
+            List<Software> softwareList = sdao.getSoftwareByCategoryWithIcon("1");
+            Software featuredGame = sdao.getTopDownloadedByCategoryWithIcon(1);
+            Software randomGame = sdao.getRandomSoftwareByCategoryWithIcon(1);
             Map<String, List<Software>> sections = new LinkedHashMap<>();
             List<String> genres = new ArrayList<>();
             List<Software> genreResults = new ArrayList<>();
 
             try {
-                genres = sdao.getGenresByCategory(2);
+                genres = sdao.getGenresByCategory(1);
                 if (selectedGenre == null) {
                     for (String genre : genres) {
-                        List<Software> list = sdao.getSoftwareByCategoryAndGenre(2, genre);
+                        List<Software> list = sdao.getSoftwareByCategoryAndGenre(1, genre);
+                        sortSoftwareList(list, selectedSort, selectedOrder);
                         sections.put(genre, list);
                     }
                 } else {
-                    genreResults = sdao.getSoftwareByCategoryAndGenre(2, selectedGenre);
+                    genreResults = sdao.getSoftwareByCategoryAndGenre(1, selectedGenre);
+                    sortSoftwareList(genreResults, selectedSort, selectedOrder);
                 }
             } catch (SQLException ignored) {
                 request.setAttribute("gameWarning", "Thieu bang genre/software_genre, dang hien thi danh sach game mac dinh.");
@@ -82,6 +86,8 @@ public class GameServlet extends HttpServlet {
             request.setAttribute("genreResults", genreResults);
             request.setAttribute("sections", sections);
             request.setAttribute("softwareToShow", softwareList);
+            request.setAttribute("featuredGame", featuredGame);
+            request.setAttribute("randomGame", randomGame);
         } catch (SQLException e) {
             request.setAttribute("genres", new ArrayList<String>());
             request.setAttribute("selectedGenre", selectedGenre);
@@ -90,6 +96,8 @@ public class GameServlet extends HttpServlet {
             request.setAttribute("genreResults", new ArrayList<Software>());
             request.setAttribute("sections", new LinkedHashMap<String, List<Software>>());
             request.setAttribute("softwareToShow", new ArrayList<Software>());
+            request.setAttribute("featuredGame", null);
+            request.setAttribute("randomGame", null);
             request.setAttribute("gameWarning", "Khong tai duoc du lieu game tu database.");
         }
 

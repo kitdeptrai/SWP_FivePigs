@@ -56,7 +56,7 @@ public class PendingReviewServlet extends HttpServlet {
             SoftwareDao softwareDao = new SoftwareDao();
             CategoryDao categoryDao = new CategoryDao();
 
-            List<Software> list = softwareDao.filterMyAssignedPendingReviews(
+            List<Software> list = softwareDao.filterPendingReviews(
                     reviewerId, keyword, categoryId, priceType
             );
 

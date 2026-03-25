@@ -24,7 +24,6 @@
 
         <div class="settings-shell">
             <div class="settings-nav">
-                <a href="${pageContext.request.contextPath}/settings?tab=payment_methods" class="settings-nav-item ${currentTab == 'payment_methods' ? 'active' : ''}"><i class="fa-regular fa-credit-card"></i>Payment methods</a>
                 <a href="${pageContext.request.contextPath}/settings?tab=feedback" class="settings-nav-item ${currentTab == 'feedback' ? 'active' : ''}"><i class="fa-regular fa-message"></i>Send feedback</a>
                 <a href="${pageContext.request.contextPath}/settings?tab=store_settings" class="settings-nav-item ${currentTab == 'store_settings' ? 'active' : ''}"><i class="fa-solid fa-gear"></i>Store settings</a>
             </div>

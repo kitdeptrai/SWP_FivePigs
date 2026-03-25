@@ -19,6 +19,25 @@ import java.util.Map;
 @WebServlet(name = "AppServlet", urlPatterns = {"/app"})
 public class AppServlet extends HttpServlet {
 
+    private void sortSoftwareList(List<Software> list, String sort, String order) {
+        if (list == null || list.isEmpty()) {
+            return;
+        }
+
+        Comparator<Software> comparator;
+        if ("price".equals(sort)) {
+            comparator = Comparator.comparing(sw -> sw.getPrice() == null ? 0.0 : sw.getPrice());
+        } else {
+            comparator = Comparator.comparing(sw -> sw.getName() == null ? "" : sw.getName().toLowerCase());
+        }
+
+        if ("desc".equals(order)) {
+            comparator = comparator.reversed();
+        }
+
+        list.sort(comparator.thenComparing(Software::getSoftwareId, Comparator.nullsLast(Integer::compareTo)));
+    }
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -29,20 +48,24 @@ public class AppServlet extends HttpServlet {
         String selectedOrder = normalizeOrder(request.getParameter("order"));
 
         try {
-            List<Software> softwareList = sdao.getSoftwareByCategoryWithIcon("1");
+            List<Software> softwareList = sdao.getSoftwareByCategoryWithIcon("2");
+            Software featuredApp = sdao.getTopDownloadedByCategoryWithIcon(2);
+            Software randomApp = sdao.getRandomSoftwareByCategoryWithIcon(2);
             Map<String, List<Software>> sections = new LinkedHashMap<>();
             List<String> genres = new ArrayList<>();
             List<Software> genreResults = new ArrayList<>();
 
             try {
-                genres = sdao.getGenresByCategory(1);
+                genres = sdao.getGenresByCategory(2);
                 if (selectedGenre == null) {
                     for (String genre : genres) {
-                        List<Software> list = sdao.getSoftwareByCategoryAndGenre(1, genre);
+                        List<Software> list = sdao.getSoftwareByCategoryAndGenre(2, genre);
+                        sortSoftwareList(list, selectedSort, selectedOrder);
                         sections.put(genre, list);
                     }
                 } else {
-                    genreResults = sdao.getSoftwareByCategoryAndGenre(1, selectedGenre);
+                    genreResults = sdao.getSoftwareByCategoryAndGenre(2, selectedGenre);
+                    sortSoftwareList(genreResults, selectedSort, selectedOrder);
                 }
             } catch (SQLException ignored) {
                 request.setAttribute("appWarning", "Thieu bang genre/software_genre, dang hien thi danh sach app mac dinh.");
@@ -65,6 +88,8 @@ public class AppServlet extends HttpServlet {
             request.setAttribute("genreResults", genreResults);
             request.setAttribute("sections", sections);
             request.setAttribute("softwareToShow", softwareList);
+            request.setAttribute("featuredApp", featuredApp);
+            request.setAttribute("randomApp", randomApp);
         } catch (SQLException e) {
             request.setAttribute("genres", new ArrayList<String>());
             request.setAttribute("selectedGenre", selectedGenre);
@@ -73,6 +98,8 @@ public class AppServlet extends HttpServlet {
             request.setAttribute("genreResults", new ArrayList<Software>());
             request.setAttribute("sections", new LinkedHashMap<String, List<Software>>());
             request.setAttribute("softwareToShow", new ArrayList<>());
+            request.setAttribute("featuredApp", null);
+            request.setAttribute("randomApp", null);
             request.setAttribute("appWarning", "Khong tai duoc du lieu app tu database.");
         }
 
@@ -102,24 +129,5 @@ public class AppServlet extends HttpServlet {
             return "desc";
         }
         return "asc";
-    }
-
-    private void sortSoftwareList(List<Software> list, String sort, String order) {
-        if (list == null || list.isEmpty()) {
-            return;
-        }
-
-        Comparator<Software> comparator;
-        if ("price".equals(sort)) {
-            comparator = Comparator.comparing(sw -> sw.getPrice() == null ? 0.0 : sw.getPrice());
-        } else {
-            comparator = Comparator.comparing(sw -> sw.getName() == null ? "" : sw.getName().toLowerCase());
-        }
-
-        if ("desc".equals(order)) {
-            comparator = comparator.reversed();
-        }
-
-        list.sort(comparator.thenComparing(Software::getSoftwareId, Comparator.nullsLast(Integer::compareTo)));
     }
 }

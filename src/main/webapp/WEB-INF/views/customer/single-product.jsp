@@ -120,12 +120,7 @@
                                         </div>
                                         <div class="pricing-plan-meta">
                                             <span>${plan.maxUsers} user<c:if test="${plan.maxUsers != 1}">s</c:if></span>
-                                            <span>
-                                                <c:choose>
-                                                    <c:when test="${empty plan.durationDays}">No expiry</c:when>
-                                                    <c:otherwise>${plan.durationDays} day<c:if test="${plan.durationDays != 1}">s</c:if></c:otherwise>
-                                                </c:choose>
-                                            </span>
+                                            <span>365-day access</span>
                                         </div>
                                     </div>
                                 </label>
@@ -352,6 +347,7 @@
 </script>
 </body>
 </html>
+
 
 
 

@@ -1,7 +1,10 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="com.fivepigs.app.model.User" %>
 <%
-    String activePage = (String) request.getAttribute("activePage");
+    String activePage = request.getParameter("activePage");
+    if (activePage == null || activePage.isBlank()) {
+        activePage = (String) request.getAttribute("activePage");
+    }
     if (activePage == null) activePage = "";
 
     User currentUser = (User) session.getAttribute("user");
@@ -37,6 +40,7 @@
         <i class="fa-solid fa-cubes"></i> Apps
     </a>
 
+   <% if(!isGuest) { %>
     <a href="<%= libraryHref %>" class="menu-item <%= activePage.equals("library") ? "active" : "" %>" title="<%= isGuest ? "Login to open Library" : "Library" %>">
         <i class="fa-solid fa-book-open"></i> Library
     </a>
@@ -44,6 +48,7 @@
     <a href="<%= cartHref %>" class="menu-item <%= activePage.equals("cart") ? "active" : "" %>" title="<%= isGuest ? "Login to open Cart" : "Cart" %>">
         <i class="fa-solid fa-cart-shopping"></i> Cart
     </a>
+   <% } %>
 
     <% if (isVendor) { %>
     <a href="${pageContext.request.contextPath}/vendor/dashboard" class="menu-item" title="Vendor dashboard">
@@ -56,9 +61,6 @@
     <% } %>
 
     <div class="sidebar-footer">
-        <a href="${pageContext.request.contextPath}/news" class="menu-item <%= activePage.equals("news") ? "active" : "" %>">
-            <i class="fa-solid fa-book-open"></i> News
-        </a>
         <a href="${pageContext.request.contextPath}/aboutus" class="menu-item <%= activePage.equals("about") ? "active" : "" %>">
             <i class="fa-solid fa-circle-info"></i> About
         </a>

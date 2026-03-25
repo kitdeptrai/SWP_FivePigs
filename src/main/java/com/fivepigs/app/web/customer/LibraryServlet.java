@@ -41,7 +41,7 @@ public class LibraryServlet extends HttpServlet {
         String selectedOrder = normalizeOrder(request.getParameter("order"), "desc");
 
         try {
-            List<Software> myLibrary = softwareDao.getLibraryByUserIdWithIcon(userId);
+            List<Software> myLibrary = softwareDao.getLibraryByUserIdWithIcon(userId, selectedSort, selectedOrder);
             Map<Integer, Boolean> downloadedMap = stateDao.getDownloadedMapByUser(userId);
             Map<Integer, License> ownedLicenseMap = licenseDao.getOwnedLicenseMapByOwner(userId);
 
@@ -59,7 +59,7 @@ public class LibraryServlet extends HttpServlet {
         }
     }
 
-    private Integer resolveUserId(HttpSession session) { 
+    private Integer resolveUserId(HttpSession session) {
         if (session == null) {
             return null;
         }
