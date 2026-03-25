@@ -203,7 +203,7 @@ public class AdminDao {
     }
 
     public Integer getRoleIdByName(String roleName) {
-        // match role_name không phân biệt hoa thường
+        // Match role_name case-insensitively
         String sql = "SELECT role_id FROM Role WHERE LOWER(role_name) = LOWER(?)";
         try (Connection conn = Db.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -223,7 +223,7 @@ public class AdminDao {
     private static String normalizeRoleName(String roleName) {
         if (roleName == null) return null;
         String r = roleName.trim();
-        // fix typo phổ biến
+        // Fix common typo
         if (r.equalsIgnoreCase("aproval")) return "Approval";
         return r;
     }
@@ -861,7 +861,10 @@ public class AdminDao {
     public List<AdminOrderRow> listSuccessfulOrdersPaged(int limit, int offset, String keyword, java.sql.Date fromDate, java.sql.Date toDate) {
         StringBuilder sql = new StringBuilder(
                 "SELECT o.order_id, o.total_amount, o.order_date, ps.status_name AS payment_status, " +
-                        "u.full_name AS customer_name, u.email AS customer_email " +
+                        "u.full_name AS customer_name, u.email AS customer_email, " +
+                        "COALESCE((SELECT CAST(sc.config_value AS DECIMAL(10,2)) " +
+                        "          FROM fivepigs.system_config sc " +
+                        "          WHERE sc.config_key = 'commission_percent' LIMIT 1), 10) AS commission_percent " +
                         "FROM orders o " +
                         "JOIN users u ON o.customer_id = u.user_id " +
                         "JOIN payment_status ps ON o.payment_status_id = ps.payment_status_id " +
@@ -897,13 +900,19 @@ public class AdminDao {
             }
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
+                    double totalAmount = rs.getDouble("total_amount");
+                    double commissionPercent = rs.getDouble("commission_percent");
+                    double adminReceivedAmount = totalAmount * (commissionPercent / 100.0);
+
                     rows.add(new AdminOrderRow(
                             rs.getInt("order_id"),
                             rs.getString("customer_name"),
                             rs.getString("customer_email"),
-                            rs.getDouble("total_amount"),
+                            totalAmount,
                             rs.getTimestamp("order_date"),
-                            rs.getString("payment_status")
+                            rs.getString("payment_status"),
+                            commissionPercent,
+                            adminReceivedAmount
                     ));
                 }
             }
@@ -985,7 +994,7 @@ public class AdminDao {
             roleId = getRoleIdByName(roleName);
         }
         if (roleId == null) {
-            throw new SQLException("Role không tồn tại: " + roleName);
+            throw new SQLException("Role does not exist: " + roleName);
         }
 
         String sql = "UPDATE users SET full_name = ?, phone = ?, status = ?, role_id = ? WHERE user_id = ?";
@@ -1277,14 +1286,18 @@ public class AdminDao {
         private final double totalAmount;
         private final java.sql.Timestamp orderDate;
         private final String paymentStatus;
+        private final double commissionPercent;
+        private final double adminReceivedAmount;
 
-        public AdminOrderRow(int orderId, String customerName, String customerEmail, double totalAmount, java.sql.Timestamp orderDate, String paymentStatus) {
+        public AdminOrderRow(int orderId, String customerName, String customerEmail, double totalAmount, java.sql.Timestamp orderDate, String paymentStatus, double commissionPercent, double adminReceivedAmount) {
             this.orderId = orderId;
             this.customerName = customerName;
             this.customerEmail = customerEmail;
             this.totalAmount = totalAmount;
             this.orderDate = orderDate;
             this.paymentStatus = paymentStatus;
+            this.commissionPercent = commissionPercent;
+            this.adminReceivedAmount = adminReceivedAmount;
         }
 
         public int getOrderId() {
@@ -1309,6 +1322,14 @@ public class AdminDao {
 
         public String getPaymentStatus() {
             return paymentStatus;
+        }
+
+        public double getCommissionPercent() {
+            return commissionPercent;
+        }
+
+        public double getAdminReceivedAmount() {
+            return adminReceivedAmount;
         }
     }
 
