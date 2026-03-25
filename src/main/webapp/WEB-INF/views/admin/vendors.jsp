@@ -138,9 +138,6 @@
                 </div>
             </div>
 
-            <c:if test="${param.success == 'updated'}">
-                <div class="alert success">Vendor updated successfully.</div>
-            </c:if>
             <c:if test="${param.success == 'disabled'}">
                 <div class="alert success">Vendor account locked successfully.</div>
             </c:if>
@@ -219,51 +216,12 @@
                         <td><fmt:formatDate value="${u.createdAt}" pattern="dd/MM/yyyy HH:mm"/></td>
                         <td>
                             <div style="display:flex; gap: 8px;">
-                                <a href="#edit-user-${u.userId}" style="color: var(--accent); text-decoration: none; font-size: 13px; font-weight: 600;">Edit</a>
                                 <c:if test="${u.status == 'ACTIVE'}">
                                     <a href="#disable-user-${u.userId}" style="color: var(--danger); text-decoration: none; font-size: 13px; font-weight: 600;" onclick="return confirm('Are you sure you want to disable this vendor?');">Disable</a>
                                 </c:if>
                                 <c:if test="${u.status == 'INACTIVE'}">
                                     <a href="#enable-user-${u.userId}" style="color: #22c55e; text-decoration: none; font-size: 13px; font-weight: 600;">Enable</a>
                                 </c:if>
-                            </div>
-
-                            <!-- Modal Edit User -->
-                            <div id="edit-user-${u.userId}" class="modal">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h2>Edit User #<c:out value="${u.userId}"/></h2>
-                                        <a class="close-modal" href="${pageContext.request.contextPath}/admin/vendors">×</a>
-                                    </div>
-                                    <form method="post" action="${pageContext.request.contextPath}/admin/vendors/update">
-                                        <input type="hidden" name="userId" value="${u.userId}" />
-                                        <div class="field">
-                                            <label>Full name</label>
-                                            <input name="fullName" type="text" value="<c:out value='${u.fullName}'/>" required maxlength="100" />
-                                        </div>
-                                        <div class="field">
-                                            <label>Phone</label>
-                                            <input name="phone" type="text" value="<c:out value='${u.phone}'/>" maxlength="20" />
-                                        </div>
-                                        <div class="field">
-                                            <label>Role</label>
-                                            <select name="roleName" required style="width:100%; padding:12px; border-radius:12px; border:1px solid var(--border); background: rgba(0,0,0,0.22); color: var(--text);">
-                                                <option value="Vendor" selected>Vendor</option>
-                                            </select>
-                                        </div>
-                                        <div class="field">
-                                            <label>Status</label>
-                                            <select name="status" required style="width:100%; padding:12px; border-radius:12px; border:1px solid var(--border); background: rgba(0,0,0,0.22); color: var(--text);">
-                                                <option value="ACTIVE" ${u.status == 'ACTIVE' ? 'selected' : ''}>ACTIVE</option>
-                                                <option value="INACTIVE" ${u.status == 'INACTIVE' ? 'selected' : ''}>INACTIVE</option>
-                                            </select>
-                                        </div>
-                                        <div class="actions">
-                                            <button type="submit">Update</button>
-                                            <a class="small" href="${pageContext.request.contextPath}/admin/vendors">Cancel</a>
-                                        </div>
-                                    </form>
-                                </div>
                             </div>
 
                             <!-- Modal Confirm Disable -->

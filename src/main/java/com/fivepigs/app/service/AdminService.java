@@ -22,10 +22,6 @@ public class AdminService {
         return updateUserByRoleScope(userIdStr, fullName, phone, status, roleName, EMPLOYEE_ROLES);
     }
 
-    public String updateVendor(String userIdStr, String fullName, String phone, String status, String roleName) throws SQLException {
-        return updateUserByRoleScope(userIdStr, fullName, phone, status, roleName, Set.of("vendor"));
-    }
-
     public String setUserStatus(String userIdStr, String status) throws SQLException {
         if (isBlank(userIdStr)) {
             return "missing_id";

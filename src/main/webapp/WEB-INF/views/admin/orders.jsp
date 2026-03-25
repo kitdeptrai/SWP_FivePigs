@@ -236,6 +236,8 @@
                     <th>Order ID</th>
                     <th>Customer</th>
                     <th>Total</th>
+                    <th>Commission %</th>
+                    <th>Admin Receive</th>
                     <th>Order Date</th>
                     <th>Status</th>
                     <th>Action</th>
@@ -250,6 +252,8 @@
                             <div style="color:#64748b;"><c:out value="${o.customerEmail}"/></div>
                         </td>
                         <td><fmt:formatNumber value="${o.totalAmount}" type="currency" currencySymbol="$" minFractionDigits="2" maxFractionDigits="2"/></td>
+                        <td><fmt:formatNumber value="${o.commissionPercent}" minFractionDigits="0" maxFractionDigits="2"/>%</td>
+                        <td><fmt:formatNumber value="${o.adminReceivedAmount}" type="currency" currencySymbol="$" minFractionDigits="2" maxFractionDigits="2"/></td>
                         <td><fmt:formatDate value="${o.orderDate}" pattern="dd/MM/yyyy HH:mm"/></td>
                         <td><span class="badge paid"><c:out value="${o.paymentStatus}"/></span></td>
                         <td>
@@ -259,7 +263,7 @@
                 </c:forEach>
                 <c:if test="${empty orders}">
                     <tr>
-                        <td colspan="6" style="text-align:center; color:#94a3b8;">No successful orders found.</td>
+                        <td colspan="8" style="text-align:center; color:#94a3b8;">No successful orders found.</td>
                     </tr>
                 </c:if>
                 </tbody>

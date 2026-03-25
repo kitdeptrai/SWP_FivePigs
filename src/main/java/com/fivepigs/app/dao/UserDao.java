@@ -4,6 +4,7 @@ import com.fivepigs.app.config.Db;
 import com.fivepigs.app.model.User;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -102,13 +103,21 @@ public class UserDao {
     }
 
     public void updateProfile(int userId, String fullName, String avatar) throws SQLException {
-        String sql = "UPDATE fivepigs.users SET full_name = ?, avatar = ? WHERE user_id = ?";
-        try (Connection c = Db.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setString(1, fullName);
-            ps.setString(2, avatar);
-            ps.setInt(3, userId);
-            ps.executeUpdate();
+        try (Connection c = Db.getConnection()) {
+            boolean hasAvatar = hasUserColumn(c, "avatar");
+            String sql = hasAvatar
+                    ? "UPDATE fivepigs.users SET full_name = ?, avatar = ? WHERE user_id = ?"
+                    : "UPDATE fivepigs.users SET full_name = ? WHERE user_id = ?";
+            try (PreparedStatement ps = c.prepareStatement(sql)) {
+                ps.setString(1, fullName);
+                if (hasAvatar) {
+                    ps.setString(2, avatar);
+                    ps.setInt(3, userId);
+                } else {
+                    ps.setInt(2, userId);
+                }
+                ps.executeUpdate();
+            }
         }
     }
 
@@ -130,25 +139,63 @@ public class UserDao {
                                  String gender,
                                  String address,
                                  String bio) throws SQLException {
-        String sql = "UPDATE Users " +
-                "SET full_name = ?, phone = ?, avatar = ?, date_of_birth = ?, gender = ?, address = ?, bio = ? " +
-                "WHERE user_id = ?";
+        try (Connection c = Db.getConnection()) {
+            boolean hasAvatar = hasUserColumn(c, "avatar");
+            String sql = hasAvatar
+                    ? "UPDATE Users " +
+                    "SET full_name = ?, phone = ?, avatar = ?, date_of_birth = ?, gender = ?, address = ?, bio = ? " +
+                    "WHERE user_id = ?"
+                    : "UPDATE Users " +
+                    "SET full_name = ?, phone = ?, date_of_birth = ?, gender = ?, address = ?, bio = ? " +
+                    "WHERE user_id = ?";
 
-        try (Connection c = Db.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setString(1, fullName);
-            ps.setString(2, phone);
-            ps.setString(3, avatar);
-            if (dateOfBirth != null) {
-                ps.setDate(4, java.sql.Date.valueOf(dateOfBirth));
-            } else {
-                ps.setNull(4, java.sql.Types.DATE);
+            try (PreparedStatement ps = c.prepareStatement(sql)) {
+                ps.setString(1, fullName);
+                ps.setString(2, phone);
+                int dateIndex;
+                int genderIndex;
+                int addressIndex;
+                int bioIndex;
+                int userIdIndex;
+
+                if (hasAvatar) {
+                    ps.setString(3, avatar);
+                    dateIndex = 4;
+                    genderIndex = 5;
+                    addressIndex = 6;
+                    bioIndex = 7;
+                    userIdIndex = 8;
+                } else {
+                    dateIndex = 3;
+                    genderIndex = 4;
+                    addressIndex = 5;
+                    bioIndex = 6;
+                    userIdIndex = 7;
+                }
+
+                if (dateOfBirth != null) {
+                    ps.setDate(dateIndex, java.sql.Date.valueOf(dateOfBirth));
+                } else {
+                    ps.setNull(dateIndex, java.sql.Types.DATE);
+                }
+                ps.setString(genderIndex, gender);
+                ps.setString(addressIndex, address);
+                ps.setString(bioIndex, bio);
+                ps.setInt(userIdIndex, userId);
+                return ps.executeUpdate() > 0;
             }
-            ps.setString(5, gender);
-            ps.setString(6, address);
-            ps.setString(7, bio);
-            ps.setInt(8, userId);
-            return ps.executeUpdate() > 0;
+        }
+    }
+
+    private boolean hasUserColumn(Connection connection, String columnName) throws SQLException {
+        DatabaseMetaData metaData = connection.getMetaData();
+        try (ResultSet rs = metaData.getColumns(connection.getCatalog(), null, "users", columnName)) {
+            if (rs.next()) {
+                return true;
+            }
+        }
+        try (ResultSet rs = metaData.getColumns(connection.getCatalog(), null, "Users", columnName)) {
+            return rs.next();
         }
     }
 }
