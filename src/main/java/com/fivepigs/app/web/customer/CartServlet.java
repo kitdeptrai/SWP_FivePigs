@@ -90,14 +90,16 @@ public class CartServlet extends HttpServlet {
                     return;
                 }
 
+
                 double total = cartDao.getCartTotal(userId);
                 if (total <= 0) {
                     int count = cartDao.checkout(userId);
                     if (count > 0) {
+
                         notificationDao.insertNotification(
                                 userId,
-                                "Purchase completed",
-                                count + " free item(s) have been added to your Library."
+                                count + " free item(s) added to your Library",
+                                "Purchase completed. Your free items are now available in Library."
                         );
                     }
                     response.sendRedirect(request.getContextPath() + "/library?msg=checkout_success");

@@ -62,7 +62,7 @@ public class SearchServlet extends HttpServlet {
     private Integer mapCategoryId(String dept) {
         return switch (dept) {
             case "apps" -> 2;
-            case "games" -> 3;
+            case "games" -> 1;
             default -> null;
         };
     }

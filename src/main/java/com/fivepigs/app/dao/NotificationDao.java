@@ -245,7 +245,6 @@ public void insertNotification(int userId, String title, String content) {
         String sql = "INSERT INTO Notification(user_id, title, content, is_read, created_at) VALUES(?, ?, ?, 0, NOW())";
         try (Connection con = Db.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
-
             ps.setInt(1, userId);
             ps.setString(2, title);
             ps.setString(3, content);

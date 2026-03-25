@@ -19,6 +19,25 @@ import java.util.Map;
 @WebServlet(name = "AppServlet", urlPatterns = {"/app"})
 public class AppServlet extends HttpServlet {
 
+    private void sortSoftwareList(List<Software> list, String sort, String order) {
+        if (list == null || list.isEmpty()) {
+            return;
+        }
+
+        Comparator<Software> comparator;
+        if ("price".equals(sort)) {
+            comparator = Comparator.comparing(sw -> sw.getPrice() == null ? 0.0 : sw.getPrice());
+        } else {
+            comparator = Comparator.comparing(sw -> sw.getName() == null ? "" : sw.getName().toLowerCase());
+        }
+
+        if ("desc".equals(order)) {
+            comparator = comparator.reversed();
+        }
+
+        list.sort(comparator.thenComparing(Software::getSoftwareId, Comparator.nullsLast(Integer::compareTo)));
+    }
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -104,24 +123,5 @@ public class AppServlet extends HttpServlet {
             return "desc";
         }
         return "asc";
-    }
-
-    private void sortSoftwareList(List<Software> list, String sort, String order) {
-        if (list == null || list.isEmpty()) {
-            return;
-        }
-
-        Comparator<Software> comparator;
-        if ("price".equals(sort)) {
-            comparator = Comparator.comparing(sw -> sw.getPrice() == null ? 0.0 : sw.getPrice());
-        } else {
-            comparator = Comparator.comparing(sw -> sw.getName() == null ? "" : sw.getName().toLowerCase());
-        }
-
-        if ("desc".equals(order)) {
-            comparator = comparator.reversed();
-        }
-
-        list.sort(comparator.thenComparing(Software::getSoftwareId, Comparator.nullsLast(Integer::compareTo)));
     }
 }

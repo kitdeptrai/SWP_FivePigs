@@ -130,7 +130,7 @@ public class SettingsServlet extends HttpServlet {
         }
 
         return switch (tab) {
-            case "payment_methods", "feedback", "store_settings" -> tab;
+            case "feedback", "store_settings" -> tab;
             default -> "store_settings";
         };
     }
