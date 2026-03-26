@@ -89,51 +89,68 @@ public class VendorDao {
         return revenueMap;
     }
 
-    public List<VendorPayout> getPayoutByVendorId(int vendorId) throws SQLException {
-        List<VendorPayout> list = new ArrayList<>();
+    public List<VendorEarning> getVendorTransactions(int vendorId) throws SQLException {
 
-        String sql = "SELECT * FROM Vendor_Payout WHERE vendor_id=?";
+        List<VendorEarning> list = new ArrayList<>();
 
-        try (Connection c = Db.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
+        String sql = """
+        SELECT 
+            ve.amount AS vendor_revenue,
+            od.price AS original_price,
+        
+            o.commission_percent,
+        
+            o.order_id,
+            o.order_date,
+        
+            u.full_name,
+            u.email,
+            s.name
+        
+        FROM Vendor_Earning ve
+        JOIN Orders o ON ve.order_id = o.order_id
+        JOIN Order_Detail od ON od.order_id = o.order_id 
+                             AND od.software_id = ve.software_id
+        JOIN Users u ON o.customer_id = u.user_id
+        JOIN Software s ON ve.software_id = s.software_id
+        
+        WHERE ve.vendor_id = ?
+        ORDER BY o.order_date DESC;
+    """;
+
+        try (Connection conn = Db.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, vendorId);
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
 
-                    VendorPayout vp = new VendorPayout();
+                    VendorEarning ve = new VendorEarning();
+                    Order o = new Order();
+                    OrderDetail od = new OrderDetail();
+                    SystemConfig sc = new SystemConfig();
+                    Software s = new Software();
+                    User u = new User();
+                    o.setOrderId(rs.getInt("order_id"));
+                    u.setFullName(rs.getString("full_name"));
+                    u.setEmail(rs.getString("email"));
+                    s.setName(rs.getString("name"));
 
-                    vp.setPayoutId(rs.getInt("payout_id"));
-                    vp.setAmount(rs.getDouble("amount"));
-                    vp.setPaymentMethod(rs.getString("payment_method"));
-                    vp.setPaymentAccount(rs.getString("payment_account"));
-                    vp.setStatus(rs.getString("status"));
-                    vp.setProcessedAt(rs.getObject("processed_at", LocalDateTime.class));
-                    vp.setCreatedAt(rs.getObject("created_at", LocalDateTime.class));
+                    od.setPrice(rs.getDouble("original_price"));
+                    ve.setAmount(rs.getDouble("vendor_revenue"));
+                    sc.setConfigValue(rs.getString("commission_percent"));
 
-                    list.add(vp);
+                    o.setOrderDate(rs.getObject("order_date", LocalDateTime.class));
+                    ve.setOrder(o);
+                    ve.setOrderDetail(od);
+                    ve.setSystemConfig(sc);
+                    ve.setUser(u);
+                    ve.setSoftware(s);
+                    list.add(ve);
                 }
             }
         }
 
         return list;
-    }
-
-    public void createPayoutRequest(int vendorId, double amount,
-            String paymentMethod, String paymentAccount) throws SQLException {
-
-        String sql = "INSERT INTO Vendor_Payout "
-                + "(vendor_id, amount, payment_method, payment_account, status) "
-                + "VALUES (?, ?, ?, ?, 'PENDING')";
-
-        try (Connection c = Db.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
-
-            ps.setInt(1, vendorId);
-            ps.setDouble(2, amount);
-            ps.setString(3, paymentMethod);
-            ps.setString(4, paymentAccount);
-
-            ps.executeUpdate();
-        }
     }
 }

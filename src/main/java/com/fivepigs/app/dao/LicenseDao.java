@@ -216,8 +216,8 @@ public class LicenseDao {
 
                 int licenseId;
                 try (PreparedStatement ps = c.prepareStatement(
-                        "INSERT INTO License(license_key, pricing_id, software_id, owner_id, max_users, purchase_date, expire_date, status) " +
-                                "VALUES (?, ?, ?, ?, ?, NOW(), ?, 'ACTIVE')",
+                        "INSERT INTO License(license_key, pricing_id, software_id, owner_id, max_users, purchase_date, expire_date, status) "
+                        + "VALUES (?, ?, ?, ?, ?, NOW(), ?, 'ACTIVE')",
                         PreparedStatement.RETURN_GENERATED_KEYS)) {
                     ps.setString(1, generateLicenseKey());
                     ps.setInt(2, demoPricing.getPricingId());
@@ -355,48 +355,44 @@ public class LicenseDao {
                 + "GROUP BY l.license_id\n"
                 + "ORDER BY l.license_id DESC;";
 
-       
+        try (Connection c = Db.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
 
-    try (Connection c = Db.getConnection();
-         PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, vendorId);
 
-        ps.setInt(1, vendorId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    License li = new License();
+                    User user = new User();
+                    Software sw = new Software();
+                    SoftwarePricing swp = new SoftwarePricing();
+                    li.setLicenseId(rs.getInt("license_id"));
+                    li.setLicenseKey(rs.getString("license_key"));
 
-        try (ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                License li = new License();
-                User user = new User();
-                Software sw = new Software();
-                SoftwarePricing swp=new SoftwarePricing();
-                li.setLicenseId(rs.getInt("license_id"));
-                li.setLicenseKey(rs.getString("license_key"));
+                    // Software
+                    sw.setName(rs.getString("software_name"));
+                    li.setSoftware(sw);
 
-                // Software
-                sw.setName(rs.getString("software_name"));
-                li.setSoftware(sw);
+                    // User
+                    user.setFullName(rs.getString("customer_name"));
+                    user.setEmail(rs.getString("email"));
+                    li.setUser(user);
+                    li.setSoftwarePricing(swp);
 
-                // User
-                user.setFullName(rs.getString("customer_name"));
-                user.setEmail(rs.getString("email"));
-                li.setUser(user);
-                li.setSoftwarePricing(swp);
+                    // Pricing info (NEW)
+                    swp.setPlanName(rs.getString("plan_name"));
+                    swp.setMaxUsers(rs.getInt("max_users"));
+                    li.setUsedUsers(rs.getInt("used_users"));
 
-                // Pricing info (NEW)
-                
-                swp.setPlanName(rs.getString("plan_name"));
-                swp.setMaxUsers(rs.getInt("max_users"));
-                li.setUsedUsers(rs.getInt("used_users"));
+                    // Date + status
+                    li.setPurchaseDate(rs.getObject("purchase_date", LocalDateTime.class));
+                    li.setExpireDate(rs.getObject("expire_date", LocalDateTime.class));
+                    li.setStatus(rs.getString("status"));
 
-                // Date + status
-                li.setPurchaseDate(rs.getObject("purchase_date", LocalDateTime.class));
-                li.setExpireDate(rs.getObject("expire_date", LocalDateTime.class));
-                li.setStatus(rs.getString("status"));
-
-                list.add(li);
+                    list.add(li);
+                }
             }
         }
-    }
-    return list;
+        return list;
     }
 
     public Integer getTotalLicenseByVendor(int vendorId) throws SQLException {
@@ -470,16 +466,15 @@ public class LicenseDao {
     }
 
     private boolean hasOwnedLicense(int userId, int softwareId) throws SQLException {
-        String sql = "SELECT 1 " +
-                "FROM fivepigs.license_user lu " +
-                "JOIN fivepigs.license l ON lu.license_id = l.license_id " +
-                "WHERE lu.user_id = ? AND l.software_id = ? " +
-                "AND (lu.status IS NULL OR UPPER(lu.status) = 'ACTIVE') " +
-                "AND (l.status IS NULL OR UPPER(l.status) <> 'REVOKED') " +
-                "AND (l.expire_date IS NULL OR l.expire_date >= NOW()) LIMIT 1";
+        String sql = "SELECT 1 "
+                + "FROM fivepigs.license_user lu "
+                + "JOIN fivepigs.license l ON lu.license_id = l.license_id "
+                + "WHERE lu.user_id = ? AND l.software_id = ? "
+                + "AND (lu.status IS NULL OR UPPER(lu.status) = 'ACTIVE') "
+                + "AND (l.status IS NULL OR UPPER(l.status) <> 'REVOKED') "
+                + "AND (l.expire_date IS NULL OR l.expire_date >= NOW()) LIMIT 1";
 
-        try (Connection c = Db.getConnection();
-             PreparedStatement st = c.prepareStatement(sql)) {
+        try (Connection c = Db.getConnection(); PreparedStatement st = c.prepareStatement(sql)) {
             st.setInt(1, userId);
             st.setInt(2, softwareId);
             try (ResultSet rs = st.executeQuery()) {
@@ -570,5 +565,214 @@ public class LicenseDao {
 
     private String generateLicenseKey() {
         return UUID.randomUUID().toString().replace("-", "").toUpperCase();
+    }
+
+    public void delete(int licenseId, int userId) throws SQLException {
+
+        String checkOwnerSql = """
+        SELECT owner_id
+        FROM License
+        WHERE license_id = ?
+    """;
+
+        String deleteSql = """
+        DELETE FROM License_User
+        WHERE license_id = ? AND user_id = ?
+    """;
+
+        try (Connection conn = Db.getConnection()) {
+
+            int ownerId = -1;
+
+            // check owner
+            try (PreparedStatement ps = conn.prepareStatement(checkOwnerSql)) {
+                ps.setInt(1, licenseId);
+
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        ownerId = rs.getInt("owner_id");
+                    }
+                }
+            }
+
+            if (ownerId == userId) {
+                throw new SQLException("Cannot remove license owner");
+            }
+
+            // delete
+            try (PreparedStatement ps = conn.prepareStatement(deleteSql)) {
+                ps.setInt(1, licenseId);
+                ps.setInt(2, userId);
+                ps.executeUpdate();
+            }
+        }
+    }
+
+    public List<User> getUsersByLicenseId(int licenseId) throws SQLException {
+        List<User> list = new ArrayList<>();
+
+        String sql = """
+        SELECT u.*
+        FROM License_User lu
+        JOIN Users u ON lu.user_id = u.user_id
+        WHERE lu.license_id = ?
+          AND lu.status = 'ACTIVE'
+    """;
+
+        try (Connection conn = Db.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, licenseId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    User u = new User();
+                    u.setUserId(rs.getInt("user_id"));
+                    u.setFullName(rs.getString("full_name"));
+                    u.setEmail(rs.getString("email"));
+                    u.setStatus(rs.getString("status"));
+                    list.add(u);
+                }
+            }
+        }
+
+        return list;
+    }
+
+    public int countUsers(int licenseId) throws SQLException {
+        String sql = """
+        SELECT COUNT(*)
+        FROM License_User
+        WHERE license_id = ?
+          AND status = 'ACTIVE'
+    """;
+
+        try (Connection conn = Db.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, licenseId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        }
+
+        return 0;
+    }
+
+    public boolean addUserToLicense(int licenseId, int userId) throws SQLException {
+
+        String checkSql = """
+        SELECT l.max_users,
+               (SELECT COUNT(*) FROM License_User 
+                WHERE license_id = l.license_id AND status='ACTIVE') AS total_users
+        FROM License l
+        WHERE l.license_id = ?
+    """;
+
+        String insertSql = """
+        INSERT INTO License_User (license_id, user_id)
+        VALUES (?, ?)
+    """;
+
+        try (Connection conn = Db.getConnection()) {
+
+            // check limit
+            try (PreparedStatement ps = conn.prepareStatement(checkSql)) {
+                ps.setInt(1, licenseId);
+
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        int max = rs.getInt("max_users");
+                        int current = rs.getInt("total_users");
+
+                        if (current >= max) {
+                            return false; // full
+                        }
+                    }
+                }
+            }
+
+            // insert
+            try (PreparedStatement ps = conn.prepareStatement(insertSql)) {
+                ps.setInt(1, licenseId);
+                ps.setInt(2, userId);
+                ps.executeUpdate();
+            }
+        }
+
+        return true;
+    }
+
+    public boolean updateMaxUsers(int licenseId, int newMax) throws SQLException {
+
+        String countSql = """
+        SELECT COUNT(*) 
+        FROM License_User
+        WHERE license_id = ?
+          AND status='ACTIVE'
+    """;
+
+        String updateSql = """
+        UPDATE License
+        SET max_users = ?
+        WHERE license_id = ?
+    """;
+
+        try (Connection conn = Db.getConnection()) {
+
+            int currentUsers = 0;
+
+            try (PreparedStatement ps = conn.prepareStatement(countSql)) {
+                ps.setInt(1, licenseId);
+
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        currentUsers = rs.getInt(1);
+                    }
+                }
+            }
+
+            if (newMax < currentUsers) {
+                return false; // invalid
+            }
+
+            try (PreparedStatement ps = conn.prepareStatement(updateSql)) {
+                ps.setInt(1, newMax);
+                ps.setInt(2, licenseId);
+                ps.executeUpdate();
+            }
+        }
+
+        return true;
+    }
+
+    public License getLicenseById(int licenseId) throws SQLException {
+
+        String sql = """
+        SELECT *
+        FROM License
+        WHERE license_id = ?
+    """;
+
+        try (Connection conn = Db.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, licenseId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    License l = new License();
+                    l.setLicenseId(rs.getInt("license_id"));
+                    l.setLicenseKey(rs.getString("license_key"));
+                    l.setSoftwareId(rs.getInt("software_id"));
+                    l.setOwnerId(rs.getInt("owner_id"));
+                    l.setMaxUsers(rs.getInt("max_users"));
+                    l.setStatus(rs.getString("status"));
+                    return l;
+                }
+            }
+        }
+
+        return null;
     }
 }
