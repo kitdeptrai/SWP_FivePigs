@@ -2,6 +2,8 @@ package com.fivepigs.app.service;
 
 import com.fivepigs.app.dao.AdminDao;
 
+import com.fivepigs.app.util.EmailService;
+
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
@@ -222,6 +224,50 @@ public class AdminService {
         return updated ? null : "invalid_state";
     }
 
+    public AdminDao.AdminReportDetailRow getReportDetail(String reportIdStr) {
+        Integer reportId = parseId(reportIdStr);
+        if (reportId == null) {
+            return null;
+        }
+        return adminDao.getReportDetail(reportId);
+    }
+
+    public String markReportAsRead(String reportIdStr) throws SQLException {
+        Integer reportId = parseId(reportIdStr);
+        if (reportId == null) {
+            return "invalid_id";
+        }
+
+        AdminDao.AdminReportDetailRow detail = adminDao.getReportDetail(reportId);
+        if (detail == null) {
+            return "not_found";
+        }
+
+        boolean updated = adminDao.markReportAsRead(reportId);
+        if (!updated) {
+            return "invalid_state";
+        }
+
+        String toEmail = detail.getReporterEmail();
+        if (toEmail != null && !toEmail.isBlank()) {
+            String subject = "Your report has been received by FivePigs Admin";
+            String htmlBody = "<p>Hello " + escapeHtml(detail.getReporterName()) + ",</p>"
+                    + "<p>We have received and marked your report as read.</p>"
+                    + "<p><strong>Report ID:</strong> #" + detail.getReportId() + "<br/>"
+                    + "<strong>Software:</strong> " + escapeHtml(detail.getSoftwareName()) + "<br/>"
+                    + "<strong>Status:</strong> READ</p>"
+                    + "<p>Thank you for helping us improve quality and safety on FivePigs.</p>"
+                    + "<p>Best regards,<br/>FivePigs Admin Team</p>";
+            try {
+                EmailService.sendHtmlEmail(toEmail, subject, htmlBody);
+            } catch (RuntimeException ignored) {
+                // Do not fail the admin action if email sending fails.
+            }
+        }
+
+        return null;
+    }
+
     public AdminDao.AdminProductDetailRow getProductDetail(String softwareIdStr) {
         Integer softwareId = parseId(softwareIdStr);
         if (softwareId == null) {
@@ -403,6 +449,17 @@ public class AdminService {
 
     private boolean isBlank(String value) {
         return value == null || value.isBlank();
+    }
+
+    private String escapeHtml(String value) {
+        if (value == null) {
+            return "";
+        }
+        return value.replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
+                .replace("\"", "&quot;")
+                .replace("'", "&#39;");
     }
 
     public static class PageResult<T> {

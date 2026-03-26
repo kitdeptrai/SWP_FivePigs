@@ -590,6 +590,52 @@ public class AdminDao {
         }
     }
 
+    public AdminReportDetailRow getReportDetail(int reportId) {
+        String sql = "SELECT r.report_id, r.software_id, r.reason, r.status AS report_status, r.created_at AS report_created_at, " +
+                "s.name AS software_name, s.status AS software_status, " +
+                "vendor.full_name AS vendor_name, vendor.email AS vendor_email, " +
+                "reporter.full_name AS reporter_name, reporter.email AS reporter_email " +
+                "FROM report r " +
+                "JOIN software s ON r.software_id = s.software_id " +
+                "LEFT JOIN users vendor ON s.vendor_id = vendor.user_id " +
+                "LEFT JOIN users reporter ON r.reporter_id = reporter.user_id " +
+                "WHERE r.report_id = ?";
+
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, reportId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new AdminReportDetailRow(
+                            rs.getInt("report_id"),
+                            rs.getInt("software_id"),
+                            rs.getString("software_name"),
+                            rs.getString("vendor_name"),
+                            rs.getString("vendor_email"),
+                            rs.getString("reporter_name"),
+                            rs.getString("reporter_email"),
+                            rs.getString("reason"),
+                            rs.getString("report_status"),
+                            rs.getString("software_status"),
+                            rs.getTimestamp("report_created_at")
+                    );
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public boolean markReportAsRead(int reportId) throws SQLException {
+        String sql = "UPDATE report SET status = 'READ' WHERE report_id = ? AND UPPER(COALESCE(status, '')) <> 'READ'";
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, reportId);
+            return ps.executeUpdate() > 0;
+        }
+    }
+
     public AdminProductDetailRow getProductDetail(int softwareId) {
         String sql = "SELECT s.software_id, s.name, s.short_description, s.price, s.is_free, s.status, s.download_count, s.avg_rating, s.created_at, " +
                 "u.full_name AS vendor_name, c.category_name, sv.version_name, sd.description, sd.system_requirement, si.image_url " +
@@ -1164,6 +1210,78 @@ public class AdminDao {
 
         public String getReporterName() {
             return reporterName;
+        }
+
+        public String getReason() {
+            return reason;
+        }
+
+        public String getReportStatus() {
+            return reportStatus;
+        }
+
+        public String getSoftwareStatus() {
+            return softwareStatus;
+        }
+
+        public java.sql.Timestamp getCreatedAt() {
+            return createdAt;
+        }
+    }
+
+    public static class AdminReportDetailRow {
+        private final int reportId;
+        private final int softwareId;
+        private final String softwareName;
+        private final String vendorName;
+        private final String vendorEmail;
+        private final String reporterName;
+        private final String reporterEmail;
+        private final String reason;
+        private final String reportStatus;
+        private final String softwareStatus;
+        private final java.sql.Timestamp createdAt;
+
+        public AdminReportDetailRow(int reportId, int softwareId, String softwareName, String vendorName, String vendorEmail, String reporterName, String reporterEmail, String reason, String reportStatus, String softwareStatus, java.sql.Timestamp createdAt) {
+            this.reportId = reportId;
+            this.softwareId = softwareId;
+            this.softwareName = softwareName;
+            this.vendorName = vendorName;
+            this.vendorEmail = vendorEmail;
+            this.reporterName = reporterName;
+            this.reporterEmail = reporterEmail;
+            this.reason = reason;
+            this.reportStatus = reportStatus;
+            this.softwareStatus = softwareStatus;
+            this.createdAt = createdAt;
+        }
+
+        public int getReportId() {
+            return reportId;
+        }
+
+        public int getSoftwareId() {
+            return softwareId;
+        }
+
+        public String getSoftwareName() {
+            return softwareName;
+        }
+
+        public String getVendorName() {
+            return vendorName;
+        }
+
+        public String getVendorEmail() {
+            return vendorEmail;
+        }
+
+        public String getReporterName() {
+            return reporterName;
+        }
+
+        public String getReporterEmail() {
+            return reporterEmail;
         }
 
         public String getReason() {
