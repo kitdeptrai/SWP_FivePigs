@@ -173,30 +173,14 @@
     <jsp:include page="sidebar.jsp"/>
 
     <main class="main">
-        <h1 style="margin-top:0;">Product Detail</h1>
-        <p class="subtitle">Product details.</p>
+        <h1 style="margin-top:0;">Report Detail</h1>
+        <p class="subtitle">Detailed information of a reported product case.</p>
 
         <div class="card">
-            <div style="display:flex; align-items:center; gap:16px;">
-                <c:if test="${not empty product.imageUrl}">
-                    <img src="/${product.imageUrl}" alt="thumbnail" style="width:90px; height:90px; border-radius:12px; object-fit:cover;" />
-                </c:if>
-                <div>
-                    <h2 style="margin:0;">${product.name}</h2>
-                    <p style="margin:6px 0; color:#64748b;">${product.categoryName} • ${product.vendorName}</p>
-                    <c:choose>
-                        <c:when test="${product.status == 'ACTIVE'}">
-                            <span class="badge active">ACTIVE</span>
-                        </c:when>
-                        <c:when test="${product.status == 'INACTIVE'}">
-                            <span class="badge inactive">INACTIVE</span>
-                        </c:when>
-                        <c:otherwise>
-                            <span class="badge pending">${product.status}</span>
-                        </c:otherwise>
-                    </c:choose>
-                </div>
-            </div>
+            <h3 style="margin-top:0;">Report #${report.reportId}</h3>
+            <div class="kv"><strong>Report Status</strong><span>${report.reportStatus}</span></div>
+            <div class="kv"><strong>Created At</strong><span><fmt:formatDate value="${report.createdAt}" pattern="dd/MM/yyyy HH:mm"/></span></div>
+            <div class="kv"><strong>Reason</strong><span>${report.reason}</span></div>
 
             <div style="margin-top:20px;" class="actions">
                 <a class="btn secondary" href="${pageContext.request.contextPath}/admin/products">Back</a>
@@ -204,40 +188,18 @@
         </div>
 
         <div class="card">
-            <h3>Basic information</h3>
-            <div class="kv"><strong>ID</strong><span>#${product.softwareId}</span></div>
-            <div class="kv"><strong>Version</strong><span>${product.versionName}</span></div>
-            <div class="kv"><strong>Price</strong>
-                <span>
-                    <c:choose>
-                        <c:when test="${product.isFree == 1}">Free</c:when>
-                        <c:otherwise><fmt:formatNumber value="${product.price}" type="currency" currencySymbol="$"/></c:otherwise>
-                    </c:choose>
-                </span>
-            </div>
-            <div class="kv"><strong>Downloads</strong><span>${product.downloadCount}</span></div>
-            <div class="kv"><strong>Rating</strong><span><fmt:formatNumber value="${product.avgRating}" minFractionDigits="1" maxFractionDigits="1"/></span></div>
-            <div class="kv"><strong>Created At</strong><span><fmt:formatDate value="${product.createdAt}" pattern="dd/MM/yyyy HH:mm"/></span></div>
-            <div class="kv"><strong>Short Description</strong><span>${product.shortDescription}</span></div>
+            <h3>Product information</h3>
+            <div class="kv"><strong>Software ID</strong><span>#${report.softwareId}</span></div>
+            <div class="kv"><strong>Software Name</strong><span>${report.softwareName}</span></div>
+            <div class="kv"><strong>Product Status</strong><span>${report.softwareStatus}</span></div>
+            <div class="kv"><strong>Vendor</strong><span>${report.vendorName}</span></div>
+            <div class="kv"><strong>Vendor Email</strong><span>${report.vendorEmail}</span></div>
         </div>
 
         <div class="card">
-            <h3>Description</h3>
-            <p>${product.description}</p>
-        </div>
-
-        <div class="card">
-            <h3>System Requirement</h3>
-            <p>${product.systemRequirement}</p>
-        </div>
-
-        <div class="card">
-            <h3>Images</h3>
-            <div class="image-grid">
-                <c:forEach var="img" items="${images}">
-                    <img src="/${img.imageUrl}" alt="product image" />
-                </c:forEach>
-            </div>
+            <h3>Reporter information</h3>
+            <div class="kv"><strong>Reporter Name</strong><span>${report.reporterName}</span></div>
+            <div class="kv"><strong>Reporter Email</strong><span>${report.reporterEmail}</span></div>
         </div>
     </main>
 </div>

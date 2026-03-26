@@ -636,8 +636,138 @@ public class AdminDao {
         }
     }
 
+    public int countUserFeedback(String keyword, String status) {
+        StringBuilder sql = new StringBuilder(
+                "SELECT COUNT(*) " +
+                        "FROM user_feedback uf " +
+                        "JOIN users u ON uf.user_id = u.user_id " +
+                        "WHERE 1=1"
+        );
+        List<Object> params = new ArrayList<>();
+
+        if (status != null) {
+            sql.append(" AND UPPER(COALESCE(uf.status, 'NEW')) = ?");
+            params.add(status);
+        }
+        if (keyword != null) {
+            sql.append(" AND (CAST(uf.feedback_id AS CHAR) LIKE ? OR LOWER(COALESCE(uf.subject, '')) LIKE ? OR LOWER(COALESCE(uf.message, '')) LIKE ? OR LOWER(COALESCE(u.full_name, '')) LIKE ? OR LOWER(COALESCE(u.email, '')) LIKE ?)");
+            String kw = "%" + keyword.toLowerCase() + "%";
+            params.add(kw);
+            params.add(kw);
+            params.add(kw);
+            params.add(kw);
+            params.add(kw);
+        }
+
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? rs.getInt(1) : 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    public List<AdminUserFeedbackRow> listUserFeedbackPaged(int limit, int offset, String keyword, String status) {
+        StringBuilder sql = new StringBuilder(
+                "SELECT uf.feedback_id, uf.subject, uf.message, COALESCE(uf.status, 'NEW') AS feedback_status, uf.created_at AS feedback_created_at, " +
+                        "u.user_id, u.full_name AS user_name, u.email AS user_email " +
+                        "FROM user_feedback uf " +
+                        "JOIN users u ON uf.user_id = u.user_id " +
+                        "WHERE 1=1"
+        );
+        List<Object> params = new ArrayList<>();
+
+        if (status != null) {
+            sql.append(" AND UPPER(COALESCE(uf.status, 'NEW')) = ?");
+            params.add(status);
+        }
+        if (keyword != null) {
+            sql.append(" AND (CAST(uf.feedback_id AS CHAR) LIKE ? OR LOWER(COALESCE(uf.subject, '')) LIKE ? OR LOWER(COALESCE(uf.message, '')) LIKE ? OR LOWER(COALESCE(u.full_name, '')) LIKE ? OR LOWER(COALESCE(u.email, '')) LIKE ?)");
+            String kw = "%" + keyword.toLowerCase() + "%";
+            params.add(kw);
+            params.add(kw);
+            params.add(kw);
+            params.add(kw);
+            params.add(kw);
+        }
+
+        sql.append(" ORDER BY uf.created_at DESC, uf.feedback_id DESC LIMIT ? OFFSET ?");
+        params.add(limit);
+        params.add(offset);
+
+        List<AdminUserFeedbackRow> rows = new ArrayList<>();
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    rows.add(new AdminUserFeedbackRow(
+                            rs.getInt("feedback_id"),
+                            rs.getInt("user_id"),
+                            rs.getString("user_name"),
+                            rs.getString("user_email"),
+                            rs.getString("subject"),
+                            rs.getString("message"),
+                            rs.getString("feedback_status"),
+                            rs.getTimestamp("feedback_created_at")
+                    ));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return rows;
+    }
+
+    public AdminUserFeedbackDetailRow getUserFeedbackDetail(int feedbackId) {
+        String sql = "SELECT uf.feedback_id, uf.user_id, uf.subject, uf.message, COALESCE(uf.status, 'NEW') AS feedback_status, uf.created_at AS feedback_created_at, " +
+                "u.full_name AS user_name, u.email AS user_email " +
+                "FROM user_feedback uf " +
+                "JOIN users u ON uf.user_id = u.user_id " +
+                "WHERE uf.feedback_id = ?";
+
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, feedbackId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new AdminUserFeedbackDetailRow(
+                            rs.getInt("feedback_id"),
+                            rs.getInt("user_id"),
+                            rs.getString("user_name"),
+                            rs.getString("user_email"),
+                            rs.getString("subject"),
+                            rs.getString("message"),
+                            rs.getString("feedback_status"),
+                            rs.getTimestamp("feedback_created_at")
+                    );
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public boolean markUserFeedbackAsRead(int feedbackId) throws SQLException {
+        String sql = "UPDATE user_feedback SET status = 'READ' WHERE feedback_id = ? AND UPPER(COALESCE(status, 'NEW')) <> 'READ'";
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, feedbackId);
+            return ps.executeUpdate() > 0;
+        }
+    }
+
     public AdminProductDetailRow getProductDetail(int softwareId) {
-        String sql = "SELECT s.software_id, s.name, s.short_description, s.price, s.is_free, s.status, s.download_count, s.avg_rating, s.created_at, " +
+        String sql = "SELECT s.software_id, s.name, s.short_description, COALESCE(sp.price, 0) AS price, s.is_free, s.status, s.download_count, s.avg_rating, s.created_at, " +
                 "u.full_name AS vendor_name, c.category_name, sv.version_name, sd.description, sd.system_requirement, si.image_url " +
                 "FROM software s " +
                 "LEFT JOIN users u ON s.vendor_id = u.user_id " +
@@ -645,6 +775,7 @@ public class AdminDao {
                 "LEFT JOIN software_version sv ON sv.software_id = s.software_id AND sv.is_active = 1 " +
                 "LEFT JOIN software_detail sd ON sd.software_id = s.software_id " +
                 "LEFT JOIN software_image si ON si.software_id = s.software_id AND si.is_thumbnail = 1 " +
+                "LEFT JOIN software_pricing sp ON sp.software_id = s.software_id AND sp.is_active = 1 " +
                 "WHERE s.software_id = ?";
 
         try (Connection conn = Db.getConnection();
@@ -1294,6 +1425,114 @@ public class AdminDao {
 
         public String getSoftwareStatus() {
             return softwareStatus;
+        }
+
+        public java.sql.Timestamp getCreatedAt() {
+            return createdAt;
+        }
+    }
+
+    public static class AdminUserFeedbackRow {
+        private final int feedbackId;
+        private final int userId;
+        private final String userName;
+        private final String userEmail;
+        private final String subject;
+        private final String message;
+        private final String feedbackStatus;
+        private final java.sql.Timestamp createdAt;
+
+        public AdminUserFeedbackRow(int feedbackId, int userId, String userName, String userEmail, String subject, String message, String feedbackStatus, java.sql.Timestamp createdAt) {
+            this.feedbackId = feedbackId;
+            this.userId = userId;
+            this.userName = userName;
+            this.userEmail = userEmail;
+            this.subject = subject;
+            this.message = message;
+            this.feedbackStatus = feedbackStatus;
+            this.createdAt = createdAt;
+        }
+
+        public int getFeedbackId() {
+            return feedbackId;
+        }
+
+        public int getUserId() {
+            return userId;
+        }
+
+        public String getUserName() {
+            return userName;
+        }
+
+        public String getUserEmail() {
+            return userEmail;
+        }
+
+        public String getSubject() {
+            return subject;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public String getFeedbackStatus() {
+            return feedbackStatus;
+        }
+
+        public java.sql.Timestamp getCreatedAt() {
+            return createdAt;
+        }
+    }
+
+    public static class AdminUserFeedbackDetailRow {
+        private final int feedbackId;
+        private final int userId;
+        private final String userName;
+        private final String userEmail;
+        private final String subject;
+        private final String message;
+        private final String feedbackStatus;
+        private final java.sql.Timestamp createdAt;
+
+        public AdminUserFeedbackDetailRow(int feedbackId, int userId, String userName, String userEmail, String subject, String message, String feedbackStatus, java.sql.Timestamp createdAt) {
+            this.feedbackId = feedbackId;
+            this.userId = userId;
+            this.userName = userName;
+            this.userEmail = userEmail;
+            this.subject = subject;
+            this.message = message;
+            this.feedbackStatus = feedbackStatus;
+            this.createdAt = createdAt;
+        }
+
+        public int getFeedbackId() {
+            return feedbackId;
+        }
+
+        public int getUserId() {
+            return userId;
+        }
+
+        public String getUserName() {
+            return userName;
+        }
+
+        public String getUserEmail() {
+            return userEmail;
+        }
+
+        public String getSubject() {
+            return subject;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public String getFeedbackStatus() {
+            return feedbackStatus;
         }
 
         public java.sql.Timestamp getCreatedAt() {

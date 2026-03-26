@@ -13,6 +13,7 @@ public class AdminService {
     private static final Set<String> ACTIVE_STATUSES = Set.of("ACTIVE", "INACTIVE");
     private static final Set<String> PAYOUT_STATUSES = Set.of("PENDING", "PAID");
     private static final Set<String> REPORT_STATUSES = Set.of("PENDING", "ERROR_REVIEW", "ERROR_APPROVAL", "REJECTED", "ERROR_REJECTED");
+    private static final Set<String> FEEDBACK_STATUSES = Set.of("NEW", "READ");
 
     private final AdminDao adminDao;
 
@@ -84,6 +85,10 @@ public class AdminService {
 
     public PageResult<AdminDao.AdminProductReportRow> getProductsPage(String pageParam, int pageSize, String keyword, String status) {
         return getProductsPage(parsePage(pageParam), pageSize, keyword, status);
+    }
+
+    public PageResult<AdminDao.AdminUserFeedbackRow> getUserFeedbackPage(String pageParam, int pageSize, String keyword, String status) {
+        return getUserFeedbackPage(parsePage(pageParam), pageSize, keyword, status);
     }
 
     public PageResult<AdminDao.AdminOrderRow> getSuccessfulOrdersPage(String pageParam,
@@ -206,6 +211,20 @@ public class AdminService {
         return new PageResult<>(items, currentPage, safePageSize, totalItems, totalPages);
     }
 
+    public PageResult<AdminDao.AdminUserFeedbackRow> getUserFeedbackPage(int page, int pageSize, String keyword, String status) {
+        int safePageSize = pageSize <= 0 ? 10 : pageSize;
+        String normalizedKeyword = normalizeKeyword(keyword);
+        String normalizedStatus = normalizeFeedbackStatusFilter(status);
+
+        int totalItems = adminDao.countUserFeedback(normalizedKeyword, normalizedStatus);
+        int totalPages = Math.max(1, (int) Math.ceil((double) totalItems / safePageSize));
+        int currentPage = Math.max(1, Math.min(page, totalPages));
+        int offset = (currentPage - 1) * safePageSize;
+
+        List<AdminDao.AdminUserFeedbackRow> items = adminDao.listUserFeedbackPaged(safePageSize, offset, normalizedKeyword, normalizedStatus);
+        return new PageResult<>(items, currentPage, safePageSize, totalItems, totalPages);
+    }
+
     public String approveReport(String reportIdStr) throws SQLException {
         Integer reportId = parseId(reportIdStr);
         if (reportId == null) {
@@ -224,39 +243,39 @@ public class AdminService {
         return updated ? null : "invalid_state";
     }
 
-    public AdminDao.AdminReportDetailRow getReportDetail(String reportIdStr) {
-        Integer reportId = parseId(reportIdStr);
-        if (reportId == null) {
+    public AdminDao.AdminUserFeedbackDetailRow getFeedbackDetail(String feedbackIdStr) {
+        Integer feedbackId = parseId(feedbackIdStr);
+        if (feedbackId == null) {
             return null;
         }
-        return adminDao.getReportDetail(reportId);
+        return adminDao.getUserFeedbackDetail(feedbackId);
     }
 
-    public String markReportAsRead(String reportIdStr) throws SQLException {
-        Integer reportId = parseId(reportIdStr);
-        if (reportId == null) {
+    public String markFeedbackAsRead(String feedbackIdStr) throws SQLException {
+        Integer feedbackId = parseId(feedbackIdStr);
+        if (feedbackId == null) {
             return "invalid_id";
         }
 
-        AdminDao.AdminReportDetailRow detail = adminDao.getReportDetail(reportId);
+        AdminDao.AdminUserFeedbackDetailRow detail = adminDao.getUserFeedbackDetail(feedbackId);
         if (detail == null) {
             return "not_found";
         }
 
-        boolean updated = adminDao.markReportAsRead(reportId);
+        boolean updated = adminDao.markUserFeedbackAsRead(feedbackId);
         if (!updated) {
             return "invalid_state";
         }
 
-        String toEmail = detail.getReporterEmail();
+        String toEmail = detail.getUserEmail();
         if (toEmail != null && !toEmail.isBlank()) {
-            String subject = "Your report has been received by FivePigs Admin";
-            String htmlBody = "<p>Hello " + escapeHtml(detail.getReporterName()) + ",</p>"
-                    + "<p>We have received and marked your report as read.</p>"
-                    + "<p><strong>Report ID:</strong> #" + detail.getReportId() + "<br/>"
-                    + "<strong>Software:</strong> " + escapeHtml(detail.getSoftwareName()) + "<br/>"
+            String subject = "Your feedback has been received by FivePigs Admin";
+            String htmlBody = "<p>Hello " + escapeHtml(detail.getUserName()) + ",</p>"
+                    + "<p>We have received your feedback and marked it as read.</p>"
+                    + "<p><strong>Feedback ID:</strong> #" + detail.getFeedbackId() + "<br/>"
+                    + "<strong>Subject:</strong> " + escapeHtml(detail.getSubject()) + "<br/>"
                     + "<strong>Status:</strong> READ</p>"
-                    + "<p>Thank you for helping us improve quality and safety on FivePigs.</p>"
+                    + "<p>Thank you for helping us improve FivePigs.</p>"
                     + "<p>Best regards,<br/>FivePigs Admin Team</p>";
             try {
                 EmailService.sendHtmlEmail(toEmail, subject, htmlBody);
@@ -274,6 +293,14 @@ public class AdminService {
             return null;
         }
         return adminDao.getProductDetail(softwareId);
+    }
+
+    public AdminDao.AdminReportDetailRow getProductReportDetail(String reportIdStr) {
+        Integer reportId = parseId(reportIdStr);
+        if (reportId == null) {
+            return null;
+        }
+        return adminDao.getReportDetail(reportId);
     }
 
     public String updateProductStatus(String softwareIdStr, String status) throws SQLException {
@@ -424,6 +451,17 @@ public class AdminService {
         }
         String value = status.trim().toUpperCase();
         if (!PAYOUT_STATUSES.contains(value)) {
+            return null;
+        }
+        return value;
+    }
+
+    private String normalizeFeedbackStatusFilter(String status) {
+        if (isBlank(status)) {
+            return null;
+        }
+        String value = status.trim().toUpperCase();
+        if (!FEEDBACK_STATUSES.contains(value)) {
             return null;
         }
         return value;

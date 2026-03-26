@@ -17,9 +17,9 @@ public class AdminReportsServlet extends DashboardServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String keyword = req.getParameter("keyword");
         String status = req.getParameter("status");
-        String selectedReportId = req.getParameter("reportId");
+        String selectedFeedbackId = req.getParameter("feedbackId");
 
-        AdminService.PageResult<?> pageResult = adminService.getProductsPage(
+        AdminService.PageResult<?> pageResult = adminService.getUserFeedbackPage(
                 req.getParameter("page"),
                 10,
                 keyword,
@@ -31,10 +31,10 @@ public class AdminReportsServlet extends DashboardServlet {
         req.setAttribute("totalPages", pageResult.getTotalPages());
         req.setAttribute("keyword", keyword);
         req.setAttribute("status", status);
-        req.setAttribute("selectedReportId", selectedReportId);
+        req.setAttribute("selectedFeedbackId", selectedFeedbackId);
 
-        if (selectedReportId != null && !selectedReportId.isBlank()) {
-            req.setAttribute("selectedReport", adminService.getReportDetail(selectedReportId));
+        if (selectedFeedbackId != null && !selectedFeedbackId.isBlank()) {
+            req.setAttribute("selectedFeedback", adminService.getFeedbackDetail(selectedFeedbackId));
         }
 
         super.doGet(req, resp);
@@ -48,9 +48,9 @@ public class AdminReportsServlet extends DashboardServlet {
             return;
         }
 
-        String reportId = req.getParameter("reportId");
+        String feedbackId = req.getParameter("feedbackId");
         try {
-            String error = adminService.markReportAsRead(reportId);
+            String error = adminService.markFeedbackAsRead(feedbackId);
             if (error != null) {
                 resp.sendRedirect(req.getContextPath() + "/admin/reports?error=" + error);
                 return;

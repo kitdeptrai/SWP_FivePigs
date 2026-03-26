@@ -256,7 +256,7 @@
                         <td><fmt:formatDate value="${p.createdAt}" pattern="dd/MM/yyyy HH:mm"/></td>
                         <td>
                             <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                                <a href="${pageContext.request.contextPath}/admin/products/detail?softwareId=${p.softwareId}" style="padding:6px 10px; border-radius:6px; border:1px solid #cbd5e1; text-decoration:none; color:#334155; font-weight:600;">Detail</a>
+                                <a href="${pageContext.request.contextPath}/admin/products/detail?reportId=${p.reportId}" style="padding:6px 10px; border-radius:6px; border:1px solid #cbd5e1; text-decoration:none; color:#334155; font-weight:600;">Detail</a>
                                 <c:if test="${p.reportStatus == 'PENDING'}">
                                     <a href="#approve-report-${p.reportId}" style="padding:6px 10px; border-radius:6px; border:none; background:#22c55e; color:#fff; font-weight:600; text-decoration:none;">Approve</a>
                                     <a href="#reject-report-${p.reportId}" style="padding:6px 10px; border-radius:6px; border:none; background:#ef4444; color:#fff; font-weight:600; text-decoration:none;">Reject</a>

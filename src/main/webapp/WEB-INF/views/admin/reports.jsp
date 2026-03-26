@@ -177,12 +177,12 @@
     <jsp:include page="sidebar.jsp"/>
 
     <main class="main">
-        <h1 style="margin-top: 0;">Reports Management</h1>
-        <p class="subtitle">Only two actions are available: View Detail and Mark as Read.</p>
+        <h1 style="margin-top: 0;">User Feedback Management</h1>
+        <p class="subtitle">Manage user feedback submitted from the system.</p>
 
         <div class="card" style="max-width: 100%;">
             <c:if test="${param.success == 'marked_read'}">
-                <div class="alert success">Report has been marked as read and a notification email was sent to the reporter.</div>
+                <div class="alert success">Feedback has been marked as read and a notification email was sent to the user.</div>
             </c:if>
             <c:if test="${not empty param.error}">
                 <div class="alert danger">Failed to process action: <c:out value="${param.error}"/>.</div>
@@ -191,18 +191,14 @@
             <form method="get" action="${pageContext.request.contextPath}/admin/reports" class="filter-grid">
                 <div>
                     <label style="display:block; font-size:12px; color:#64748b; margin-bottom:6px;">Search</label>
-                    <input class="input" type="text" name="keyword" value="${keyword}" placeholder="Report ID, software, vendor, reporter, reason..."/>
+                    <input class="input" type="text" name="keyword" value="${keyword}" placeholder="Feedback ID, subject, message, user name, user email..."/>
                 </div>
                 <div>
                     <label style="display:block; font-size:12px; color:#64748b; margin-bottom:6px;">Status</label>
                     <select class="select" name="status">
                         <option value="">All</option>
-                        <option value="PENDING" ${status == 'PENDING' ? 'selected' : ''}>PENDING</option>
+                        <option value="NEW" ${status == 'NEW' ? 'selected' : ''}>NEW</option>
                         <option value="READ" ${status == 'READ' ? 'selected' : ''}>READ</option>
-                        <option value="ERROR_REVIEW" ${status == 'ERROR_REVIEW' ? 'selected' : ''}>ERROR_REVIEW</option>
-                        <option value="ERROR_APPROVAL" ${status == 'ERROR_APPROVAL' ? 'selected' : ''}>ERROR_APPROVAL</option>
-                        <option value="REJECTED" ${status == 'REJECTED' ? 'selected' : ''}>REJECTED</option>
-                        <option value="ERROR_REJECTED" ${status == 'ERROR_REJECTED' ? 'selected' : ''}>ERROR_REJECTED</option>
                     </select>
                 </div>
                 <button type="submit" class="btn">Filter</button>
@@ -212,9 +208,9 @@
             <table>
                 <thead>
                 <tr>
-                    <th>Report ID</th>
-                    <th>Software</th>
-                    <th>Reporter</th>
+                    <th>Feedback ID</th>
+                    <th>Subject</th>
+                    <th>User</th>
                     <th>Status</th>
                     <th>Created At</th>
                     <th>Action</th>
@@ -223,32 +219,35 @@
                 <tbody>
                 <c:forEach var="r" items="${reports}">
                     <tr>
-                        <td>#${r.reportId}</td>
+                        <td>#${r.feedbackId}</td>
                         <td>
-                            <div><strong><c:out value="${r.name}"/></strong></div>
-                            <div style="color:#64748b;">Vendor: <c:out value="${r.vendorName}"/></div>
+                            <div><strong><c:out value="${r.subject}"/></strong></div>
+                            <div style="color:#64748b;"><c:out value="${r.message}"/></div>
                         </td>
-                        <td><c:out value="${r.reporterName}"/></td>
                         <td>
-                            <c:set var="statusClass" value="${r.reportStatus == 'PENDING' ? 'pending' : (r.reportStatus == 'READ' ? 'read' : (r.reportStatus == 'REJECTED' ? 'rejected' : (r.reportStatus == 'ERROR_REVIEW' ? 'error-review' : (r.reportStatus == 'ERROR_APPROVAL' ? 'error-approval' : 'error-rejected'))))}"/>
-                            <span class="badge ${statusClass}"><c:out value="${r.reportStatus}"/></span>
+                            <div><c:out value="${r.userName}"/></div>
+                            <div style="color:#64748b;"><c:out value="${r.userEmail}"/></div>
+                        </td>
+                        <td>
+                            <c:set var="statusClass" value="${r.feedbackStatus == 'READ' ? 'read' : 'pending'}"/>
+                            <span class="badge ${statusClass}"><c:out value="${r.feedbackStatus}"/></span>
                         </td>
                         <td><fmt:formatDate value="${r.createdAt}" pattern="dd/MM/yyyy HH:mm"/></td>
                         <td>
-                            <a class="btn-link" href="${pageContext.request.contextPath}/admin/reports?page=${currentPage}&keyword=${keyword}&status=${status}&reportId=${r.reportId}">View Detail</a>
-                            <c:if test="${r.reportStatus != 'READ'}">
-                                <a class="btn-link mark-read" href="#mark-read-${r.reportId}">Mark as Read</a>
+                            <a class="btn-link" href="${pageContext.request.contextPath}/admin/reports?page=${currentPage}&keyword=${keyword}&status=${status}&feedbackId=${r.feedbackId}">View Detail</a>
+                            <c:if test="${r.feedbackStatus != 'READ'}">
+                                <a class="btn-link mark-read" href="#mark-read-${r.feedbackId}">Mark as Read</a>
 
-                                <div id="mark-read-${r.reportId}" class="modal">
+                                <div id="mark-read-${r.feedbackId}" class="modal">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <h2>Mark report as read</h2>
+                                            <h2>Mark feedback as read</h2>
                                             <a class="close-modal" href="${pageContext.request.contextPath}/admin/reports">×</a>
                                         </div>
-                                        <p>Mark this report as read and notify the reporter by email?</p>
+                                        <p>Mark this feedback as read and notify the user by email?</p>
                                         <form method="post" action="${pageContext.request.contextPath}/admin/reports">
                                             <input type="hidden" name="action" value="markRead"/>
-                                            <input type="hidden" name="reportId" value="${r.reportId}"/>
+                                            <input type="hidden" name="feedbackId" value="${r.feedbackId}"/>
                                             <div class="actions">
                                                 <button type="submit" style="background:#15803d;">Mark as Read</button>
                                                 <a class="small" href="${pageContext.request.contextPath}/admin/reports">Cancel</a>
@@ -289,35 +288,29 @@
     </main>
 </div>
 
-<c:if test="${not empty selectedReport}">
+<c:if test="${not empty selectedFeedback}">
     <div class="modal-backdrop">
         <div class="modal">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
-                <h3 style="margin:0;">Report Detail #${selectedReport.reportId}</h3>
+                <h3 style="margin:0;">Feedback Detail #${selectedFeedback.feedbackId}</h3>
                 <a class="btn-reset" href="${pageContext.request.contextPath}/admin/reports?page=${currentPage}&keyword=${keyword}&status=${status}">Close</a>
             </div>
 
             <div class="detail-grid">
-                <div class="detail-label">Software</div>
-                <div class="detail-value"><strong><c:out value="${selectedReport.softwareName}"/></strong> (ID #${selectedReport.softwareId})</div>
+                <div class="detail-label">User</div>
+                <div class="detail-value"><c:out value="${selectedFeedback.userName}"/> - <c:out value="${selectedFeedback.userEmail}"/></div>
 
-                <div class="detail-label">Vendor</div>
-                <div class="detail-value"><c:out value="${selectedReport.vendorName}"/> - <c:out value="${selectedReport.vendorEmail}"/></div>
+                <div class="detail-label">Subject</div>
+                <div class="detail-value"><c:out value="${selectedFeedback.subject}"/></div>
 
-                <div class="detail-label">Reporter</div>
-                <div class="detail-value"><c:out value="${selectedReport.reporterName}"/> - <c:out value="${selectedReport.reporterEmail}"/></div>
-
-                <div class="detail-label">Report status</div>
-                <div class="detail-value"><c:out value="${selectedReport.reportStatus}"/></div>
-
-                <div class="detail-label">Software status</div>
-                <div class="detail-value"><c:out value="${selectedReport.softwareStatus}"/></div>
+                <div class="detail-label">Feedback status</div>
+                <div class="detail-value"><c:out value="${selectedFeedback.feedbackStatus}"/></div>
 
                 <div class="detail-label">Created at</div>
-                <div class="detail-value"><fmt:formatDate value="${selectedReport.createdAt}" pattern="dd/MM/yyyy HH:mm"/></div>
+                <div class="detail-value"><fmt:formatDate value="${selectedFeedback.createdAt}" pattern="dd/MM/yyyy HH:mm"/></div>
 
-                <div class="detail-label">Reason</div>
-                <div class="detail-value"><c:out value="${selectedReport.reason}"/></div>
+                <div class="detail-label">Message</div>
+                <div class="detail-value"><c:out value="${selectedFeedback.message}"/></div>
             </div>
         </div>
     </div>
