@@ -217,7 +217,7 @@
                         <td>
                             <div style="display:flex; gap: 8px;">
                                 <c:if test="${u.status == 'ACTIVE'}">
-                                    <a href="#disable-user-${u.userId}" style="color: var(--danger); text-decoration: none; font-size: 13px; font-weight: 600;" onclick="return confirm('Are you sure you want to disable this vendor?');">Disable</a>
+                                    <a href="#disable-user-${u.userId}" style="color: var(--danger); text-decoration: none; font-size: 13px; font-weight: 600;">Disable</a>
                                 </c:if>
                                 <c:if test="${u.status == 'INACTIVE'}">
                                     <a href="#enable-user-${u.userId}" style="color: #22c55e; text-decoration: none; font-size: 13px; font-weight: 600;">Enable</a>

@@ -258,14 +258,42 @@
                             <div style="display:flex; gap:8px; flex-wrap:wrap;">
                                 <a href="${pageContext.request.contextPath}/admin/products/detail?softwareId=${p.softwareId}" style="padding:6px 10px; border-radius:6px; border:1px solid #cbd5e1; text-decoration:none; color:#334155; font-weight:600;">Detail</a>
                                 <c:if test="${p.reportStatus == 'PENDING'}">
-                                    <form method="post" action="${pageContext.request.contextPath}/admin/products/approve" style="margin:0;" onsubmit="return confirm('Approve this report and move it to ERROR_REVIEW?');">
-                                        <input type="hidden" name="reportId" value="${p.reportId}" />
-                                        <button type="submit" style="padding:6px 10px; border-radius:6px; border:none; background:#22c55e; color:#fff; font-weight:600;">Approve</button>
-                                    </form>
-                                    <form method="post" action="${pageContext.request.contextPath}/admin/products/reject" style="margin:0;" onsubmit="return confirm('Reject this report?');">
-                                        <input type="hidden" name="reportId" value="${p.reportId}" />
-                                        <button type="submit" style="padding:6px 10px; border-radius:6px; border:none; background:#ef4444; color:#fff; font-weight:600;">Reject</button>
-                                    </form>
+                                    <a href="#approve-report-${p.reportId}" style="padding:6px 10px; border-radius:6px; border:none; background:#22c55e; color:#fff; font-weight:600; text-decoration:none;">Approve</a>
+                                    <a href="#reject-report-${p.reportId}" style="padding:6px 10px; border-radius:6px; border:none; background:#ef4444; color:#fff; font-weight:600; text-decoration:none;">Reject</a>
+
+                                    <div id="approve-report-${p.reportId}" class="modal">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h2>Approve report</h2>
+                                                <a class="close-modal" href="${pageContext.request.contextPath}/admin/products">×</a>
+                                            </div>
+                                            <p>Approve this report and move it to <strong>ERROR_REVIEW</strong>?</p>
+                                            <form method="post" action="${pageContext.request.contextPath}/admin/products/approve">
+                                                <input type="hidden" name="reportId" value="${p.reportId}" />
+                                                <div class="actions">
+                                                    <button type="submit" style="background:#22c55e;">Approve</button>
+                                                    <a class="small" href="${pageContext.request.contextPath}/admin/products">Cancel</a>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+
+                                    <div id="reject-report-${p.reportId}" class="modal">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h2>Reject report</h2>
+                                                <a class="close-modal" href="${pageContext.request.contextPath}/admin/products">×</a>
+                                            </div>
+                                            <p>Reject this report?</p>
+                                            <form method="post" action="${pageContext.request.contextPath}/admin/products/reject">
+                                                <input type="hidden" name="reportId" value="${p.reportId}" />
+                                                <div class="actions">
+                                                    <button type="submit" style="background:#ef4444;">Reject</button>
+                                                    <a class="small" href="${pageContext.request.contextPath}/admin/products">Cancel</a>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
                                 </c:if>
                             </div>
                         </td>

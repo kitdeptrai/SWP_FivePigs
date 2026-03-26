@@ -113,6 +113,53 @@
             padding: 20px;
         }
 
+        .modal-content {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .close-modal {
+            text-decoration: none;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 6px 10px;
+            color: #334155;
+            font-weight: 600;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .actions button {
+            border: none;
+            border-radius: 8px;
+            padding: 8px 14px;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .actions .small {
+            text-decoration: none;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 6px 10px;
+            color: #334155;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
         .detail-grid {
             display: grid;
             grid-template-columns: 180px 1fr;
@@ -190,11 +237,25 @@
                         <td>
                             <a class="btn-link" href="${pageContext.request.contextPath}/admin/reports?page=${currentPage}&keyword=${keyword}&status=${status}&reportId=${r.reportId}">View Detail</a>
                             <c:if test="${r.reportStatus != 'READ'}">
-                                <form method="post" action="${pageContext.request.contextPath}/admin/reports" style="display:inline;">
-                                    <input type="hidden" name="action" value="markRead"/>
-                                    <input type="hidden" name="reportId" value="${r.reportId}"/>
-                                    <button type="submit" class="btn-link mark-read" onclick="return confirm('Mark this report as read and notify the reporter by email?');">Mark as Read</button>
-                                </form>
+                                <a class="btn-link mark-read" href="#mark-read-${r.reportId}">Mark as Read</a>
+
+                                <div id="mark-read-${r.reportId}" class="modal">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h2>Mark report as read</h2>
+                                            <a class="close-modal" href="${pageContext.request.contextPath}/admin/reports">×</a>
+                                        </div>
+                                        <p>Mark this report as read and notify the reporter by email?</p>
+                                        <form method="post" action="${pageContext.request.contextPath}/admin/reports">
+                                            <input type="hidden" name="action" value="markRead"/>
+                                            <input type="hidden" name="reportId" value="${r.reportId}"/>
+                                            <div class="actions">
+                                                <button type="submit" style="background:#15803d;">Mark as Read</button>
+                                                <a class="small" href="${pageContext.request.contextPath}/admin/reports">Cancel</a>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
                             </c:if>
                         </td>
                     </tr>
