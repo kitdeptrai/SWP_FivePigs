@@ -58,28 +58,28 @@ public class SoftwareService {
     public String validateUpload(String name, String description, String price, String category) {
 
         if (name == null || name.trim().length() < 2 || name.trim().length() > 100) {
-            return "Software name phai tu 2-100 ki tu";
+            return "Software name must be 2-100 characters";
         }
 
         if (description == null || description.trim().length() < 5) {
-            return "Description qua ngan";
+            return "Description is too short";
         }
 
         if (price == null || price.trim().isEmpty()) {
-            return "Price khong duoc de trong";
+            return "Price must not be empty";
         }
 
         try {
             double p = Double.parseDouble(price);
             if (p < 0) {
-                return "Price khong hop le";
+                return "Invalid price";
             }
         } catch (NumberFormatException e) {
-            return "Price phai la so";
+            return "Price must be a number";
         }
 
         if (category == null || category.trim().isEmpty()) {
-            return "Ban phai chon category";
+            return "You must select a category";
         }
 
         return null;

@@ -15,7 +15,7 @@
             --sidebar-bg: #0f172a;
             --card-bg: #ffffff;
             --text-main: #334155;
-            --bg-gray: #f1f5f9;
+            --bg-gray: #f5f7fb;
             --accent: #3b82f6;
         }
 
@@ -23,7 +23,7 @@
             background-color: var(--bg-gray);
             color: var(--text-main);
             margin: 0;
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            font-family: 'Inter', sans-serif;
         }
 
         .layout {
@@ -85,11 +85,17 @@
         }
 
         .card {
-            background: var(--card-bg);
-            padding: 24px;
-            border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            border: 1px solid #e2e8f0;
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            border: 1px solid #e5e7eb;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.12);
         }
 
         table {
@@ -100,17 +106,21 @@
 
         th {
             text-align: left;
-            padding: 12px;
-            background-color: var(--bg-gray);
-            color: #475569;
+            color: #666;
             font-weight: 600;
+            padding: 10px;
+            background: transparent;
             font-size: 14px;
         }
 
         td {
-            padding: 12px;
-            border-bottom: 1px solid #e2e8f0;
+            padding: 10px;
+            border-top: 1px solid #eee;
             font-size: 14px;
+        }
+
+        tr:hover {
+            background: #f9fafb;
         }
     </style>
 </head>
@@ -193,16 +203,25 @@
                             <td><c:out value="${e.phone}"/></td>
                             <td><c:out value="${e.roleName}"/></td>
                             <td>
-                                <span class="badge ${e.status == 'ACTIVE' ? 'success' : 'danger'}" style="padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 600; background: ${e.status == 'ACTIVE' ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)'}; color: ${e.status == 'ACTIVE' ? '#22c55e' : '#ef4444'};">
-                                    <c:out value="${e.status}"/>
-                                </span>
+                                <c:choose>
+                                    <c:when test="${e.status == 'ACTIVE'}">
+                                        <span class="badge" style="padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 600; background: rgba(34, 197, 94, 0.2); color: #22c55e;">
+                                            <c:out value="${e.status}"/>
+                                        </span>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <span class="badge" style="padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 600; background: rgba(239, 68, 68, 0.2); color: #ef4444;">
+                                            <c:out value="${e.status}"/>
+                                        </span>
+                                    </c:otherwise>
+                                </c:choose>
                             </td>
                             <td><fmt:formatDate value="${e.createdAt}" pattern="dd/MM/yyyy HH:mm"/></td>
                             <td>
                                 <div style="display: flex; gap: 8px;">
                                     <a href="#edit-emp-${e.userId}" style="color: var(--accent); text-decoration: none; font-size: 13px; font-weight: 600;">Edit</a>
                                     <c:if test="${e.status == 'ACTIVE'}">
-                                        <a href="#disable-emp-${e.userId}" style="color: var(--danger); text-decoration: none; font-size: 13px; font-weight: 600;" onclick="return confirm('Are you sure you want to disable this employee?');">Disable</a>
+                                        <a href="#disable-emp-${e.userId}" style="color: var(--danger); text-decoration: none; font-size: 13px; font-weight: 600;">Disable</a>
                                     </c:if>
                                     <c:if test="${e.status == 'INACTIVE'}">
                                         <a href="#enable-emp-${e.userId}" style="color: #22c55e; text-decoration: none; font-size: 13px; font-weight: 600;">Enable</a>
@@ -302,10 +321,20 @@
                     </c:if>
 
                     <c:forEach var="i" begin="1" end="${totalPages}">
-                        <a href="${pageContext.request.contextPath}/admin/employees?page=${i}&keyword=${keyword}&role=${role}&status=${status}"
-                           style="padding:8px 12px; border-radius:8px; text-decoration:none; border:1px solid #cbd5e1; background:${i == currentPage ? '#3b82f6' : '#fff'}; color:${i == currentPage ? '#fff' : '#334155'}; font-weight:${i == currentPage ? '600' : '500'};">
-                                ${i}
-                        </a>
+                        <c:choose>
+                            <c:when test="${i == currentPage}">
+                                <a href="${pageContext.request.contextPath}/admin/employees?page=${i}&keyword=${keyword}&role=${role}&status=${status}"
+                                   style="padding:8px 12px; border-radius:8px; text-decoration:none; border:1px solid #3b82f6; background:#3b82f6; color:#fff; font-weight:600;">
+                                        ${i}
+                                </a>
+                            </c:when>
+                            <c:otherwise>
+                                <a href="${pageContext.request.contextPath}/admin/employees?page=${i}&keyword=${keyword}&role=${role}&status=${status}"
+                                   style="padding:8px 12px; border-radius:8px; text-decoration:none; border:1px solid #cbd5e1; background:#fff; color:#334155; font-weight:500;">
+                                        ${i}
+                                </a>
+                            </c:otherwise>
+                        </c:choose>
                     </c:forEach>
 
                     <c:if test="${currentPage < totalPages}">

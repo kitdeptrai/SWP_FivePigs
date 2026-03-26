@@ -112,17 +112,21 @@ public class AdminDao {
     }
 
     public List<RevenueByMonthRow> getRevenueByMonth() {
-        String sql = "SELECT MONTH(order_date) AS month, COALESCE(SUM(total_amount), 0) AS revenue " +
-                     "FROM orders " +
-                     "WHERE payment_status_id = 1 " +
-                     "GROUP BY MONTH(order_date) " +
-                     "ORDER BY MONTH(order_date)";
+        String sql = "SELECT * FROM (" +
+                "SELECT DATE_FORMAT(o.order_date, '%Y-%m') AS month_label, COALESCE(SUM(o.total_amount), 0) AS revenue " +
+                "FROM orders o " +
+                "JOIN payment_status ps ON o.payment_status_id = ps.payment_status_id " +
+                "WHERE UPPER(ps.status_name) = 'PAID' " +
+                "GROUP BY DATE_FORMAT(o.order_date, '%Y-%m') " +
+                "ORDER BY month_label DESC " +
+                "LIMIT 3" +
+                ") recent_months ORDER BY month_label ASC";
         List<RevenueByMonthRow> rows = new ArrayList<>();
         try (Connection conn = Db.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
-                rows.add(new RevenueByMonthRow(rs.getInt("month"), rs.getDouble("revenue")));
+                rows.add(new RevenueByMonthRow(rs.getString("month_label"), rs.getDouble("revenue")));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -131,14 +135,10 @@ public class AdminDao {
     }
 
     public List<TopAppRow> getTop5AppsBestSeller() {
-        String sql = "SELECT s.name AS app_name, COUNT(od.order_detail_id) AS purchase_count, COALESCE(SUM(od.price), 0) AS total_revenue " +
-                     "FROM order_detail od " +
-                     "JOIN software s ON s.software_id = od.software_id " +
-                     "JOIN orders o ON o.order_id = od.order_id " +
-                     "WHERE o.payment_status_id = 1 " +
-                     "GROUP BY s.software_id, s.name " +
-                     "ORDER BY purchase_count DESC " +
-                     "LIMIT 5";
+        String sql = "SELECT s.name AS app_name, s.download_count " +
+                "FROM software s " +
+                "ORDER BY s.download_count DESC, s.name ASC " +
+                "LIMIT 5";
         List<TopAppRow> rows = new ArrayList<>();
         try (Connection conn = Db.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
@@ -146,8 +146,7 @@ public class AdminDao {
             while (rs.next()) {
                 rows.add(new TopAppRow(
                         rs.getString("app_name"),
-                        rs.getInt("purchase_count"),
-                        rs.getDouble("total_revenue")
+                        rs.getInt("download_count")
                 ));
             }
         } catch (SQLException e) {
@@ -156,34 +155,50 @@ public class AdminDao {
         return rows;
     }
 
-    public List<ActivityRow> getRecentActivities(int limit) {
-        String sql = "SELECT u.full_name AS user_name, r.reason, r.created_at " +
-                "FROM report r " +
-                "JOIN users u ON r.reporter_id = u.user_id " +
-                "ORDER BY r.created_at DESC " +
-                "LIMIT ?";
-        List<ActivityRow> rows = new ArrayList<>();
+    public double getCommissionPercent() {
+        String sql = "SELECT config_value FROM fivepigs.system_config WHERE config_key = 'commission_percent' LIMIT 1";
         try (Connection conn = Db.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, limit);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    String reason = rs.getString("reason");
-                    String action = "submitted a report";
-                    if (reason != null && !reason.isBlank()) {
-                        action = "submitted a report: " + reason;
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                String raw = rs.getString("config_value");
+                if (raw != null && !raw.isBlank()) {
+                    try {
+                        double percent = Double.parseDouble(raw.trim());
+                        if (percent < 0) {
+                            return 0;
+                        }
+                        return Math.min(percent, 20);
+                    } catch (NumberFormatException ignored) {
                     }
-                    rows.add(new ActivityRow(
-                            rs.getString("user_name"),
-                            action,
-                            rs.getTimestamp("created_at")
-                    ));
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return rows;
+        return 10.0;
+    }
+
+    public void setCommissionPercent(double commissionPercent, Integer userId) throws SQLException {
+        double normalizedPercent = Math.max(0, Math.min(20, commissionPercent));
+
+        String updateSql = "UPDATE fivepigs.system_config SET config_value = ? WHERE config_key = 'commission_percent'";
+        String insertSql = "INSERT INTO fivepigs.system_config(config_key, config_value) VALUES('commission_percent', ?)";
+
+        try (Connection conn = Db.getConnection()) {
+            try (PreparedStatement updatePs = conn.prepareStatement(updateSql)) {
+                updatePs.setString(1, Double.toString(normalizedPercent));
+                int updatedRows = updatePs.executeUpdate();
+                if (updatedRows > 0) {
+                    return;
+                }
+            }
+
+            try (PreparedStatement insertPs = conn.prepareStatement(insertSql)) {
+                insertPs.setString(1, Double.toString(normalizedPercent));
+                insertPs.executeUpdate();
+            }
+        }
     }
 
     // ===== Users/Employees Management =====
@@ -203,7 +218,7 @@ public class AdminDao {
     }
 
     public Integer getRoleIdByName(String roleName) {
-        // match role_name không phân biệt hoa thường
+        // Match role_name case-insensitively
         String sql = "SELECT role_id FROM Role WHERE LOWER(role_name) = LOWER(?)";
         try (Connection conn = Db.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -223,7 +238,7 @@ public class AdminDao {
     private static String normalizeRoleName(String roleName) {
         if (roleName == null) return null;
         String r = roleName.trim();
-        // fix typo phổ biến
+        // Fix common typo
         if (r.equalsIgnoreCase("aproval")) return "Approval";
         return r;
     }
@@ -231,9 +246,9 @@ public class AdminDao {
     public List<UserRow> listEmployees() {
         // Employees: reviewer + aproval
         String sql = "SELECT u.user_id, u.full_name, u.email, u.phone, u.status, u.created_at, r.role_name " +
-                     "FROM users u JOIN role r ON u.role_id = r.role_id " +
-                     "WHERE LOWER(r.role_name) IN ('reviewer', 'approval', 'aproval') " +
-                     "ORDER BY u.created_at DESC";
+                "FROM users u JOIN role r ON u.role_id = r.role_id " +
+                "WHERE LOWER(r.role_name) IN ('reviewer', 'approval', 'aproval') " +
+                "ORDER BY u.created_at DESC";
         List<UserRow> rows = new ArrayList<>();
         try (Connection conn = Db.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
@@ -258,7 +273,7 @@ public class AdminDao {
     public int countEmployees(String keyword, String role, String status) {
         StringBuilder sql = new StringBuilder(
                 "SELECT COUNT(*) FROM users u JOIN role r ON u.role_id = r.role_id " +
-                "WHERE LOWER(r.role_name) IN ('reviewer', 'approval', 'aproval')"
+                        "WHERE LOWER(r.role_name) IN ('reviewer', 'approval', 'aproval')"
         );
         List<Object> params = new ArrayList<>();
 
@@ -295,8 +310,8 @@ public class AdminDao {
     public List<UserRow> listEmployeesPaged(int limit, int offset, String keyword, String role, String status) {
         StringBuilder sql = new StringBuilder(
                 "SELECT u.user_id, u.full_name, u.email, u.phone, u.status, u.created_at, r.role_name " +
-                "FROM users u JOIN role r ON u.role_id = r.role_id " +
-                "WHERE LOWER(r.role_name) IN ('reviewer', 'approval', 'aproval')"
+                        "FROM users u JOIN role r ON u.role_id = r.role_id " +
+                        "WHERE LOWER(r.role_name) IN ('reviewer', 'approval', 'aproval')"
         );
         List<Object> params = new ArrayList<>();
 
@@ -348,9 +363,9 @@ public class AdminDao {
     public List<UserRow> listUsers() {
         // Users: Customer + Vendor
         String sql = "SELECT u.user_id, u.full_name, u.email, u.phone, u.status, u.created_at, r.role_name " +
-                     "FROM users u JOIN role r ON u.role_id = r.role_id " +
-                     "WHERE r.role_name IN ('Customer', 'Vendor') " +
-                     "ORDER BY u.created_at DESC";
+                "FROM users u JOIN role r ON u.role_id = r.role_id " +
+                "WHERE r.role_name IN ('Customer', 'Vendor') " +
+                "ORDER BY u.created_at DESC";
         List<UserRow> rows = new ArrayList<>();
         try (Connection conn = Db.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
@@ -374,9 +389,9 @@ public class AdminDao {
 
     public List<UserRow> listVendors() {
         String sql = "SELECT u.user_id, u.full_name, u.email, u.phone, u.status, u.created_at, r.role_name " +
-                     "FROM users u JOIN role r ON u.role_id = r.role_id " +
-                     "WHERE r.role_name = 'Vendor' " +
-                     "ORDER BY u.created_at DESC";
+                "FROM users u JOIN role r ON u.role_id = r.role_id " +
+                "WHERE r.role_name = 'Vendor' " +
+                "ORDER BY u.created_at DESC";
         List<UserRow> rows = new ArrayList<>();
         try (Connection conn = Db.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
@@ -401,7 +416,7 @@ public class AdminDao {
     public int countVendors(String keyword, String status) {
         StringBuilder sql = new StringBuilder(
                 "SELECT COUNT(*) FROM users u JOIN role r ON u.role_id = r.role_id " +
-                "WHERE r.role_name = 'Vendor'"
+                        "WHERE r.role_name = 'Vendor'"
         );
         List<Object> params = new ArrayList<>();
 
@@ -434,8 +449,8 @@ public class AdminDao {
     public List<UserRow> listVendorsPaged(int limit, int offset, String keyword, String status) {
         StringBuilder sql = new StringBuilder(
                 "SELECT u.user_id, u.full_name, u.email, u.phone, u.status, u.created_at, r.role_name " +
-                "FROM users u JOIN role r ON u.role_id = r.role_id " +
-                "WHERE r.role_name = 'Vendor'"
+                        "FROM users u JOIN role r ON u.role_id = r.role_id " +
+                        "WHERE r.role_name = 'Vendor'"
         );
         List<Object> params = new ArrayList<>();
 
@@ -485,20 +500,23 @@ public class AdminDao {
     public int countProducts(String keyword, String status) {
         StringBuilder sql = new StringBuilder(
                 "SELECT COUNT(*) " +
-                "FROM software s " +
-                "LEFT JOIN users u ON s.vendor_id = u.user_id " +
-                "LEFT JOIN category c ON s.category_id = c.category_id " +
-                "WHERE 1=1"
+                        "FROM report r " +
+                        "JOIN software s ON r.software_id = s.software_id " +
+                        "LEFT JOIN users vendor ON s.vendor_id = vendor.user_id " +
+                        "LEFT JOIN users reporter ON r.reporter_id = reporter.user_id " +
+                        "WHERE 1=1"
         );
         List<Object> params = new ArrayList<>();
 
         if (status != null) {
-            sql.append(" AND s.status = ?");
+            sql.append(" AND UPPER(r.status) = ?");
             params.add(status);
         }
         if (keyword != null) {
-            sql.append(" AND (LOWER(s.name) LIKE ? OR LOWER(COALESCE(u.full_name, '')) LIKE ? OR LOWER(COALESCE(c.category_name, '')) LIKE ?)");
+            sql.append(" AND (CAST(r.report_id AS CHAR) LIKE ? OR LOWER(COALESCE(s.name, '')) LIKE ? OR LOWER(COALESCE(vendor.full_name, '')) LIKE ? OR LOWER(COALESCE(reporter.full_name, '')) LIKE ? OR LOWER(COALESCE(r.reason, '')) LIKE ?)");
             String kw = "%" + keyword.toLowerCase() + "%";
+            params.add(kw);
+            params.add(kw);
             params.add(kw);
             params.add(kw);
             params.add(kw);
@@ -518,34 +536,38 @@ public class AdminDao {
         }
     }
 
-    public List<AdminProductRow> listProductsPaged(int limit, int offset, String keyword, String status) {
+    public List<AdminProductReportRow> listProductsPaged(int limit, int offset, String keyword, String status) {
         StringBuilder sql = new StringBuilder(
-                "SELECT s.software_id, s.name, s.price, s.is_free, s.status, s.download_count, s.avg_rating, s.created_at, " +
-                "u.full_name AS vendor_name, c.category_name " +
-                "FROM software s " +
-                "LEFT JOIN users u ON s.vendor_id = u.user_id " +
-                "LEFT JOIN category c ON s.category_id = c.category_id " +
-                "WHERE 1=1"
+                "SELECT r.report_id, r.software_id, r.reason, r.status AS report_status, r.created_at AS report_created_at, " +
+                        "s.name, s.status AS software_status, " +
+                        "vendor.full_name AS vendor_name, reporter.full_name AS reporter_name " +
+                        "FROM report r " +
+                        "JOIN software s ON r.software_id = s.software_id " +
+                        "LEFT JOIN users vendor ON s.vendor_id = vendor.user_id " +
+                        "LEFT JOIN users reporter ON r.reporter_id = reporter.user_id " +
+                        "WHERE 1=1"
         );
         List<Object> params = new ArrayList<>();
 
         if (status != null) {
-            sql.append(" AND s.status = ?");
+            sql.append(" AND UPPER(r.status) = ?");
             params.add(status);
         }
         if (keyword != null) {
-            sql.append(" AND (LOWER(s.name) LIKE ? OR LOWER(COALESCE(u.full_name, '')) LIKE ? OR LOWER(COALESCE(c.category_name, '')) LIKE ?)");
+            sql.append(" AND (CAST(r.report_id AS CHAR) LIKE ? OR LOWER(COALESCE(s.name, '')) LIKE ? OR LOWER(COALESCE(vendor.full_name, '')) LIKE ? OR LOWER(COALESCE(reporter.full_name, '')) LIKE ? OR LOWER(COALESCE(r.reason, '')) LIKE ?)");
             String kw = "%" + keyword.toLowerCase() + "%";
             params.add(kw);
             params.add(kw);
             params.add(kw);
+            params.add(kw);
+            params.add(kw);
         }
 
-        sql.append(" ORDER BY s.created_at DESC LIMIT ? OFFSET ?");
+        sql.append(" ORDER BY r.created_at DESC, r.report_id DESC LIMIT ? OFFSET ?");
         params.add(limit);
         params.add(offset);
 
-        List<AdminProductRow> rows = new ArrayList<>();
+        List<AdminProductReportRow> rows = new ArrayList<>();
         try (Connection conn = Db.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql.toString())) {
             for (int i = 0; i < params.size(); i++) {
@@ -553,17 +575,16 @@ public class AdminDao {
             }
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    rows.add(new AdminProductRow(
+                    rows.add(new AdminProductReportRow(
+                            rs.getInt("report_id"),
                             rs.getInt("software_id"),
                             rs.getString("name"),
                             rs.getString("vendor_name"),
-                            rs.getString("category_name"),
-                            rs.getDouble("price"),
-                            rs.getInt("is_free"),
-                            rs.getString("status"),
-                            rs.getInt("download_count"),
-                            rs.getDouble("avg_rating"),
-                            rs.getTimestamp("created_at")
+                            rs.getString("reporter_name"),
+                            rs.getString("reason"),
+                            rs.getString("report_status"),
+                            rs.getString("software_status"),
+                            rs.getTimestamp("report_created_at")
                     ));
                 }
             }
@@ -573,8 +594,195 @@ public class AdminDao {
         return rows;
     }
 
+    public boolean updateReportStatus(int reportId, String fromStatus, String toStatus) throws SQLException {
+        String sql = "UPDATE report SET status = ? WHERE report_id = ? AND UPPER(status) = ?";
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, toStatus);
+            ps.setInt(2, reportId);
+            ps.setString(3, fromStatus.toUpperCase());
+            return ps.executeUpdate() > 0;
+        }
+    }
+
+    public AdminReportDetailRow getReportDetail(int reportId) {
+        String sql = "SELECT r.report_id, r.software_id, r.reason, r.status AS report_status, r.created_at AS report_created_at, " +
+                "s.name AS software_name, s.status AS software_status, " +
+                "vendor.full_name AS vendor_name, vendor.email AS vendor_email, " +
+                "reporter.full_name AS reporter_name, reporter.email AS reporter_email " +
+                "FROM report r " +
+                "JOIN software s ON r.software_id = s.software_id " +
+                "LEFT JOIN users vendor ON s.vendor_id = vendor.user_id " +
+                "LEFT JOIN users reporter ON r.reporter_id = reporter.user_id " +
+                "WHERE r.report_id = ?";
+
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, reportId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new AdminReportDetailRow(
+                            rs.getInt("report_id"),
+                            rs.getInt("software_id"),
+                            rs.getString("software_name"),
+                            rs.getString("vendor_name"),
+                            rs.getString("vendor_email"),
+                            rs.getString("reporter_name"),
+                            rs.getString("reporter_email"),
+                            rs.getString("reason"),
+                            rs.getString("report_status"),
+                            rs.getString("software_status"),
+                            rs.getTimestamp("report_created_at")
+                    );
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public boolean markReportAsRead(int reportId) throws SQLException {
+        String sql = "UPDATE report SET status = 'READ' WHERE report_id = ? AND UPPER(COALESCE(status, '')) <> 'READ'";
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, reportId);
+            return ps.executeUpdate() > 0;
+        }
+    }
+
+    public int countUserFeedback(String keyword, String status) {
+        StringBuilder sql = new StringBuilder(
+                "SELECT COUNT(*) " +
+                        "FROM user_feedback uf " +
+                        "JOIN users u ON uf.user_id = u.user_id " +
+                        "WHERE 1=1"
+        );
+        List<Object> params = new ArrayList<>();
+
+        if (status != null) {
+            sql.append(" AND UPPER(COALESCE(uf.status, 'NEW')) = ?");
+            params.add(status);
+        }
+        if (keyword != null) {
+            sql.append(" AND (CAST(uf.feedback_id AS CHAR) LIKE ? OR LOWER(COALESCE(uf.subject, '')) LIKE ? OR LOWER(COALESCE(uf.message, '')) LIKE ? OR LOWER(COALESCE(u.full_name, '')) LIKE ? OR LOWER(COALESCE(u.email, '')) LIKE ?)");
+            String kw = "%" + keyword.toLowerCase() + "%";
+            params.add(kw);
+            params.add(kw);
+            params.add(kw);
+            params.add(kw);
+            params.add(kw);
+        }
+
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? rs.getInt(1) : 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    public List<AdminUserFeedbackRow> listUserFeedbackPaged(int limit, int offset, String keyword, String status) {
+        StringBuilder sql = new StringBuilder(
+                "SELECT uf.feedback_id, uf.subject, uf.message, COALESCE(uf.status, 'NEW') AS feedback_status, uf.created_at AS feedback_created_at, " +
+                        "u.user_id, u.full_name AS user_name, u.email AS user_email " +
+                        "FROM user_feedback uf " +
+                        "JOIN users u ON uf.user_id = u.user_id " +
+                        "WHERE 1=1"
+        );
+        List<Object> params = new ArrayList<>();
+
+        if (status != null) {
+            sql.append(" AND UPPER(COALESCE(uf.status, 'NEW')) = ?");
+            params.add(status);
+        }
+        if (keyword != null) {
+            sql.append(" AND (CAST(uf.feedback_id AS CHAR) LIKE ? OR LOWER(COALESCE(uf.subject, '')) LIKE ? OR LOWER(COALESCE(uf.message, '')) LIKE ? OR LOWER(COALESCE(u.full_name, '')) LIKE ? OR LOWER(COALESCE(u.email, '')) LIKE ?)");
+            String kw = "%" + keyword.toLowerCase() + "%";
+            params.add(kw);
+            params.add(kw);
+            params.add(kw);
+            params.add(kw);
+            params.add(kw);
+        }
+
+        sql.append(" ORDER BY uf.created_at DESC, uf.feedback_id DESC LIMIT ? OFFSET ?");
+        params.add(limit);
+        params.add(offset);
+
+        List<AdminUserFeedbackRow> rows = new ArrayList<>();
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    rows.add(new AdminUserFeedbackRow(
+                            rs.getInt("feedback_id"),
+                            rs.getInt("user_id"),
+                            rs.getString("user_name"),
+                            rs.getString("user_email"),
+                            rs.getString("subject"),
+                            rs.getString("message"),
+                            rs.getString("feedback_status"),
+                            rs.getTimestamp("feedback_created_at")
+                    ));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return rows;
+    }
+
+    public AdminUserFeedbackDetailRow getUserFeedbackDetail(int feedbackId) {
+        String sql = "SELECT uf.feedback_id, uf.user_id, uf.subject, uf.message, COALESCE(uf.status, 'NEW') AS feedback_status, uf.created_at AS feedback_created_at, " +
+                "u.full_name AS user_name, u.email AS user_email " +
+                "FROM user_feedback uf " +
+                "JOIN users u ON uf.user_id = u.user_id " +
+                "WHERE uf.feedback_id = ?";
+
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, feedbackId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new AdminUserFeedbackDetailRow(
+                            rs.getInt("feedback_id"),
+                            rs.getInt("user_id"),
+                            rs.getString("user_name"),
+                            rs.getString("user_email"),
+                            rs.getString("subject"),
+                            rs.getString("message"),
+                            rs.getString("feedback_status"),
+                            rs.getTimestamp("feedback_created_at")
+                    );
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public boolean markUserFeedbackAsRead(int feedbackId) throws SQLException {
+        String sql = "UPDATE user_feedback SET status = 'READ' WHERE feedback_id = ? AND UPPER(COALESCE(status, 'NEW')) <> 'READ'";
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, feedbackId);
+            return ps.executeUpdate() > 0;
+        }
+    }
+
     public AdminProductDetailRow getProductDetail(int softwareId) {
-        String sql = "SELECT s.software_id, s.name, s.short_description, s.price, s.is_free, s.status, s.download_count, s.avg_rating, s.created_at, " +
+        String sql = "SELECT s.software_id, s.name, s.short_description, COALESCE(sp.price, 0) AS price, s.is_free, s.status, s.download_count, s.avg_rating, s.created_at, " +
                 "u.full_name AS vendor_name, c.category_name, sv.version_name, sd.description, sd.system_requirement, si.image_url " +
                 "FROM software s " +
                 "LEFT JOIN users u ON s.vendor_id = u.user_id " +
@@ -582,6 +790,7 @@ public class AdminDao {
                 "LEFT JOIN software_version sv ON sv.software_id = s.software_id AND sv.is_active = 1 " +
                 "LEFT JOIN software_detail sd ON sd.software_id = s.software_id " +
                 "LEFT JOIN software_image si ON si.software_id = s.software_id AND si.is_thumbnail = 1 " +
+                "LEFT JOIN software_pricing sp ON sp.software_id = s.software_id AND sp.is_active = 1 " +
                 "WHERE s.software_id = ?";
 
         try (Connection conn = Db.getConnection();
@@ -688,10 +897,10 @@ public class AdminDao {
     public List<VendorPayoutRow> listVendorPayoutsPaged(int limit, int offset, String status, String keyword, java.sql.Date fromDate, java.sql.Date toDate, String sortById) {
         StringBuilder sql = new StringBuilder(
                 "SELECT vp.payout_id, vp.vendor_id, u.full_name AS vendor_name, u.email AS vendor_email, " +
-                "vp.amount, vp.payment_method, vp.payment_account, vp.status, vp.created_at, vp.processed_at " +
-                "FROM vendor_payout vp " +
-                "JOIN users u ON vp.vendor_id = u.user_id " +
-                "WHERE 1=1"
+                        "vp.amount, vp.payment_method, vp.payment_account, vp.status, vp.created_at, vp.processed_at " +
+                        "FROM vendor_payout vp " +
+                        "JOIN users u ON vp.vendor_id = u.user_id " +
+                        "WHERE 1=1"
         );
         List<Object> params = new ArrayList<>();
 
@@ -799,6 +1008,137 @@ public class AdminDao {
         }
     }
 
+    // ===== Orders Management =====
+
+    public int countSuccessfulOrders(String keyword, java.sql.Date fromDate, java.sql.Date toDate) {
+        StringBuilder sql = new StringBuilder(
+                "SELECT COUNT(*) " +
+                        "FROM orders o " +
+                        "JOIN users u ON o.customer_id = u.user_id " +
+                        "JOIN payment_status ps ON o.payment_status_id = ps.payment_status_id " +
+                        "WHERE UPPER(ps.status_name) = 'PAID'"
+        );
+        List<Object> params = new ArrayList<>();
+
+        if (keyword != null) {
+            sql.append(" AND (CAST(o.order_id AS CHAR) LIKE ? OR LOWER(u.full_name) LIKE ? OR LOWER(u.email) LIKE ?)");
+            String kw = "%" + keyword.toLowerCase() + "%";
+            params.add(kw);
+            params.add(kw);
+            params.add(kw);
+        }
+        if (fromDate != null) {
+            sql.append(" AND DATE(o.order_date) >= ?");
+            params.add(fromDate);
+        }
+        if (toDate != null) {
+            sql.append(" AND DATE(o.order_date) <= ?");
+            params.add(toDate);
+        }
+
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? rs.getInt(1) : 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    public List<AdminOrderRow> listSuccessfulOrdersPaged(int limit, int offset, String keyword, java.sql.Date fromDate, java.sql.Date toDate) {
+        StringBuilder sql = new StringBuilder(
+                "SELECT o.order_id, o.total_amount, o.order_date, ps.status_name AS payment_status, " +
+                        "u.full_name AS customer_name, u.email AS customer_email, " +
+                        "COALESCE(o.commission_percent, 10) AS commission_percent " +
+                        "FROM orders o " +
+                        "JOIN users u ON o.customer_id = u.user_id " +
+                        "JOIN payment_status ps ON o.payment_status_id = ps.payment_status_id " +
+                        "WHERE UPPER(ps.status_name) = 'PAID'"
+        );
+        List<Object> params = new ArrayList<>();
+
+        if (keyword != null) {
+            sql.append(" AND (CAST(o.order_id AS CHAR) LIKE ? OR LOWER(u.full_name) LIKE ? OR LOWER(u.email) LIKE ?)");
+            String kw = "%" + keyword.toLowerCase() + "%";
+            params.add(kw);
+            params.add(kw);
+            params.add(kw);
+        }
+        if (fromDate != null) {
+            sql.append(" AND DATE(o.order_date) >= ?");
+            params.add(fromDate);
+        }
+        if (toDate != null) {
+            sql.append(" AND DATE(o.order_date) <= ?");
+            params.add(toDate);
+        }
+
+        sql.append(" ORDER BY o.order_date DESC LIMIT ? OFFSET ?");
+        params.add(limit);
+        params.add(offset);
+
+        List<AdminOrderRow> rows = new ArrayList<>();
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    double totalAmount = rs.getDouble("total_amount");
+                    double commissionPercent = rs.getDouble("commission_percent");
+                    double adminReceivedAmount = totalAmount * (commissionPercent / 100.0);
+
+                    rows.add(new AdminOrderRow(
+                            rs.getInt("order_id"),
+                            rs.getString("customer_name"),
+                            rs.getString("customer_email"),
+                            totalAmount,
+                            rs.getTimestamp("order_date"),
+                            rs.getString("payment_status"),
+                            commissionPercent,
+                            adminReceivedAmount
+                    ));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return rows;
+    }
+
+    public List<AdminOrderDetailRow> listOrderDetails(int orderId) {
+        String sql = "SELECT od.order_detail_id, od.software_id, s.name AS software_name, od.price " +
+                "FROM order_detail od " +
+                "LEFT JOIN software s ON od.software_id = s.software_id " +
+                "WHERE od.order_id = ? " +
+                "ORDER BY od.order_detail_id ASC";
+
+        List<AdminOrderDetailRow> rows = new ArrayList<>();
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, orderId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    rows.add(new AdminOrderDetailRow(
+                            rs.getInt("order_detail_id"),
+                            rs.getInt("software_id"),
+                            rs.getString("software_name"),
+                            rs.getDouble("price")
+                    ));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return rows;
+    }
+
     // ===== CRUD =====
 
     public void createEmployee(String fullName, String email, String phone, String roleName, String password) throws SQLException {
@@ -861,7 +1201,7 @@ public class AdminDao {
             roleId = getRoleIdByName(roleName);
         }
         if (roleId == null) {
-            throw new SQLException("Role không tồn tại: " + roleName);
+            throw new SQLException("Role does not exist: " + roleName);
         }
 
         String sql = "UPDATE users SET full_name = ?, phone = ?, status = ?, role_id = ? WHERE user_id = ?";
@@ -879,17 +1219,17 @@ public class AdminDao {
     // ===== Helper data rows =====
 
     public static class RevenueByMonthRow {
-        private final int month;
+        private final String month;
         private final double revenue;
         private int percent;
 
-        public RevenueByMonthRow(int month, double revenue) {
+        public RevenueByMonthRow(String month, double revenue) {
             this.month = month;
             this.revenue = revenue;
             this.percent = 0;
         }
 
-        public int getMonth() {
+        public String getMonth() {
             return month;
         }
 
@@ -908,49 +1248,19 @@ public class AdminDao {
 
     public static class TopAppRow {
         private final String appName;
-        private final int purchaseCount;
-        private final double totalRevenue;
+        private final int downloadCount;
 
-        public TopAppRow(String appName, int purchaseCount, double totalRevenue) {
+        public TopAppRow(String appName, int downloadCount) {
             this.appName = appName;
-            this.purchaseCount = purchaseCount;
-            this.totalRevenue = totalRevenue;
+            this.downloadCount = downloadCount;
         }
 
         public String getAppName() {
             return appName;
         }
 
-        public int getPurchaseCount() {
-            return purchaseCount;
-        }
-
-        public double getTotalRevenue() {
-            return totalRevenue;
-        }
-    }
-
-    public static class ActivityRow {
-        private final String user;
-        private final String action;
-        private final java.sql.Timestamp time;
-
-        public ActivityRow(String user, String action, java.sql.Timestamp time) {
-            this.user = user;
-            this.action = action;
-            this.time = time;
-        }
-
-        public String getUser() {
-            return user;
-        }
-
-        public String getAction() {
-            return action;
-        }
-
-        public java.sql.Timestamp getTime() {
-            return time;
+        public int getDownloadCount() {
+            return downloadCount;
         }
     }
 
@@ -1013,6 +1323,246 @@ public class AdminDao {
 
         public double getAvgRating() {
             return avgRating;
+        }
+
+        public java.sql.Timestamp getCreatedAt() {
+            return createdAt;
+        }
+    }
+
+    public static class AdminProductReportRow {
+        private final int reportId;
+        private final int softwareId;
+        private final String name;
+        private final String vendorName;
+        private final String reporterName;
+        private final String reason;
+        private final String reportStatus;
+        private final String softwareStatus;
+        private final java.sql.Timestamp createdAt;
+
+        public AdminProductReportRow(int reportId, int softwareId, String name, String vendorName, String reporterName, String reason, String reportStatus, String softwareStatus, java.sql.Timestamp createdAt) {
+            this.reportId = reportId;
+            this.softwareId = softwareId;
+            this.name = name;
+            this.vendorName = vendorName;
+            this.reporterName = reporterName;
+            this.reason = reason;
+            this.reportStatus = reportStatus;
+            this.softwareStatus = softwareStatus;
+            this.createdAt = createdAt;
+        }
+
+        public int getReportId() {
+            return reportId;
+        }
+
+        public int getSoftwareId() {
+            return softwareId;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getVendorName() {
+            return vendorName;
+        }
+
+        public String getReporterName() {
+            return reporterName;
+        }
+
+        public String getReason() {
+            return reason;
+        }
+
+        public String getReportStatus() {
+            return reportStatus;
+        }
+
+        public String getSoftwareStatus() {
+            return softwareStatus;
+        }
+
+        public java.sql.Timestamp getCreatedAt() {
+            return createdAt;
+        }
+    }
+
+    public static class AdminReportDetailRow {
+        private final int reportId;
+        private final int softwareId;
+        private final String softwareName;
+        private final String vendorName;
+        private final String vendorEmail;
+        private final String reporterName;
+        private final String reporterEmail;
+        private final String reason;
+        private final String reportStatus;
+        private final String softwareStatus;
+        private final java.sql.Timestamp createdAt;
+
+        public AdminReportDetailRow(int reportId, int softwareId, String softwareName, String vendorName, String vendorEmail, String reporterName, String reporterEmail, String reason, String reportStatus, String softwareStatus, java.sql.Timestamp createdAt) {
+            this.reportId = reportId;
+            this.softwareId = softwareId;
+            this.softwareName = softwareName;
+            this.vendorName = vendorName;
+            this.vendorEmail = vendorEmail;
+            this.reporterName = reporterName;
+            this.reporterEmail = reporterEmail;
+            this.reason = reason;
+            this.reportStatus = reportStatus;
+            this.softwareStatus = softwareStatus;
+            this.createdAt = createdAt;
+        }
+
+        public int getReportId() {
+            return reportId;
+        }
+
+        public int getSoftwareId() {
+            return softwareId;
+        }
+
+        public String getSoftwareName() {
+            return softwareName;
+        }
+
+        public String getVendorName() {
+            return vendorName;
+        }
+
+        public String getVendorEmail() {
+            return vendorEmail;
+        }
+
+        public String getReporterName() {
+            return reporterName;
+        }
+
+        public String getReporterEmail() {
+            return reporterEmail;
+        }
+
+        public String getReason() {
+            return reason;
+        }
+
+        public String getReportStatus() {
+            return reportStatus;
+        }
+
+        public String getSoftwareStatus() {
+            return softwareStatus;
+        }
+
+        public java.sql.Timestamp getCreatedAt() {
+            return createdAt;
+        }
+    }
+
+    public static class AdminUserFeedbackRow {
+        private final int feedbackId;
+        private final int userId;
+        private final String userName;
+        private final String userEmail;
+        private final String subject;
+        private final String message;
+        private final String feedbackStatus;
+        private final java.sql.Timestamp createdAt;
+
+        public AdminUserFeedbackRow(int feedbackId, int userId, String userName, String userEmail, String subject, String message, String feedbackStatus, java.sql.Timestamp createdAt) {
+            this.feedbackId = feedbackId;
+            this.userId = userId;
+            this.userName = userName;
+            this.userEmail = userEmail;
+            this.subject = subject;
+            this.message = message;
+            this.feedbackStatus = feedbackStatus;
+            this.createdAt = createdAt;
+        }
+
+        public int getFeedbackId() {
+            return feedbackId;
+        }
+
+        public int getUserId() {
+            return userId;
+        }
+
+        public String getUserName() {
+            return userName;
+        }
+
+        public String getUserEmail() {
+            return userEmail;
+        }
+
+        public String getSubject() {
+            return subject;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public String getFeedbackStatus() {
+            return feedbackStatus;
+        }
+
+        public java.sql.Timestamp getCreatedAt() {
+            return createdAt;
+        }
+    }
+
+    public static class AdminUserFeedbackDetailRow {
+        private final int feedbackId;
+        private final int userId;
+        private final String userName;
+        private final String userEmail;
+        private final String subject;
+        private final String message;
+        private final String feedbackStatus;
+        private final java.sql.Timestamp createdAt;
+
+        public AdminUserFeedbackDetailRow(int feedbackId, int userId, String userName, String userEmail, String subject, String message, String feedbackStatus, java.sql.Timestamp createdAt) {
+            this.feedbackId = feedbackId;
+            this.userId = userId;
+            this.userName = userName;
+            this.userEmail = userEmail;
+            this.subject = subject;
+            this.message = message;
+            this.feedbackStatus = feedbackStatus;
+            this.createdAt = createdAt;
+        }
+
+        public int getFeedbackId() {
+            return feedbackId;
+        }
+
+        public int getUserId() {
+            return userId;
+        }
+
+        public String getUserName() {
+            return userName;
+        }
+
+        public String getUserEmail() {
+            return userEmail;
+        }
+
+        public String getSubject() {
+            return subject;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public String getFeedbackStatus() {
+            return feedbackStatus;
         }
 
         public java.sql.Timestamp getCreatedAt() {
@@ -1113,6 +1663,90 @@ public class AdminDao {
 
         public String getImageUrl() {
             return imageUrl;
+        }
+    }
+
+    public static class AdminOrderRow {
+        private final int orderId;
+        private final String customerName;
+        private final String customerEmail;
+        private final double totalAmount;
+        private final java.sql.Timestamp orderDate;
+        private final String paymentStatus;
+        private final double commissionPercent;
+        private final double adminReceivedAmount;
+
+        public AdminOrderRow(int orderId, String customerName, String customerEmail, double totalAmount, java.sql.Timestamp orderDate, String paymentStatus, double commissionPercent, double adminReceivedAmount) {
+            this.orderId = orderId;
+            this.customerName = customerName;
+            this.customerEmail = customerEmail;
+            this.totalAmount = totalAmount;
+            this.orderDate = orderDate;
+            this.paymentStatus = paymentStatus;
+            this.commissionPercent = commissionPercent;
+            this.adminReceivedAmount = adminReceivedAmount;
+        }
+
+        public int getOrderId() {
+            return orderId;
+        }
+
+        public String getCustomerName() {
+            return customerName;
+        }
+
+        public String getCustomerEmail() {
+            return customerEmail;
+        }
+
+        public double getTotalAmount() {
+            return totalAmount;
+        }
+
+        public java.sql.Timestamp getOrderDate() {
+            return orderDate;
+        }
+
+        public String getPaymentStatus() {
+            return paymentStatus;
+        }
+
+        public double getCommissionPercent() {
+            return commissionPercent;
+        }
+
+        public double getAdminReceivedAmount() {
+            return adminReceivedAmount;
+        }
+    }
+
+    public static class AdminOrderDetailRow {
+        private final int orderDetailId;
+        private final int softwareId;
+        private final String softwareName;
+        private final double price;
+
+        public AdminOrderDetailRow(int orderDetailId, int softwareId, String softwareName, double price) {
+            this.orderDetailId = orderDetailId;
+            this.softwareId = softwareId;
+            this.softwareName = softwareName;
+            this.price = price;
+        }
+
+        public int getOrderDetailId() {
+            return orderDetailId;
+        }
+
+        public int getSoftwareId() {
+            return softwareId;
+        }
+
+        public String getSoftwareName() {
+            return softwareName;
+        }
+
+        public double getPrice() {
+            return price;
         }
     }
 

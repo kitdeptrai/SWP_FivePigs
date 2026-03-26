@@ -1,7 +1,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page pageEncoding="UTF-8" %>
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -23,16 +23,16 @@
     <div class="content-section active-section">
         <h2 style="margin-bottom: 20px;">My Cart</h2>
 
-        <c:if test="${param.msg == 'added'}"><div style="margin-bottom:12px;padding:10px 12px;background:#e8f7ee;color:#1f7a44;border-radius:10px;">Da them vao gio hang.</div></c:if>
-        <c:if test="${param.msg == 'exists'}"><div style="margin-bottom:12px;padding:10px 12px;background:#fff6e5;color:#8a5b00;border-radius:10px;">San pham da ton tai trong cart hoac da co trong library.</div></c:if>
-        <c:if test="${param.msg == 'removed'}"><div style="margin-bottom:12px;padding:10px 12px;background:#eef2ff;color:#3044a5;border-radius:10px;">Da xoa khoi cart.</div></c:if>
-        <c:if test="${param.msg == 'empty'}"><div style="margin-bottom:12px;padding:10px 12px;background:#fff6e5;color:#8a5b00;border-radius:10px;">Cart dang trong.</div></c:if>
+        <c:if test="${param.msg == 'added'}"><div style="margin-bottom:12px;padding:10px 12px;background:#e8f7ee;color:#1f7a44;border-radius:10px;">Added to cart.</div></c:if>
+        <c:if test="${param.msg == 'exists'}"><div style="margin-bottom:12px;padding:10px 12px;background:#fff6e5;color:#8a5b00;border-radius:10px;">Product already exists in cart or is already in your library.</div></c:if>
+        <c:if test="${param.msg == 'removed'}"><div style="margin-bottom:12px;padding:10px 12px;background:#eef2ff;color:#3044a5;border-radius:10px;">Removed from cart.</div></c:if>
+        <c:if test="${param.msg == 'empty'}"><div style="margin-bottom:12px;padding:10px 12px;background:#fff6e5;color:#8a5b00;border-radius:10px;">Your cart is empty.</div></c:if>
 
         <div style="display:grid;grid-template-columns:2fr 1fr;gap:20px;align-items:start;">
             <div style="background:#fff;border-radius:16px;padding:16px;box-shadow:0 4px 10px rgba(0,0,0,0.04);">
                 <c:choose>
                     <c:when test="${empty cartItems}">
-                        <p style="color:#666;">Chua co san pham trong cart.</p>
+                        <p style="color:#666;">There are no products in your cart yet.</p>
                     </c:when>
                     <c:otherwise>
                         <c:forEach var="item" items="${cartItems}">

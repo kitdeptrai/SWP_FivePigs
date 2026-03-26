@@ -52,13 +52,13 @@ public class ResetPasswordServlet extends HttpServlet {
         String email = (String) session.getAttribute("reset_email");
 
         if (newPassword == null || newPassword.length() < 6 || newPassword.length() > 72) {
-            req.setAttribute("error", "Mật khẩu mới phải từ 6 đến 72 ký tự.");
+            req.setAttribute("error", "New password must be between 6 and 72 characters.");
             req.getRequestDispatcher("/WEB-INF/views/reset_password.jsp").forward(req, resp);
             return;
         }
 
         if (!newPassword.equals(confirmPassword)) {
-            req.setAttribute("error", "Mật khẩu mới không khớp.");
+            req.setAttribute("error", "New passwords do not match.");
             req.getRequestDispatcher("/WEB-INF/views/reset_password.jsp").forward(req, resp);
             return;
         }
@@ -77,7 +77,7 @@ public class ResetPasswordServlet extends HttpServlet {
             resp.sendRedirect(req.getContextPath() + "/login?reset=success");
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new ServletException("Lỗi database khi cập nhật mật khẩu", e);
+            throw new ServletException("Database error while updating password", e);
         }
     }
 }

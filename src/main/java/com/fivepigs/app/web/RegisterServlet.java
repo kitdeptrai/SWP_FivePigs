@@ -12,8 +12,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 /**
- * Controller: Xử lý request/response cho chức năng đăng ký
- * Tuân theo mô hình MVC
+ * Controller: Handles request/response for registration
+ * Follows MVC pattern
  */
 @WebServlet(name = "RegisterServlet", urlPatterns = {"/register"})
 public class RegisterServlet extends HttpServlet {
@@ -26,7 +26,8 @@ public class RegisterServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        // Hiển thị form đăng ký (View)
+        // Show register form (View)
+        CaptchaApiServlet.ensureCaptcha(req, "register");
         req.getRequestDispatcher("/WEB-INF/views/register.jsp").forward(req, resp);
     }
 
@@ -47,13 +48,23 @@ public class RegisterServlet extends HttpServlet {
         String error = userService.validateRegistration(fullName, email, password, confirmPassword);
         if (error != null) {
             req.setAttribute("error", error);
+            CaptchaApiServlet.ensureCaptcha(req, "register");
+            req.getRequestDispatcher("/WEB-INF/views/register.jsp").forward(req, resp);
+            return;
+        }
+
+        String captchaError = CaptchaApiServlet.requireVerified(req.getSession(), "register");
+        if (captchaError != null) {
+            req.setAttribute("error", captchaError);
+            CaptchaApiServlet.ensureCaptcha(req, "register");
             req.getRequestDispatcher("/WEB-INF/views/register.jsp").forward(req, resp);
             return;
         }
 
         try {
             if (userService.emailExists(email)) {
-                req.setAttribute("error", "Email đã tồn tại");
+                req.setAttribute("error", "Email already exists.");
+                CaptchaApiServlet.ensureCaptcha(req, "register");
                 req.getRequestDispatcher("/WEB-INF/views/register.jsp").forward(req, resp);
                 return;
             }
@@ -71,20 +82,20 @@ public class RegisterServlet extends HttpServlet {
                     System.currentTimeMillis() + 5 * 60 * 1000);
             session.setAttribute("reg_otp_attempts", 0);
 
-            // Chuẩn bị nội dung email HTML
+            // Build email content
             String emailBody = "<div style='font-family: Arial, sans-serif; line-height: 1.6;'>"
-                    + "<h2>Xác thực tài khoản của bạn</h2>"
-                    + "<p>Cảm ơn bạn đã đăng ký. Vui lòng sử dụng mã OTP dưới đây để hoàn tất quá trình:</p>"
+                    + "<h2>Verify your account</h2>"
+                    + "<p>Thank you for registering. Please use the OTP below to complete your registration:</p>"
                     + "<h3 style='color: #007bff; font-size: 24px; letter-spacing: 2px;'><b>" + otp + "</b></h3>"
-                    + "<p>Mã OTP này sẽ hết hạn trong 5 phút.</p>"
-                    + "<p>Trân trọng,<br/>Đội ngũ FivePigs</p>"
+                    + "<p>This OTP will expire in 5 minutes.</p>"
+                    + "<p>Best regards,<br/>FivePigs Team</p>"
                     + "</div>";
 
-            // Gửi mail async để không block request
+            // Send email asynchronously to avoid blocking request
             new Thread(() ->
                     com.fivepigs.app.util.EmailService.sendHtmlEmail(
                             email,
-                            "Mã xác thực OTP của bạn",
+                            "Your OTP verification code",
                             emailBody
                     )
             ).start();
@@ -92,7 +103,7 @@ public class RegisterServlet extends HttpServlet {
             resp.sendRedirect(req.getContextPath() + "/verify-register-otp");
 
         } catch (SQLException e) {
-            throw new ServletException("Lỗi database", e);
+            throw new ServletException("Database error", e);
         }
     }
 

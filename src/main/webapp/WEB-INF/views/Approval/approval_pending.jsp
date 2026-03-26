@@ -40,7 +40,7 @@
                     </div>
                     <div class="pending-panel" id="pending-container">
                         <c:if test="${empty listpending}">
-                            <div class="empty">Không có ứng dụng nào đang chờ duyệt.</div>
+                            <div class="empty">No applications are currently pending approval.</div>
                         </c:if>
 
                         <c:forEach var="it" items="${listpending}">

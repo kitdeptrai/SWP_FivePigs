@@ -1,6 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -45,7 +45,7 @@
 <body>
   <div class="card">
     <h1>Welcome to FIVEPIGS Store</h1>
-    <p>Bạn đang ở User Dashboard (chưa đăng nhập). Đăng nhập để dùng Library, Cart và các tính năng cá nhân.</p>
+    <p>You are on the User Dashboard (not logged in). Log in to use Library, Cart, and other personal features.</p>
     <div class="actions">
       <a class="btn primary" href="${pageContext.request.contextPath}/login">Login</a>
       <a class="btn ghost" href="${pageContext.request.contextPath}/register">Create account</a>

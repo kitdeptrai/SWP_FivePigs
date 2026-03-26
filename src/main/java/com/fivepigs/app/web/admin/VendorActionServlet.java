@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 @WebServlet({
-        "/admin/vendors/update",
         "/admin/vendors/enable",
         "/admin/vendors/disable"
 })
@@ -25,7 +24,6 @@ public class VendorActionServlet extends HttpServlet {
         String servletPath = req.getServletPath();
         try {
             switch (servletPath) {
-                case "/admin/vendors/update" -> handleUpdate(req, resp);
                 case "/admin/vendors/enable" -> handleStatus(req, resp, "ACTIVE", "enabled");
                 case "/admin/vendors/disable" -> handleStatus(req, resp, "INACTIVE", "disabled");
                 default -> resp.sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -34,21 +32,6 @@ public class VendorActionServlet extends HttpServlet {
             e.printStackTrace();
             resp.sendRedirect(req.getContextPath() + "/admin/vendors?error=db_error");
         }
-    }
-
-    private void handleUpdate(HttpServletRequest req, HttpServletResponse resp) throws IOException, SQLException {
-        String userIdStr = req.getParameter("userId");
-        String fullName = req.getParameter("fullName");
-        String phone = req.getParameter("phone");
-        String status = req.getParameter("status");
-        String roleName = req.getParameter("roleName");
-
-        String error = adminService.updateVendor(userIdStr, fullName, phone, status, roleName);
-        if (error != null) {
-            resp.sendRedirect(req.getContextPath() + "/admin/vendors?error=" + error);
-            return;
-        }
-        resp.sendRedirect(req.getContextPath() + "/admin/vendors?success=updated");
     }
 
     private void handleStatus(HttpServletRequest req, HttpServletResponse resp, String status, String success) throws IOException, SQLException {

@@ -3,6 +3,8 @@ package com.fivepigs.app.service;
 import com.fivepigs.app.dao.AdminDao;
 import com.fivepigs.app.dao.NotificationDao;
 
+import com.fivepigs.app.util.EmailService;
+
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
@@ -11,6 +13,8 @@ public class AdminService {
     private static final Set<String> EMPLOYEE_ROLES = Set.of("reviewer", "approval", "aproval");
     private static final Set<String> ACTIVE_STATUSES = Set.of("ACTIVE", "INACTIVE");
     private static final Set<String> PAYOUT_STATUSES = Set.of("PENDING", "PAID");
+    private static final Set<String> REPORT_STATUSES = Set.of("PENDING", "ERROR_REVIEW", "ERROR_APPROVAL", "REJECTED", "ERROR_REJECTED");
+    private static final Set<String> FEEDBACK_STATUSES = Set.of("NEW", "READ");
 
     private final AdminDao adminDao;
 
@@ -20,10 +24,6 @@ public class AdminService {
 
     public String updateEmployee(String userIdStr, String fullName, String phone, String status, String roleName) throws SQLException {
         return updateUserByRoleScope(userIdStr, fullName, phone, status, roleName, EMPLOYEE_ROLES);
-    }
-
-    public String updateVendor(String userIdStr, String fullName, String phone, String status, String roleName) throws SQLException {
-        return updateUserByRoleScope(userIdStr, fullName, phone, status, roleName, Set.of("vendor"));
     }
 
     public String setUserStatus(String userIdStr, String status) throws SQLException {
@@ -95,27 +95,77 @@ public class AdminService {
         return new PageResult<>(items, currentPage, safePageSize, totalItems, totalPages);
     }
 
-    public PageResult<AdminDao.AdminProductRow> getProductsPage(String pageParam, int pageSize, String keyword, String status) {
+    public PageResult<AdminDao.AdminProductReportRow> getProductsPage(String pageParam, int pageSize, String keyword, String status) {
         return getProductsPage(parsePage(pageParam), pageSize, keyword, status);
     }
 
-    public PageResult<AdminDao.VendorPayoutRow> getVendorPayoutsPage(String pageParam,
+    public PageResult<AdminDao.AdminUserFeedbackRow> getUserFeedbackPage(String pageParam, int pageSize, String keyword, String status) {
+        return getUserFeedbackPage(parsePage(pageParam), pageSize, keyword, status);
+    }
+
+    public PageResult<AdminDao.AdminOrderRow> getSuccessfulOrdersPage(String pageParam,
                                                                       int pageSize,
-                                                                      String status,
                                                                       String keyword,
                                                                       String fromDate,
-                                                                      String toDate,
-                                                                      String sortById) {
+                                                                      String toDate) {
+        return getSuccessfulOrdersPage(parsePage(pageParam), pageSize, keyword, fromDate, toDate);
+    }
+
+    public PageResult<AdminDao.AdminOrderRow> getSuccessfulOrdersPage(int page,
+                                                                      int pageSize,
+                                                                      String keyword,
+                                                                      String fromDate,
+                                                                      String toDate) {
+        int safePageSize = pageSize <= 0 ? 10 : pageSize;
+        String normalizedKeyword = normalizeKeyword(keyword);
+        java.sql.Date normalizedFromDate = parseSqlDate(fromDate);
+        java.sql.Date normalizedToDate = parseSqlDate(toDate);
+        if (normalizedFromDate != null && normalizedToDate != null && normalizedFromDate.after(normalizedToDate)) {
+            java.sql.Date tmp = normalizedFromDate;
+            normalizedFromDate = normalizedToDate;
+            normalizedToDate = tmp;
+        }
+
+        int totalItems = adminDao.countSuccessfulOrders(normalizedKeyword, normalizedFromDate, normalizedToDate);
+        int totalPages = Math.max(1, (int) Math.ceil((double) totalItems / safePageSize));
+        int currentPage = Math.max(1, Math.min(page, totalPages));
+        int offset = (currentPage - 1) * safePageSize;
+
+        List<AdminDao.AdminOrderRow> items = adminDao.listSuccessfulOrdersPaged(
+                safePageSize,
+                offset,
+                normalizedKeyword,
+                normalizedFromDate,
+                normalizedToDate
+        );
+        return new PageResult<>(items, currentPage, safePageSize, totalItems, totalPages);
+    }
+
+    public List<AdminDao.AdminOrderDetailRow> getOrderDetails(String orderIdStr) {
+        Integer orderId = parseId(orderIdStr);
+        if (orderId == null) {
+            return java.util.Collections.emptyList();
+        }
+        return adminDao.listOrderDetails(orderId);
+    }
+
+    public PageResult<AdminDao.VendorPayoutRow> getVendorPayoutsPage(String pageParam,
+                                                                     int pageSize,
+                                                                     String status,
+                                                                     String keyword,
+                                                                     String fromDate,
+                                                                     String toDate,
+                                                                     String sortById) {
         return getVendorPayoutsPage(parsePage(pageParam), pageSize, status, keyword, fromDate, toDate, sortById);
     }
 
     public PageResult<AdminDao.VendorPayoutRow> getVendorPayoutsPage(int page,
-                                                                      int pageSize,
-                                                                      String status,
-                                                                      String keyword,
-                                                                      String fromDate,
-                                                                      String toDate,
-                                                                      String sortById) {
+                                                                     int pageSize,
+                                                                     String status,
+                                                                     String keyword,
+                                                                     String fromDate,
+                                                                     String toDate,
+                                                                     String sortById) {
         int safePageSize = pageSize <= 0 ? 10 : pageSize;
         String normalizedStatus = normalizePayoutStatusFilter(status);
         String normalizedKeyword = normalizeKeyword(keyword);
@@ -159,18 +209,94 @@ public class AdminService {
         return null;
     }
 
-    public PageResult<AdminDao.AdminProductRow> getProductsPage(int page, int pageSize, String keyword, String status) {
+    public PageResult<AdminDao.AdminProductReportRow> getProductsPage(int page, int pageSize, String keyword, String status) {
         int safePageSize = pageSize <= 0 ? 10 : pageSize;
         String normalizedKeyword = normalizeKeyword(keyword);
-        String normalizedStatus = normalizeProductStatusFilter(status);
+        String normalizedStatus = normalizeReportStatusFilter(status);
 
         int totalItems = adminDao.countProducts(normalizedKeyword, normalizedStatus);
         int totalPages = Math.max(1, (int) Math.ceil((double) totalItems / safePageSize));
         int currentPage = Math.max(1, Math.min(page, totalPages));
         int offset = (currentPage - 1) * safePageSize;
 
-        List<AdminDao.AdminProductRow> items = adminDao.listProductsPaged(safePageSize, offset, normalizedKeyword, normalizedStatus);
+        List<AdminDao.AdminProductReportRow> items = adminDao.listProductsPaged(safePageSize, offset, normalizedKeyword, normalizedStatus);
         return new PageResult<>(items, currentPage, safePageSize, totalItems, totalPages);
+    }
+
+    public PageResult<AdminDao.AdminUserFeedbackRow> getUserFeedbackPage(int page, int pageSize, String keyword, String status) {
+        int safePageSize = pageSize <= 0 ? 10 : pageSize;
+        String normalizedKeyword = normalizeKeyword(keyword);
+        String normalizedStatus = normalizeFeedbackStatusFilter(status);
+
+        int totalItems = adminDao.countUserFeedback(normalizedKeyword, normalizedStatus);
+        int totalPages = Math.max(1, (int) Math.ceil((double) totalItems / safePageSize));
+        int currentPage = Math.max(1, Math.min(page, totalPages));
+        int offset = (currentPage - 1) * safePageSize;
+
+        List<AdminDao.AdminUserFeedbackRow> items = adminDao.listUserFeedbackPaged(safePageSize, offset, normalizedKeyword, normalizedStatus);
+        return new PageResult<>(items, currentPage, safePageSize, totalItems, totalPages);
+    }
+
+    public String approveReport(String reportIdStr) throws SQLException {
+        Integer reportId = parseId(reportIdStr);
+        if (reportId == null) {
+            return "invalid_id";
+        }
+        boolean updated = adminDao.updateReportStatus(reportId, "PENDING", "ERROR_REVIEW");
+        return updated ? null : "invalid_state";
+    }
+
+    public String rejectReport(String reportIdStr) throws SQLException {
+        Integer reportId = parseId(reportIdStr);
+        if (reportId == null) {
+            return "invalid_id";
+        }
+        boolean updated = adminDao.updateReportStatus(reportId, "PENDING", "REJECTED");
+        return updated ? null : "invalid_state";
+    }
+
+    public AdminDao.AdminUserFeedbackDetailRow getFeedbackDetail(String feedbackIdStr) {
+        Integer feedbackId = parseId(feedbackIdStr);
+        if (feedbackId == null) {
+            return null;
+        }
+        return adminDao.getUserFeedbackDetail(feedbackId);
+    }
+
+    public String markFeedbackAsRead(String feedbackIdStr) throws SQLException {
+        Integer feedbackId = parseId(feedbackIdStr);
+        if (feedbackId == null) {
+            return "invalid_id";
+        }
+
+        AdminDao.AdminUserFeedbackDetailRow detail = adminDao.getUserFeedbackDetail(feedbackId);
+        if (detail == null) {
+            return "not_found";
+        }
+
+        boolean updated = adminDao.markUserFeedbackAsRead(feedbackId);
+        if (!updated) {
+            return "invalid_state";
+        }
+
+        String toEmail = detail.getUserEmail();
+        if (toEmail != null && !toEmail.isBlank()) {
+            String subject = "Your feedback has been received by FivePigs Admin";
+            String htmlBody = "<p>Hello " + escapeHtml(detail.getUserName()) + ",</p>"
+                    + "<p>We have received your feedback and marked it as read.</p>"
+                    + "<p><strong>Feedback ID:</strong> #" + detail.getFeedbackId() + "<br/>"
+                    + "<strong>Subject:</strong> " + escapeHtml(detail.getSubject()) + "<br/>"
+                    + "<strong>Status:</strong> READ</p>"
+                    + "<p>Thank you for helping us improve FivePigs.</p>"
+                    + "<p>Best regards,<br/>FivePigs Admin Team</p>";
+            try {
+                EmailService.sendHtmlEmail(toEmail, subject, htmlBody);
+            } catch (RuntimeException ignored) {
+                // Do not fail the admin action if email sending fails.
+            }
+        }
+
+        return null;
     }
 
     public AdminDao.AdminProductDetailRow getProductDetail(String softwareIdStr) {
@@ -179,6 +305,14 @@ public class AdminService {
             return null;
         }
         return adminDao.getProductDetail(softwareId);
+    }
+
+    public AdminDao.AdminReportDetailRow getProductReportDetail(String reportIdStr) {
+        Integer reportId = parseId(reportIdStr);
+        if (reportId == null) {
+            return null;
+        }
+        return adminDao.getReportDetail(reportId);
     }
 
     public String updateProductStatus(String softwareIdStr, String status) throws SQLException {
@@ -322,11 +456,15 @@ public class AdminService {
         return value;
     }
 
-    private String normalizeProductStatusFilter(String status) {
+    private String normalizeReportStatusFilter(String status) {
         if (isBlank(status)) {
             return null;
         }
-        return status.trim().toUpperCase();
+        String value = status.trim().toUpperCase();
+        if (!REPORT_STATUSES.contains(value)) {
+            return null;
+        }
+        return value;
     }
 
     private String normalizePayoutStatusFilter(String status) {
@@ -335,6 +473,17 @@ public class AdminService {
         }
         String value = status.trim().toUpperCase();
         if (!PAYOUT_STATUSES.contains(value)) {
+            return null;
+        }
+        return value;
+    }
+
+    private String normalizeFeedbackStatusFilter(String status) {
+        if (isBlank(status)) {
+            return null;
+        }
+        String value = status.trim().toUpperCase();
+        if (!FEEDBACK_STATUSES.contains(value)) {
             return null;
         }
         return value;
@@ -360,6 +509,17 @@ public class AdminService {
 
     private boolean isBlank(String value) {
         return value == null || value.isBlank();
+    }
+
+    private String escapeHtml(String value) {
+        if (value == null) {
+            return "";
+        }
+        return value.replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
+                .replace("\"", "&quot;")
+                .replace("'", "&#39;");
     }
 
     public static class PageResult<T> {
