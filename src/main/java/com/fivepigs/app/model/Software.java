@@ -27,6 +27,7 @@ public class Software {
 //    download_count INT DEFAULT 0,
 //    avg_rating DECIMAL(2,1) DEFAULT 0,
 //    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+
     private Integer softwareId;
     private String name;
     private String shortDescription;
