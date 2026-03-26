@@ -7,7 +7,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Admin - Products</title>
+    <title>Admin - Reported Products</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css">
     <style>
         :root {
@@ -15,7 +15,7 @@
             --sidebar-bg: #0f172a;
             --card-bg: #ffffff;
             --text-main: #334155;
-            --bg-gray: #f1f5f9;
+            --bg-gray: #f5f7fb;
             --accent: #3b82f6;
         }
 
@@ -23,7 +23,7 @@
             background-color: var(--bg-gray);
             color: var(--text-main);
             margin: 0;
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            font-family: 'Inter', sans-serif;
         }
 
         .layout {
@@ -85,11 +85,17 @@
         }
 
         .card {
-            background: var(--card-bg);
-            padding: 24px;
-            border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            border: 1px solid #e2e8f0;
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            border: 1px solid #e5e7eb;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.12);
         }
 
         table {
@@ -100,18 +106,22 @@
 
         th {
             text-align: left;
-            padding: 12px;
-            background-color: var(--bg-gray);
-            color: #475569;
+            color: #666;
             font-weight: 600;
+            padding: 10px;
+            background: transparent;
             font-size: 14px;
         }
 
         td {
-            padding: 12px;
-            border-bottom: 1px solid #e2e8f0;
+            padding: 10px;
+            border-top: 1px solid #eee;
             font-size: 14px;
             vertical-align: top;
+        }
+
+        tr:hover {
+            background: #f9fafb;
         }
 
         .badge {
@@ -145,28 +155,47 @@
     <jsp:include page="sidebar.jsp"/>
 
     <main class="main">
-        <h1 style="margin-top: 0;">Products Management</h1>
-        <p class="subtitle">Manage the product list (active/inactive).</p>
+        <h1 style="margin-top: 0;">Reported Products</h1>
+        <p class="subtitle">Review customer reports and route them for bug review or reject them.</p>
 
         <div class="card" style="max-width: 100%;">
             <div style="display:flex; justify-content: space-between; align-items:center; gap: 16px;">
                 <div>
-                    <h2 style="margin:0; font-size: 18px; color: var(--dark-blue);">Product list</h2>
-                    <p style="margin:6px 0 0; color:#64748b; font-size: 13px;">All products in the system</p>
+                    <h2 style="margin:0; font-size: 18px; color: var(--dark-blue);">Report queue</h2>
+                    <p style="margin:6px 0 0; color:#64748b; font-size: 13px;">Reports pulled from the <code>Report</code> table</p>
                 </div>
             </div>
+
+            <c:if test="${param.success == 'approved'}">
+                <div style="margin-top:16px; padding:12px 14px; border-radius:10px; background:#dcfce7; color:#166534; border:1px solid #86efac;">
+                    Report approved. Status changed to <strong>ERROR_REVIEW</strong>.
+                </div>
+            </c:if>
+            <c:if test="${param.success == 'rejected'}">
+                <div style="margin-top:16px; padding:12px 14px; border-radius:10px; background:#fee2e2; color:#991b1b; border:1px solid #fca5a5;">
+                    Report rejected. Status changed to <strong>REJECTED</strong>.
+                </div>
+            </c:if>
+            <c:if test="${not empty param.error}">
+                <div style="margin-top:16px; padding:12px 14px; border-radius:10px; background:#fff7ed; color:#9a3412; border:1px solid #fdba74;">
+                    Unable to process this report. Error: <c:out value="${param.error}"/>.
+                </div>
+            </c:if>
 
             <form method="get" action="${pageContext.request.contextPath}/admin/products" style="margin-top:16px; display:grid; grid-template-columns: 2fr 1fr auto auto; gap:10px; align-items:end;">
                 <div>
                     <label style="display:block; font-size:12px; color:#64748b; margin-bottom:6px;">Search</label>
-                    <input type="text" name="keyword" value="${keyword}" placeholder="Product name, vendor, category..." style="width:100%; padding:10px 12px; border:1px solid #cbd5e1; border-radius:8px;" />
+                    <input type="text" name="keyword" value="${keyword}" placeholder="Report ID, product, vendor, reporter, reason..." style="width:100%; padding:10px 12px; border:1px solid #cbd5e1; border-radius:8px;" />
                 </div>
                 <div>
-                    <label style="display:block; font-size:12px; color:#64748b; margin-bottom:6px;">Status</label>
+                    <label style="display:block; font-size:12px; color:#64748b; margin-bottom:6px;">Report Status</label>
                     <select name="status" style="width:100%; padding:10px 12px; border:1px solid #cbd5e1; border-radius:8px;">
                         <option value="">All</option>
-                        <option value="ACTIVE" ${status == 'ACTIVE' ? 'selected' : ''}>ACTIVE</option>
-                        <option value="INACTIVE" ${status == 'INACTIVE' ? 'selected' : ''}>INACTIVE</option>
+                        <option value="PENDING" ${status == 'PENDING' ? 'selected' : ''}>PENDING</option>
+                        <option value="ERROR_REVIEW" ${status == 'ERROR_REVIEW' ? 'selected' : ''}>ERROR_REVIEW</option>
+                        <option value="ERROR_APPROVAL" ${status == 'ERROR_APPROVAL' ? 'selected' : ''}>ERROR_APPROVAL</option>
+                        <option value="REJECTED" ${status == 'REJECTED' ? 'selected' : ''}>REJECTED</option>
+                        <option value="ERROR_REJECTED" ${status == 'ERROR_REJECTED' ? 'selected' : ''}>ERROR_REJECTED</option>
                     </select>
                 </div>
                 <button type="submit" style="padding:10px 14px; border-radius:8px; border:none; background:#3b82f6; color:#fff; font-weight:600;">Filter</button>
@@ -176,14 +205,13 @@
             <table>
                 <thead>
                 <tr>
-                    <th>ID</th>
+                    <th>Report ID</th>
                     <th>Product name</th>
                     <th>Vendor</th>
-                    <th>Category</th>
-                    <th>Price</th>
-                    <th>Status</th>
-                    <th>Downloads</th>
-                    <th>Rating</th>
+                    <th>Reporter</th>
+                    <th>Reason</th>
+                    <th>Report Status</th>
+                    <th>Product Status</th>
                     <th>Created At</th>
                     <th>Actions</th>
                 </tr>
@@ -191,45 +219,82 @@
                 <tbody>
                 <c:forEach var="p" items="${products}">
                     <tr>
-                        <td>#<c:out value="${p.softwareId}"/></td>
+                        <td>#<c:out value="${p.reportId}"/></td>
                         <td><c:out value="${p.name}"/></td>
                         <td><c:out value="${p.vendorName}"/></td>
-                        <td><c:out value="${p.categoryName}"/></td>
+                        <td><c:out value="${p.reporterName}"/></td>
+                        <td style="max-width:320px; white-space:normal;"><c:out value="${p.reason}"/></td>
                         <td>
                             <c:choose>
-                                <c:when test="${p.isFree == 1}">
-                                    Free
+                                <c:when test="${p.reportStatus == 'PENDING'}">
+                                    <span class="badge pending">PENDING</span>
+                                </c:when>
+                                <c:when test="${p.reportStatus == 'ERROR_REVIEW' || p.reportStatus == 'ERROR_APPROVAL'}">
+                                    <span class="badge active"><c:out value="${p.reportStatus}"/></span>
+                                </c:when>
+                                <c:when test="${p.reportStatus == 'REJECTED' || p.reportStatus == 'ERROR_REJECTED'}">
+                                    <span class="badge inactive"><c:out value="${p.reportStatus}"/></span>
                                 </c:when>
                                 <c:otherwise>
-                                    <fmt:formatNumber value="${p.price}" type="currency" currencySymbol="$"/>
+                                    <span class="badge pending"><c:out value="${p.reportStatus}"/></span>
                                 </c:otherwise>
                             </c:choose>
                         </td>
                         <td>
                             <c:choose>
-                                <c:when test="${p.status == 'ACTIVE'}">
+                                <c:when test="${p.softwareStatus == 'ACTIVE'}">
                                     <span class="badge active">ACTIVE</span>
                                 </c:when>
-                                <c:when test="${p.status == 'INACTIVE'}">
+                                <c:when test="${p.softwareStatus == 'INACTIVE'}">
                                     <span class="badge inactive">INACTIVE</span>
                                 </c:when>
                                 <c:otherwise>
-                                    <span class="badge pending"><c:out value="${p.status}"/></span>
+                                    <span class="badge pending"><c:out value="${p.softwareStatus}"/></span>
                                 </c:otherwise>
                             </c:choose>
                         </td>
-                        <td><c:out value="${p.downloadCount}"/></td>
-                        <td><fmt:formatNumber value="${p.avgRating}" minFractionDigits="1" maxFractionDigits="1"/></td>
                         <td><fmt:formatDate value="${p.createdAt}" pattern="dd/MM/yyyy HH:mm"/></td>
                         <td>
                             <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                                <a href="${pageContext.request.contextPath}/admin/products/detail?softwareId=${p.softwareId}" style="padding:6px 10px; border-radius:6px; border:1px solid #cbd5e1; text-decoration:none; color:#334155; font-weight:600;">Detail</a>
-                                <form method="post" action="${pageContext.request.contextPath}/admin/products/${p.status == 'ACTIVE' ? 'disable' : 'enable'}" style="margin:0;" onsubmit="return confirm('${p.status == 'ACTIVE' ? 'Are you sure you want to disable this product?' : 'Are you sure you want to enable this product?'}');">
-                                    <input type="hidden" name="softwareId" value="${p.softwareId}" />
-                                    <button type="submit" style="padding:6px 10px; border-radius:6px; border:none; background:${p.status == 'ACTIVE' ? '#f97316' : '#22c55e'}; color:#fff; font-weight:600;">
-                                        ${p.status == 'ACTIVE' ? 'Disable' : 'Enable'}
-                                    </button>
-                                </form>
+                                <a href="${pageContext.request.contextPath}/admin/products/detail?reportId=${p.reportId}" style="padding:6px 10px; border-radius:6px; border:1px solid #cbd5e1; text-decoration:none; color:#334155; font-weight:600;">Detail</a>
+                                <c:if test="${p.reportStatus == 'PENDING'}">
+                                    <a href="#approve-report-${p.reportId}" style="padding:6px 10px; border-radius:6px; border:none; background:#22c55e; color:#fff; font-weight:600; text-decoration:none;">Approve</a>
+                                    <a href="#reject-report-${p.reportId}" style="padding:6px 10px; border-radius:6px; border:none; background:#ef4444; color:#fff; font-weight:600; text-decoration:none;">Reject</a>
+
+                                    <div id="approve-report-${p.reportId}" class="modal">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h2>Approve report</h2>
+                                                <a class="close-modal" href="${pageContext.request.contextPath}/admin/products">×</a>
+                                            </div>
+                                            <p>Approve this report and move it to <strong>ERROR_REVIEW</strong>?</p>
+                                            <form method="post" action="${pageContext.request.contextPath}/admin/products/approve">
+                                                <input type="hidden" name="reportId" value="${p.reportId}" />
+                                                <div class="actions">
+                                                    <button type="submit" style="background:#22c55e;">Approve</button>
+                                                    <a class="small" href="${pageContext.request.contextPath}/admin/products">Cancel</a>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+
+                                    <div id="reject-report-${p.reportId}" class="modal">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h2>Reject report</h2>
+                                                <a class="close-modal" href="${pageContext.request.contextPath}/admin/products">×</a>
+                                            </div>
+                                            <p>Reject this report?</p>
+                                            <form method="post" action="${pageContext.request.contextPath}/admin/products/reject">
+                                                <input type="hidden" name="reportId" value="${p.reportId}" />
+                                                <div class="actions">
+                                                    <button type="submit" style="background:#ef4444;">Reject</button>
+                                                    <a class="small" href="${pageContext.request.contextPath}/admin/products">Cancel</a>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </c:if>
                             </div>
                         </td>
                     </tr>
@@ -237,7 +302,7 @@
 
                 <c:if test="${empty products}">
                     <tr>
-                        <td colspan="9" style="text-align:center; color:#94a3b8; padding: 16px;">No products found.</td>
+                        <td colspan="9" style="text-align:center; color:#94a3b8; padding: 16px;">No reported products found.</td>
                     </tr>
                 </c:if>
                 </tbody>

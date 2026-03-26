@@ -27,7 +27,7 @@ public class VerifyResetOtpServlet extends HttpServlet {
         if ("true".equals(resend)) {
             Long lastSentAt = (Long) session.getAttribute("reset_otp_last_sent");
             if (lastSentAt != null && System.currentTimeMillis() - lastSentAt < 60_000) {
-                req.setAttribute("error", "Vui lòng chờ 60 giây trước khi gửi lại OTP.");
+                req.setAttribute("error", "Please wait 60 seconds before resending OTP.");
             } else {
                 String email = (String) session.getAttribute("reset_email");
                 String otp = OtpUtil.generateOtp();
@@ -36,14 +36,14 @@ public class VerifyResetOtpServlet extends HttpServlet {
                 session.setAttribute("reset_otp_last_sent", System.currentTimeMillis());
                 session.setAttribute("reset_otp_attempts", 0);
                 String emailBody = "<div style='font-family: Arial, sans-serif; line-height: 1.6;'>"
-                        + "<h2>Yêu cầu đặt lại mật khẩu</h2>"
-                        + "<p>Chúng tôi đã nhận được yêu cầu đặt lại mật khẩu cho tài khoản của bạn. Vui lòng sử dụng mã OTP dưới đây:</p>"
+                        + "<h2>Password reset request</h2>"
+                        + "<p>We received a request to reset your password. Please use the OTP below:</p>"
                         + "<h3 style='color: #dc3545; font-size: 24px; letter-spacing: 2px;'><b>" + otp + "</b></h3>"
-                        + "<p>Mã OTP này sẽ hết hạn trong 5 phút.</p>"
-                        + "<p>Nếu bạn không yêu cầu điều này, vui lòng bỏ qua email này.</p>"
+                        + "<p>This OTP will expire in 5 minutes.</p>"
+                        + "<p>If you did not request this, please ignore this email.</p>"
                         + "</div>";
-                new Thread(() -> EmailService.sendHtmlEmail(email, "Yêu cầu đặt lại mật khẩu", emailBody)).start();
-                req.setAttribute("success", "Đã gửi lại mã OTP. Vui lòng kiểm tra email.");
+                new Thread(() -> EmailService.sendHtmlEmail(email, "Password reset request", emailBody)).start();
+                req.setAttribute("success", "OTP resent. Please check your email.");
             }
             req.getRequestDispatcher("/WEB-INF/views/verify_reset_otp.jsp").forward(req, resp);
             return;
@@ -68,7 +68,7 @@ public class VerifyResetOtpServlet extends HttpServlet {
 
         if (sessionOtpHash == null || expireTime == null || System.currentTimeMillis() > expireTime) {
             session.invalidate();
-            req.setAttribute("error", "OTP đã hết hạn hoặc không hợp lệ. Vui lòng thử lại.");
+            req.setAttribute("error", "OTP expired or invalid. Please try again.");
             req.getRequestDispatcher("/WEB-INF/views/forgot_password.jsp").forward(req, resp);
             return;
         }
@@ -78,11 +78,11 @@ public class VerifyResetOtpServlet extends HttpServlet {
             session.setAttribute("reset_otp_attempts", attempts);
             if (attempts >= 5) {
                 session.invalidate();
-                req.setAttribute("error", "Bạn đã nhập sai OTP quá 5 lần. Vui lòng thực hiện lại.");
+                req.setAttribute("error", "You entered the wrong OTP too many times. Please start again.");
                 req.getRequestDispatcher("/WEB-INF/views/forgot_password.jsp").forward(req, resp);
                 return;
             }
-            req.setAttribute("error", "Mã OTP không chính xác. Còn " + (5 - attempts) + " lần thử.");
+            req.setAttribute("error", "Incorrect OTP. " + (5 - attempts) + " attempts remaining.");
             req.getRequestDispatcher("/WEB-INF/views/verify_reset_otp.jsp").forward(req, resp);
             return;
         }

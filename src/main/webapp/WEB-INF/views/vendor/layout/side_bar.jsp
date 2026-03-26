@@ -32,8 +32,8 @@
         </li>
 
         <li>
-            <a href="/vendor/payout" class="${pageContext.request.requestURI.contains('payout') ? 'active' : ''}">
-                <i class="fa-solid fa-dollar-sign"></i> Payout
+            <a href="/vendor/transaction_management" class="${pageContext.request.requestURI.contains('transaction_management') ? 'active' : ''}">
+                <i class="fa-regular fa-star"></i> Transaction
             </a>
         </li>
 

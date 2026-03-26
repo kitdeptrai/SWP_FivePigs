@@ -24,15 +24,11 @@
         </a>
         <a href="${pageContext.request.contextPath}/admin/products" class="menu-item ${activeMenu == 'products' ? 'active' : ''}">
             <i class="fa-solid fa-box"></i>
-            <span>Products</span>
+            <span>Reported Products</span>
         </a>
         <a href="${pageContext.request.contextPath}/admin/orders" class="menu-item ${activeMenu == 'orders' ? 'active' : ''}">
             <i class="fa-solid fa-cart-shopping"></i>
             <span>Orders</span>
-        </a>
-        <a href="${pageContext.request.contextPath}/admin/payouts" class="menu-item ${activeMenu == 'payouts' ? 'active' : ''}">
-            <i class="fa-solid fa-wallet"></i>
-            <span>Payouts</span>
         </a>
         <a href="${pageContext.request.contextPath}/admin/reports" class="menu-item ${activeMenu == 'reports' ? 'active' : ''}">
             <i class="fa-solid fa-triangle-exclamation"></i>

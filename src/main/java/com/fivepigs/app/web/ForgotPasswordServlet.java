@@ -28,15 +28,15 @@ public class ForgotPasswordServlet extends HttpServlet {
 
         try {
             if (email == null || email.trim().isEmpty()) {
-                req.setAttribute("error", "Vui lòng nhập email.");
+                req.setAttribute("error", "Please enter your email.");
                 req.getRequestDispatcher("/WEB-INF/views/forgot_password.jsp").forward(req, resp);
                 return;
             }
 
-            // Kiểm tra email tồn tại
+            // Check if email exists
             boolean exists = userService.emailExists(email);
             if (!exists) {
-                req.setAttribute("error", "Tài khoản không tồn tại");
+                req.setAttribute("error", "Account does not exist.");
                 req.getRequestDispatcher("/WEB-INF/views/forgot_password.jsp").forward(req, resp);
                 return;
             }
@@ -47,7 +47,7 @@ public class ForgotPasswordServlet extends HttpServlet {
             Long lastSentAt = (Long) session.getAttribute("reset_otp_last_sent");
             if (lastSentAt != null && System.currentTimeMillis() - lastSentAt < 60_000) {
                 req.setAttribute("email", email);
-                req.setAttribute("success", "OTP đã được gửi gần đây. Vui lòng thử lại sau 60 giây.");
+                req.setAttribute("success", "OTP was sent recently. Please try again after 60 seconds.");
                 req.getRequestDispatcher("/WEB-INF/views/forgot_password.jsp").forward(req, resp);
                 return;
             }
@@ -61,14 +61,14 @@ public class ForgotPasswordServlet extends HttpServlet {
             session.setAttribute("reset_otp_attempts", 0);
 
             String emailBody = "<div style='font-family: Arial, sans-serif; line-height: 1.6;'>"
-                    + "<h2>Yêu cầu đặt lại mật khẩu</h2>"
-                    + "<p>Chúng tôi đã nhận được yêu cầu đặt lại mật khẩu cho tài khoản của bạn. Vui lòng sử dụng mã OTP dưới đây:</p>"
+                    + "<h2>Password reset request</h2>"
+                    + "<p>We received a request to reset your password. Please use the OTP below:</p>"
                     + "<h3 style='color: #dc3545; font-size: 24px; letter-spacing: 2px;'><b>" + otp + "</b></h3>"
-                    + "<p>Mã OTP này sẽ hết hạn trong 5 phút.</p>"
-                    + "<p>Nếu bạn không yêu cầu điều này, vui lòng bỏ qua email này.</p>"
+                    + "<p>This OTP will expire in 5 minutes.</p>"
+                    + "<p>If you did not request this, please ignore this email.</p>"
                     + "</div>";
 
-            new Thread(() -> EmailService.sendHtmlEmail(email, "Yêu cầu đặt lại mật khẩu", emailBody)).start();
+            new Thread(() -> EmailService.sendHtmlEmail(email, "Password reset request", emailBody)).start();
 
             // Require OTP verification before allowing password change
             session.setAttribute("reset_verified", false);
@@ -77,7 +77,7 @@ public class ForgotPasswordServlet extends HttpServlet {
 
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new ServletException("Lỗi database khi kiểm tra email", e);
+            throw new ServletException("Database error while checking email", e);
         }
     }
 }

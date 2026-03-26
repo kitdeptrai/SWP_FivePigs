@@ -122,6 +122,7 @@ CREATE TABLE Orders (
     customer_id INT,
     payment_status_id INT,
     total_amount DECIMAL(10,2),
+    commission_percent DECIMAL(5,2) DEFAULT 10.00,
     order_date DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (customer_id) REFERENCES Users(user_id),
     FOREIGN KEY (payment_status_id) REFERENCES Payment_Status(payment_status_id)

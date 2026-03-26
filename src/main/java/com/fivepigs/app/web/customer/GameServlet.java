@@ -46,23 +46,23 @@ public class GameServlet extends HttpServlet {
         String selectedOrder = normalizeOrder(request.getParameter("order"));
 
         try {
-            List<Software> softwareList = sdao.getSoftwareByCategoryWithIcon("1");
-            Software featuredGame = sdao.getTopDownloadedByCategoryWithIcon(1);
-            Software randomGame = sdao.getRandomSoftwareByCategoryWithIcon(1);
+            List<Software> softwareList = sdao.getSoftwareByCategoryWithIcon("2");
+            Software featuredGame = sdao.getTopDownloadedByCategoryWithIcon(2);
+            Software randomGame = sdao.getRandomSoftwareByCategoryWithIcon(2);
             Map<String, List<Software>> sections = new LinkedHashMap<>();
             List<String> genres = new ArrayList<>();
             List<Software> genreResults = new ArrayList<>();
 
             try {
-                genres = sdao.getGenresByCategory(1);
+                genres = sdao.getGenresByCategory(2);
                 if (selectedGenre == null) {
                     for (String genre : genres) {
-                        List<Software> list = sdao.getSoftwareByCategoryAndGenre(1, genre);
+                        List<Software> list = sdao.getSoftwareByCategoryAndGenre(2, genre);
                         sortSoftwareList(list, selectedSort, selectedOrder);
                         sections.put(genre, list);
                     }
                 } else {
-                    genreResults = sdao.getSoftwareByCategoryAndGenre(1, selectedGenre);
+                    genreResults = sdao.getSoftwareByCategoryAndGenre(2, selectedGenre);
                     sortSoftwareList(genreResults, selectedSort, selectedOrder);
                 }
             } catch (SQLException ignored) {

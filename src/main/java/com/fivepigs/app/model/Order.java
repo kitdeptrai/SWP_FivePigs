@@ -26,7 +26,8 @@ public class Order {
     private Integer customerId;
     private Integer paymentStatusId;
     private Double totalAmount;
-    private LocalDateTime orderDatel;
+    private LocalDateTime orderDate;
+    
 
     public Order() {
     }
@@ -36,7 +37,7 @@ public class Order {
         this.customerId = customerId;
         this.paymentStatusId = paymentStatusId;
         this.totalAmount = totalAmount;
-        this.orderDatel = orderDatel;
+        this.orderDate = orderDatel;
     }
 
     public Integer getOrderId() {
@@ -71,12 +72,12 @@ public class Order {
         this.totalAmount = totalAmount;
     }
 
-    public LocalDateTime getOrderDatel() {
-        return orderDatel;
+    public LocalDateTime getOrderDate() {
+        return orderDate;
     }
 
-    public void setOrderDatel(LocalDateTime orderDatel) {
-        this.orderDatel = orderDatel;
+    public void setOrderDate(LocalDateTime orderDatel) {
+        this.orderDate= orderDatel;
     }
     
     
