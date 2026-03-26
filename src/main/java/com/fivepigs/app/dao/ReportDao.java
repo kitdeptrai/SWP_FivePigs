@@ -165,6 +165,138 @@ public class ReportDao {
         }
     }
 
+    public List<Report> getErrorApprovalReports() throws SQLException {
+        String sql = """
+            SELECT
+                r.report_id,
+                r.software_id,
+                r.reporter_id,
+                r.reviewer_id,
+                r.reason,
+                r.status,
+                r.bug_confirmed,
+                r.reviewer_note,
+                r.reproduce_steps,
+                r.created_at,
+                r.processed_at,
+                s.name AS software_name,
+                u.full_name AS reporter_name,
+                sv.file_url
+            FROM Report r
+            JOIN Software s ON s.software_id = r.software_id
+            JOIN Users u ON u.user_id = r.reporter_id
+            LEFT JOIN Software_Version sv
+                ON sv.software_id = s.software_id AND sv.is_active = 1
+            WHERE r.status = 'ERROR_APPROVAL'
+            ORDER BY r.created_at DESC
+        """;
+
+        List<Report> list = new ArrayList<>();
+        try (Connection c = Db.getConnection(); PreparedStatement ps = c.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                list.add(mapReport(rs));
+            }
+        }
+        return list;
+    }
+
+    public Report getErrorApprovalReportById(int reportId) throws SQLException {
+        String sql = """
+            SELECT
+                r.report_id,
+                r.software_id,
+                r.reporter_id,
+                r.reviewer_id,
+                r.reason,
+                r.status,
+                r.bug_confirmed,
+                r.reviewer_note,
+                r.reproduce_steps,
+                r.created_at,
+                r.processed_at,
+                s.name AS software_name,
+                u.full_name AS reporter_name,
+                sv.file_url
+            FROM Report r
+            JOIN Software s ON s.software_id = r.software_id
+            JOIN Users u ON u.user_id = r.reporter_id
+            LEFT JOIN Software_Version sv
+                ON sv.software_id = s.software_id AND sv.is_active = 1
+            WHERE r.report_id = ?
+            LIMIT 1
+        """;
+
+        try (Connection c = Db.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, reportId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapReport(rs);
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Lấy vendor_id của phần mềm theo softwareId.
+     * Trả về null nếu không tìm thấy.
+     */
+    public Integer getVendorIdBySoftwareId(int softwareId) throws SQLException {
+        String sql = "SELECT vendor_id FROM Software WHERE software_id = ? LIMIT 1";
+        try (Connection c = Db.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, softwareId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    int v = rs.getInt("vendor_id");
+                    return rs.wasNull() ? null : v;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Process the approval decision on an ERROR_APPROVAL report.
+     * decision = "APPROVE" → set Report.status='APPROVED' and Software.status='REJECTED'
+     * decision = "REJECT"  → set Report.status='REJECTED', Software.status unchanged
+     */
+    public void processErrorReport(int reportId, int softwareId, String decision) throws SQLException {
+        Connection c = Db.getConnection();
+        try {
+            c.setAutoCommit(false);
+
+            // 1. Update report status
+            String reportStatus = "APPROVE".equalsIgnoreCase(decision) ? "APPROVED" : "REJECTED";
+            String updateReport = """
+                UPDATE Report
+                SET status = ?, processed_at = NOW()
+                WHERE report_id = ? AND status = 'ERROR_APPROVAL'
+            """;
+            try (PreparedStatement ps = c.prepareStatement(updateReport)) {
+                ps.setString(1, reportStatus);
+                ps.setInt(2, reportId);
+                ps.executeUpdate();
+            }
+
+            // 2. If approved → reject the software on market
+            if ("APPROVE".equalsIgnoreCase(decision)) {
+                String updateSoftware = "UPDATE Software SET status = 'REJECTED' WHERE software_id = ?";
+                try (PreparedStatement ps = c.prepareStatement(updateSoftware)) {
+                    ps.setInt(1, softwareId);
+                    ps.executeUpdate();
+                }
+            }
+
+            c.commit();
+        } catch (Exception e) {
+            c.rollback();
+            throw e;
+        } finally {
+            c.close();
+        }
+    }
+
     private Report mapReport(ResultSet rs) throws SQLException {
         Report r = new Report();
         r.setReportId(rs.getInt("report_id"));

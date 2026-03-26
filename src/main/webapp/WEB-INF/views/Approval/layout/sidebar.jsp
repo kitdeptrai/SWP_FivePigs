@@ -17,6 +17,7 @@
                     <li><a href="approval_dashboard?page=dashboard" class="${param.page eq 'dashboard' ? 'active' : ''}">Dashboard</a></li>
                     <li><a href="approval_pending?page=approval_pending" class="${param.page eq 'approval_pending' ? 'active' : ''}">Pending Approval</a></li>
                     <li><a href="approval_history?page=approval_history" class="${param.page eq 'approval_history' ? 'active' : ''}">Approval History</a></li>
+                    <li><a href="ApprovalErrorReports?page=error_reports" class="${param.page eq 'error_reports' ? 'active' : ''}">Error Reports</a></li>
                     <li><a href="approval_notifications?page=notifications" class="${param.page eq 'notifications' ? 'active' : ''}">Notifications</a></li>
                     <li><a href="approval_profile?page=profile" class="${param.page eq 'profile' ? 'active' : ''}">Profile</a></li>
                 </ul>
