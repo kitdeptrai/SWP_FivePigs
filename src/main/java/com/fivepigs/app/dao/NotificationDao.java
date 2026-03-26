@@ -12,6 +12,16 @@ import java.util.List;
 
 public class NotificationDao {
 
+    public void broadcastToAdmins(String title, String content, String type, String priority, String relatedUrl) {
+        AdminDao adminDao = new AdminDao();
+        List<Integer> adminIds = adminDao.getAdminUserIds();
+        if (adminIds == null || adminIds.isEmpty()) return;
+
+        for (Integer adminId : adminIds) {
+            insertNotification(adminId, title, content, type, priority, relatedUrl);
+        }
+    }
+
     private Notification mapRow(ResultSet rs) throws SQLException {
         Notification n = new Notification();
         n.setNotificationId(rs.getInt("notification_id"));
@@ -173,6 +183,7 @@ public class NotificationDao {
         }
         return 0;
     }
+
 
     // method mới: insert notification linh hoạt theo type / priority / related_url
     public void insertNotification(int userId, String title, String content,

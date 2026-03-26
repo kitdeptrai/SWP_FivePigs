@@ -8,12 +8,8 @@ import java.sql.*;
 
 import java.sql.*;
 import com.fivepigs.app.model.*;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
+
+import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -22,20 +18,26 @@ import java.util.Map;
 
 public class SoftwareDao {
 
+    private final String CUSTOMER_PRICE_SQL
+            = "COALESCE((SELECT MIN(sp.price) "
+            + "FROM fivepigs.software_pricing sp "
+            + "WHERE sp.software_id = s.software_id "
+            + "  AND sp.is_active = 1 "
+            + "  AND UPPER(COALESCE(sp.plan_name, '')) <> 'DEMO'), 0) AS price";
     private static final String PRICE_JOIN = """
         LEFT JOIN (
-            SELECT software_id, MIN(price) AS min_price
+            SELECT software_id, MIN(price) AS price
             FROM Software_Pricing
             WHERE is_active = 1
             GROUP BY software_id
-        ) sp_min ON sp_min.software_id = s.software_id
+        ) sp ON sp.software_id = s.software_id
         """;
 
     private static final String PRICE_SELECT = """
         CASE
             WHEN s.is_free = 1 THEN 0
-            ELSE COALESCE(sp_min.min_price, 0)
-        END AS final_price
+            ELSE COALESCE(sp.price, 0)
+        END AS price
         """;
 
     public Integer pendingReviewApp() throws SQLException {
@@ -69,7 +71,6 @@ public class SoftwareDao {
         return 0;
     }
 
-    // Đếm số app được review hôm nay
     public Integer reviewedToday() throws SQLException {
         String sql = """
                     SELECT COUNT(DISTINCT software_id) AS count
@@ -85,13 +86,6 @@ public class SoftwareDao {
         return 0;
     }
 
-    /**
-     * Quality score (thay cho quality_score cũ): - Dùng
-     * Review_Score.total_score (0..10) - Quy đổi ra %: AVG(total_score) * 10
-     *
-     * @return
-     * @throws java.sql.SQLException
-     */
     public Integer getQualityScore() throws SQLException {
         String sql = """
                     SELECT ROUND(AVG(total_score) * 10) AS score
@@ -107,7 +101,6 @@ public class SoftwareDao {
     }
 
     public List<Software> getPendingSoftware() throws SQLException {
-
         List<Software> list = new ArrayList<>();
 
         String sql = """
@@ -145,28 +138,21 @@ public class SoftwareDao {
                 s.setShortDescription(rs.getString("short_description"));
                 s.setPrice(rs.getDouble("price"));
                 s.setStatus(rs.getString("status"));
+
                 Timestamp ts = rs.getTimestamp("created_at");
                 if (ts != null) {
                     s.setCreatedAt(ts.toLocalDateTime());
                 }
-                s.setVersion(rs.getString("version"));
-                s.setCategoryName(rs.getString("category_name")); // QUAN TRỌNG
 
+                s.setVersion(rs.getString("version"));
+                s.setCategoryName(rs.getString("category_name"));
                 list.add(s);
             }
         }
 
-    return list;
-}
+        return list;
+    }
 
-
-
-
-    
-    // My Reviews (apps được assign cho reviewer)
-
-
-    // update status trong pending reviews
     public boolean updateStatus(int softwareId, String status) throws SQLException {
         String sql = "UPDATE Software SET status = ? WHERE software_id = ?";
         try (Connection conn = Db.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -176,10 +162,8 @@ public class SoftwareDao {
         }
     }
 
-    // Search pending software (đã sửa: đúng table + đúng status)
     public List<Software> searchPendingSoftware(String keyword) throws SQLException {
-
-    List<Software> list = new ArrayList<>();
+        List<Software> list = new ArrayList<>();
 
         String sql = """
                 SELECT s.software_id,
@@ -209,8 +193,6 @@ public class SoftwareDao {
         return list;
     }
 
-    // My Reviews (apps đã có record trong Software_Review_Process)
-    // Đã sửa: lấy version từ Software_Version, bỏ quality_score
     public List<Software> getMyReviews(Integer reviewerId) throws SQLException {
         List<Software> list = new ArrayList<>();
 
@@ -263,7 +245,7 @@ public class SoftwareDao {
                     s.setLanguage(null);
                     s.setCategoryName(rs.getString("category_name"));
                     s.setImageUrl(rs.getString("image_url"));
-                    s.setQualityScore(null); // schema mới không có quality_score
+                    s.setQualityScore(null);
 
                     list.add(s);
                 }
@@ -273,7 +255,7 @@ public class SoftwareDao {
     }
 
     public List<Software> getMyAssignedPendingReviews(int reviewerId) throws SQLException {
-    List<Software> list = new ArrayList<>();
+        List<Software> list = new ArrayList<>();
 
         String sql = """
                 SELECT s.software_id,
@@ -313,29 +295,31 @@ public class SoftwareDao {
 
         try (Connection conn = Db.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
-        ps.setInt(1, reviewerId);
+            ps.setInt(1, reviewerId);
 
-        try (ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                Software s = new Software();
-                s.setSoftwareId(rs.getInt("software_id"));
-                s.setName(rs.getString("name"));
-                s.setShortDescription(rs.getString("short_description"));
-                s.setPrice(rs.getDouble("price"));
-                s.setStatus(rs.getString("status"));
-                s.setVersion(rs.getString("version"));
-                s.setCategoryName(rs.getString("category_name"));
-                s.setImageUrl(rs.getString("image_url"));
-                list.add(s);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Software s = new Software();
+                    s.setSoftwareId(rs.getInt("software_id"));
+                    s.setName(rs.getString("name"));
+                    s.setShortDescription(rs.getString("short_description"));
+                    s.setPrice(rs.getDouble("price"));
+                    s.setStatus(rs.getString("status"));
+                    s.setVersion(rs.getString("version"));
+                    s.setCategoryName(rs.getString("category_name"));
+                    s.setImageUrl(rs.getString("image_url"));
+
+                    Timestamp ts = rs.getTimestamp("created_at");
+                    if (ts != null) {
+                        s.setCreatedAt(ts.toLocalDateTime());
+                    }
+
+                    list.add(s);
+                }
             }
         }
+        return list;
     }
-    return list;
-}
-
-
-    // Top3RevenueByVendor: OK (không dùng cột bị xóa)
-
 
     public List<Software> Top3RevenueByVendor(Integer vendorId) throws SQLException {
         List<Software> list = new ArrayList<>();
@@ -368,14 +352,12 @@ public class SoftwareDao {
                     sw.setAvgRating(rs.getDouble("rating"));
                     sw.setDownloadCount(rs.getInt("download_count"));
                     sw.setVendorId(rs.getInt("vendor_id"));
-                    sw.setSoftwareId(rs.getInt("software_id"));
                     list.add(sw);
                 }
             }
         }
         return list;
     }
-
 
     public Integer totalProductsByVendor(Integer vendorId) throws SQLException {
         String sql = """
@@ -442,7 +424,6 @@ public class SoftwareDao {
                 """;
         try (Connection c = Db.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, vendorId);
-
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return rs.getDouble("total_revenue");
@@ -624,7 +605,7 @@ public class SoftwareDao {
         return null;
     }
 
-    public Software getSoftwareDetailBySoftwareId(int softwareId) throws SQLException {
+     public Software getSoftwareDetailBySoftwareId(int softwareId) throws SQLException {
         String sql = """
                 SELECT s.software_id,
                        s.name,
@@ -683,7 +664,7 @@ public class SoftwareDao {
                     sw.setIsFree(rs.getInt("is_free"));
                     sw.setDownloadCount(rs.getInt("download_count"));
                     sw.setAvgRating(rs.getDouble("avg_rating"));
-sw.setCreatedAt(rs.getObject("created_at", LocalDateTime.class));
+                    sw.setCreatedAt(rs.getObject("created_at", LocalDateTime.class));
 
                     cat.setCategoryId((Integer) rs.getObject("category_id"));
                     cat.setCategoryName(rs.getString("category_name"));
@@ -729,6 +710,7 @@ sw.setCreatedAt(rs.getObject("created_at", LocalDateTime.class));
         }
         return null;
     }
+
     public int createSoftware(Software software) throws Exception {
         String sql = """
                     INSERT INTO Software(name, short_description, vendor_id, category_id, is_free, status)
@@ -741,56 +723,26 @@ sw.setCreatedAt(rs.getObject("created_at", LocalDateTime.class));
             ps.setString(2, software.getShortDescription());
             ps.setInt(3, software.getVendorId());
             ps.setInt(4, software.getCategoryId());
-            ps.setDouble(5, software.getPrice());
+            ps.setInt(5, software.getIsFree());
+            ps.setString(6, software.getStatus() == null ? "PENDING_REVIEW" : software.getStatus());
 
             ps.executeUpdate();
 
-            ResultSet rs = ps.getGeneratedKeys();
-
-            if (rs.next()) {
-                return rs.getInt(1);
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
             }
         }
 
         throw new RuntimeException("Cannot create software");
     }
 
-    private final String Get_All_Product = """
-            SELECT s.*,
-                   CASE
-                       WHEN s.is_free = 1 THEN 0
-                       ELSE COALESCE(sp.price, 0)
-                   END AS price
-            FROM fivepigs.software s
-            LEFT JOIN (
-                SELECT software_id, MIN(price) AS price
-                FROM fivepigs.software_pricing
-                WHERE is_active = 1
-                GROUP BY software_id
-            ) sp ON sp.software_id = s.software_id
-            """;
-
-    private final String GET_SOFTWARE_BY_ID = """
-            SELECT s.*,
-                   CASE
-                       WHEN s.is_free = 1 THEN 0
-                       ELSE COALESCE(sp.price, 0)
-                   END AS price
-            FROM fivepigs.software s
-            LEFT JOIN (
-                SELECT software_id, MIN(price) AS price
-                FROM fivepigs.software_pricing
-                WHERE is_active = 1
-                GROUP BY software_id
-            ) sp ON sp.software_id = s.software_id
-            WHERE s.software_id = ?
-            """;
-
-    private final String Get_SoftwareImage_By_Id = """
-            SELECT * FROM fivepigs.software_image
-            WHERE software_id = ?
-            """;
-
+    private final String Get_All_Product = "SELECT s.*, " + CUSTOMER_PRICE_SQL + " FROM fivepigs.software s";
+    private final String GET_SOFTWARE_BY_ID = "SELECT s.*, " + CUSTOMER_PRICE_SQL + " FROM fivepigs.software s\n" +
+            "WHERE software_id = ?";
+    private final String Get_SoftwareImage_By_Id = "SELECT * FROM fivepigs.software_image\n" +
+            "WHERE software_id = ?";
     public List<Software> GET_ALL_SOFTWARE() throws SQLException {
         List<Software> list = new ArrayList<>();
         try (Connection c = Db.getConnection(); PreparedStatement st = c.prepareStatement(Get_All_Product); ResultSet rs = st.executeQuery()) {
@@ -857,20 +809,21 @@ sw.setCreatedAt(rs.getObject("created_at", LocalDateTime.class));
     public Software GETALLSOFTWAREBYID(String cid) {
         try (Connection c = Db.getConnection(); PreparedStatement st = c.prepareStatement(GET_SOFTWARE_BY_ID)) {
             st.setString(1, cid);
-            ResultSet rs = st.executeQuery();
-            while (rs.next()) {
-                Software sw = new Software();
-                sw.setSoftwareId(rs.getInt("software_id"));
-                sw.setName(rs.getString("name"));
-                sw.setShortDescription(rs.getString("short_description"));
-                sw.setVendorId(rs.getInt("vendor_id"));
-                sw.setCategoryId(rs.getInt("category_id"));
-                sw.setPrice(rs.getDouble("price"));
-                sw.setIsFree(rs.getInt("is_free"));
-                sw.setStatus(rs.getString("status"));
-                sw.setDownloadCount(rs.getInt("download_count"));
-                sw.setAvgRating(rs.getDouble("avg_rating"));
-                return sw;
+            try (ResultSet rs = st.executeQuery()) {
+                while (rs.next()) {
+                    Software sw = new Software();
+                    sw.setSoftwareId(rs.getInt("software_id"));
+                    sw.setName(rs.getString("name"));
+                    sw.setShortDescription(rs.getString("short_description"));
+                    sw.setVendorId(rs.getInt("vendor_id"));
+                    sw.setCategoryId(rs.getInt("category_id"));
+                    sw.setPrice(rs.getDouble("price"));
+                    sw.setIsFree(rs.getInt("is_free"));
+                    sw.setStatus(rs.getString("status"));
+                    sw.setDownloadCount(rs.getInt("download_count"));
+                    sw.setAvgRating(rs.getDouble("avg_rating"));
+                    return sw;
+                }
             }
         } catch (SQLException e) {
             System.out.println(e);
@@ -881,13 +834,14 @@ sw.setCreatedAt(rs.getObject("created_at", LocalDateTime.class));
     public SoftwareImage GetImageById(String cid) {
         try (Connection c = Db.getConnection(); PreparedStatement st = c.prepareStatement(Get_SoftwareImage_By_Id)) {
             st.setString(1, cid);
-            ResultSet rs = st.executeQuery();
-            while (rs.next()) {
-                SoftwareImage sw = new SoftwareImage();
-                sw.setImageId(rs.getInt("image_id"));
-                sw.setSoftwareId(rs.getInt("software_id"));
-                sw.setImageUrl(rs.getString("image_url"));
-                return sw;
+            try (ResultSet rs = st.executeQuery()) {
+                while (rs.next()) {
+                    SoftwareImage sw = new SoftwareImage();
+                    sw.setImageId(rs.getInt("image_id"));
+                    sw.setSoftwareId(rs.getInt("software_id"));
+                    sw.setImageUrl(rs.getString("image_url"));
+                    return sw;
+                }
             }
         } catch (SQLException e) {
             System.out.println(e);
@@ -940,7 +894,6 @@ sw.setCreatedAt(rs.getObject("created_at", LocalDateTime.class));
                     img.setSoftwareId(rs.getInt("software_id"));
                     img.setImageUrl(rs.getString("image_url"));
                     img.setIsThumbnail(rs.getInt("is_thumbnail"));
-
                     list.add(img);
                 }
             }
@@ -974,45 +927,34 @@ sw.setCreatedAt(rs.getObject("created_at", LocalDateTime.class));
         try (Connection c = Db.getConnection(); PreparedStatement st = c.prepareStatement(sql)) {
 
             st.setString(1, categoryId);
-            ResultSet rs = st.executeQuery();
-
-            while (rs.next()) {
-                Software sw = new Software();
-                sw.setSoftwareId(rs.getInt("software_id"));
-                sw.setName(rs.getString("name"));
-                sw.setPrice(rs.getDouble("price"));
-                sw.setIsFree(rs.getInt("is_free"));
-                sw.setAvgRating(rs.getDouble("avg_rating"));
-                sw.setIconUrl(rs.getString("icon_url"));
-                list.add(sw);
+            try (ResultSet rs = st.executeQuery()) {
+                while (rs.next()) {
+                    Software sw = new Software();
+                    sw.setSoftwareId(rs.getInt("software_id"));
+                    sw.setName(rs.getString("name"));
+                    sw.setPrice(rs.getDouble("price"));
+                    sw.setIsFree(rs.getInt("is_free"));
+                    sw.setAvgRating(rs.getDouble("avg_rating"));
+                    sw.setIconUrl(rs.getString("icon_url"));
+                    list.add(sw);
+                }
             }
         }
         return list;
     }
 
     public List<Software> getTopDownloadWithIcon(int limit) throws SQLException {
-        String sql = """
-                    SELECT s.*,
-                           CASE
-                               WHEN s.is_free = 1 THEN 0
-                               ELSE COALESCE(sp.price, 0)
-                           END AS price,
-                           img.image_url AS icon_url
-                    FROM fivepigs.software s
-                    LEFT JOIN (
-                        SELECT software_id, MIN(price) AS price
-                        FROM fivepigs.software_pricing
-                        WHERE is_active = 1
-                        GROUP BY software_id
-                    ) sp ON sp.software_id = s.software_id
-                    LEFT JOIN fivepigs.software_image img
-                      ON s.software_id = img.software_id AND img.is_thumbnail = 1
-                    ORDER BY s.download_count DESC
-                    LIMIT ?
-                """;
+        String sql =
+                "SELECT s.*, " + CUSTOMER_PRICE_SQL + ", img.image_url AS icon_url " +
+                        "FROM fivepigs.software s " +
+                        "LEFT JOIN fivepigs.software_image img " +
+                        "  ON s.software_id = img.software_id AND img.is_thumbnail = 1 " +
+                        "ORDER BY s.download_count DESC " +
+                        "LIMIT ?";
 
         List<Software> list = new ArrayList<>();
-        try (Connection c = Db.getConnection(); PreparedStatement st = c.prepareStatement(sql)) {
+        try (Connection c = Db.getConnection();
+             PreparedStatement st = c.prepareStatement(sql)) {
             st.setInt(1, limit);
             try (ResultSet rs = st.executeQuery()) {
                 while (rs.next()) {
@@ -1023,12 +965,14 @@ sw.setCreatedAt(rs.getObject("created_at", LocalDateTime.class));
                     sw.setDownloadCount(rs.getInt("download_count"));
                     sw.setIsFree(rs.getInt("is_free"));
                     sw.setPrice(rs.getDouble("price"));
+                    sw.setIconUrl(rs.getString("icon_url"));
                     list.add(sw);
                 }
             }
         }
         return list;
     }
+
 
     public List<Software> getBestSellingWithIcon(int limit) throws SQLException {
         String sql = """
@@ -1116,7 +1060,6 @@ sw.setCreatedAt(rs.getObject("created_at", LocalDateTime.class));
         }
         return list;
     }
-
 
     public List<Software> getLibraryByUserIdWithIcon(int userId) throws SQLException {
         String sql = """
@@ -1218,20 +1161,19 @@ sw.setCreatedAt(rs.getObject("created_at", LocalDateTime.class));
         return sections;
     }
 
-    //DAO cho Genre
     public List<String> getGenresByCategory(int categoryId) throws SQLException {
         List<String> list = new ArrayList<>();
 
-        String sql = """
-                    SELECT DISTINCT g.name
-                    FROM fivepigs.genre g
-                    JOIN fivepigs.software_genre sg ON g.genre_id = sg.genre_id
-                    JOIN fivepigs.software s ON sg.software_id = s.software_id
-                    WHERE s.category_id = ?
-                    ORDER BY g.name
-                """;
+        String sql =
+                "SELECT DISTINCT g.name " +
+                        "FROM fivepigs.genre g " +
+                        "JOIN fivepigs.software_genre sg ON g.genre_id = sg.genre_id " +
+                        "JOIN fivepigs.software s ON sg.software_id = s.software_id " +
+                        "WHERE s.category_id = ? " +
+                        "ORDER BY g.name";
 
-        try (Connection c = Db.getConnection(); PreparedStatement st = c.prepareStatement(sql)) {
+        try (Connection c = Db.getConnection();
+             PreparedStatement st = c.prepareStatement(sql)) {
 
             st.setInt(1, categoryId);
             ResultSet rs = st.executeQuery();
@@ -1244,32 +1186,22 @@ sw.setCreatedAt(rs.getObject("created_at", LocalDateTime.class));
         return list;
     }
 
-    public List<Software> getSoftwareByCategoryAndGenre(int categoryId, String genreName) throws SQLException {
+
+     public List<Software> getSoftwareByCategoryAndGenre(int categoryId, String genreName) throws SQLException {
         List<Software> list = new ArrayList<>();
 
-        String sql = """
-                    SELECT s.*,
-                           CASE
-                               WHEN s.is_free = 1 THEN 0
-                               ELSE COALESCE(sp.price, 0)
-                           END AS price,
-                           si.image_url AS icon_url
-                    FROM fivepigs.software s
-                    JOIN fivepigs.software_genre sg ON s.software_id = sg.software_id
-                    JOIN fivepigs.genre g ON sg.genre_id = g.genre_id
-                    LEFT JOIN (
-                        SELECT software_id, MIN(price) AS price
-                        FROM fivepigs.software_pricing
-                        WHERE is_active = 1
-                        GROUP BY software_id
-                    ) sp ON sp.software_id = s.software_id
-                    LEFT JOIN fivepigs.software_image si
-                      ON s.software_id = si.software_id AND si.is_thumbnail = 1
-                    WHERE s.category_id = ? AND g.name = ?
-                    ORDER BY s.download_count DESC
-                """;
+        String sql =
+                "SELECT s.*, " + CUSTOMER_PRICE_SQL + ", si.image_url AS icon_url " +
+                        "FROM fivepigs.software s " +
+                        "JOIN fivepigs.software_genre sg ON s.software_id = sg.software_id " +
+                        "JOIN fivepigs.genre g ON sg.genre_id = g.genre_id " +
+                        "LEFT JOIN fivepigs.software_image si " +
+                        "ON s.software_id = si.software_id AND si.is_thumbnail = 1 " +
+                        "WHERE s.category_id = ? AND g.name = ? " +
+                        "ORDER BY s.download_count DESC";
 
-        try (Connection c = Db.getConnection(); PreparedStatement st = c.prepareStatement(sql)) {
+        try (Connection c = Db.getConnection();
+             PreparedStatement st = c.prepareStatement(sql)) {
 
             st.setInt(1, categoryId);
             st.setString(2, genreName);
@@ -1290,8 +1222,6 @@ sw.setCreatedAt(rs.getObject("created_at", LocalDateTime.class));
         return list;
     }
 
-
-
     public String getSoftwareNameById(int softwareId) throws SQLException {
         String sql = "SELECT name FROM fivepigs.software WHERE software_id = ?";
         try (Connection c = Db.getConnection(); PreparedStatement st = c.prepareStatement(sql)) {
@@ -1306,7 +1236,7 @@ sw.setCreatedAt(rs.getObject("created_at", LocalDateTime.class));
     }
 
     public List<SoftwarePricing> getActivePricingBySoftwareId(int softwareId) throws SQLException {
-        String sql = "SELECT pricing_id, software_id, plan_name, max_users, price, duration_days, is_active, created_at " +
+        String sql = "SELECT pricing_id, software_id, plan_name, max_users, price, is_active, created_at " +
                 "FROM fivepigs.software_pricing " +
                 "WHERE software_id = ? AND is_active = 1 " +
                 "  AND UPPER(COALESCE(plan_name, '')) <> 'DEMO' " +
@@ -1327,8 +1257,6 @@ sw.setCreatedAt(rs.getObject("created_at", LocalDateTime.class));
                     Number maxUsersValue = (Number) rs.getObject("max_users");
                     pricing.setMaxUsers(maxUsersValue == null ? null : maxUsersValue.intValue());
                     pricing.setPrice(rs.getDouble("price"));
-                    Number durationDaysValue = (Number) rs.getObject("duration_days");
-                    pricing.setDurationDays(durationDaysValue == null ? null : durationDaysValue.intValue());
                     Object isActiveValue = rs.getObject("is_active");
                     if (isActiveValue instanceof Boolean booleanValue) {
                         pricing.setIsActive(booleanValue ? 1 : 0);
@@ -1344,9 +1272,8 @@ sw.setCreatedAt(rs.getObject("created_at", LocalDateTime.class));
         }
         return list;
     }
-
     public SoftwarePricing getDemoPricingBySoftwareId(int softwareId) throws SQLException {
-        String sql = "SELECT pricing_id, software_id, plan_name, max_users, price, duration_days, is_active, created_at " +
+        String sql = "SELECT pricing_id, software_id, plan_name, max_users, price, is_active, created_at " +
                 "FROM fivepigs.software_pricing " +
                 "WHERE software_id = ? AND is_active = 1 AND UPPER(COALESCE(plan_name, '')) = 'DEMO' " +
                 "ORDER BY pricing_id ASC LIMIT 1";
@@ -1365,8 +1292,6 @@ sw.setCreatedAt(rs.getObject("created_at", LocalDateTime.class));
                     Number maxUsersValue = (Number) rs.getObject("max_users");
                     pricing.setMaxUsers(maxUsersValue == null ? null : maxUsersValue.intValue());
                     pricing.setPrice(rs.getDouble("price"));
-                    Number durationDaysValue = (Number) rs.getObject("duration_days");
-                    pricing.setDurationDays(durationDaysValue == null ? null : durationDaysValue.intValue());
                     Object isActiveValue = rs.getObject("is_active");
                     if (isActiveValue instanceof Boolean booleanValue) {
                         pricing.setIsActive(booleanValue ? 1 : 0);
@@ -1455,6 +1380,7 @@ sw.setCreatedAt(rs.getObject("created_at", LocalDateTime.class));
             st.setString(1, q);
             st.setString(2, like);
             st.setString(3, like);
+
             if (categoryId == null) {
                 st.setNull(4, Types.INTEGER);
                 st.setNull(5, Types.INTEGER);
@@ -1462,6 +1388,7 @@ sw.setCreatedAt(rs.getObject("created_at", LocalDateTime.class));
                 st.setInt(4, categoryId);
                 st.setInt(5, categoryId);
             }
+
             if (normalizedGenre == null) {
                 st.setNull(6, Types.VARCHAR);
                 st.setNull(7, Types.VARCHAR);
@@ -1469,6 +1396,7 @@ sw.setCreatedAt(rs.getObject("created_at", LocalDateTime.class));
                 st.setString(6, normalizedGenre);
                 st.setString(7, normalizedGenre);
             }
+
             st.setInt(8, Math.max(1, limit));
 
             try (ResultSet rs = st.executeQuery()) {
@@ -1512,7 +1440,6 @@ sw.setCreatedAt(rs.getObject("created_at", LocalDateTime.class));
     }
 
     public void addSoftwareImage(int softwareId, String imageUrl, boolean isThumbnail) throws SQLException {
-
         String sql = "INSERT INTO Software_Image(software_id, image_url, is_thumbnail) VALUES (?, ?, ?)";
 
         try (Connection conn = Db.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -1520,7 +1447,6 @@ sw.setCreatedAt(rs.getObject("created_at", LocalDateTime.class));
             ps.setInt(1, softwareId);
             ps.setString(2, imageUrl);
             ps.setBoolean(3, isThumbnail);
-
             ps.executeUpdate();
         }
     }
@@ -1768,63 +1694,62 @@ sw.setCreatedAt(rs.getObject("created_at", LocalDateTime.class));
     }
 
     public Software getSoftwareById(int softwareId) throws SQLException {
-    String sql = """
-            SELECT s.software_id,
-                   s.name,
-                   s.short_description,
-                   s.vendor_id,
-                   s.created_at,
-                   c.category_name,
-                   u.full_name AS vendor_name,
-                   sv.version_name AS version,
-                   si.image_url
-            FROM Software s
-            LEFT JOIN Category c
-                   ON s.category_id = c.category_id
-            LEFT JOIN Users u
-                   ON s.vendor_id = u.user_id
-            LEFT JOIN Software_Version sv
-                   ON sv.software_id = s.software_id
-                  AND sv.is_active = 1
-            LEFT JOIN Software_Image si
-                   ON s.software_id = si.software_id
-                  AND si.is_thumbnail = 1
-            WHERE s.software_id = ?
-            LIMIT 1
-            """;
+        String sql = """
+        SELECT s.software_id,
+               s.name,
+               s.short_description,
+               """ + PRICE_SELECT + """
+               ,
+               s.created_at,
+               c.category_name,
+               u.full_name AS vendor_name,
+               sv.version_name AS version,
+               sv.file_url,
+               si.image_url
+        FROM Software s
+        LEFT JOIN Category c
+               ON s.category_id = c.category_id
+        LEFT JOIN Users u
+               ON s.vendor_id = u.user_id
+        LEFT JOIN Software_Version sv
+               ON sv.software_id = s.software_id
+              AND sv.is_active = 1
+        LEFT JOIN Software_Image si
+               ON s.software_id = si.software_id
+              AND si.is_thumbnail = 1
+        """ + PRICE_JOIN + """
+        WHERE s.software_id = ?
+        LIMIT 1
+    """;
 
-    try (Connection conn = Db.getConnection();
-         PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = Db.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
-        ps.setInt(1, softwareId);
+            ps.setInt(1, softwareId);
 
-        try (ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                Software s = new Software();
-                s.setSoftwareId(rs.getInt("software_id"));
-                s.setName(rs.getString("name"));
-                s.setShortDescription(rs.getString("short_description"));
-                s.setVendorId(rs.getInt("vendor_id"));
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Software s = new Software();
+                    s.setSoftwareId(rs.getInt("software_id"));
+                    s.setName(rs.getString("name"));
+                    s.setShortDescription(rs.getString("short_description"));
+                    s.setPrice(rs.getDouble("price"));
+                    s.setCategoryName(rs.getString("category_name"));
+                    s.setVersion(rs.getString("version"));
+                    s.setFileUrl(rs.getString("file_url"));
+                    s.setImageUrl(rs.getString("image_url"));
 
-                // ❌ bỏ price hoàn toàn
-                // s.setPrice(...);
+                    Timestamp ts = rs.getTimestamp("created_at");
+                    if (ts != null) {
+                        s.setCreatedAt(ts.toLocalDateTime());
+                    }
 
-                s.setCategoryName(rs.getString("category_name"));
-                s.setVersion(rs.getString("version"));
-                s.setImageUrl(rs.getString("image_url"));
-
-                Timestamp ts = rs.getTimestamp("created_at");
-                if (ts != null) {
-                    s.setCreatedAt(ts.toLocalDateTime());
+                    return s;
                 }
-
-                return s;
             }
         }
-    }
 
-    return null;
-}
+        return null;
+    }
 
     public void updateSoftwareStatus(int softwareId, String status) throws SQLException {
         String sql = "UPDATE Software SET status = ? WHERE software_id = ?";
@@ -1835,4 +1760,207 @@ sw.setCreatedAt(rs.getObject("created_at", LocalDateTime.class));
             ps.executeUpdate();
         }
     }
+
+    public List<Software> filterPendingReviews(
+            int reviewerId, String keyword, Integer categoryId, String priceType) throws SQLException {
+
+        List<Software> list = new ArrayList<>();
+
+        StringBuilder sql = new StringBuilder("""
+        SELECT s.software_id,
+               s.name,
+               s.short_description,
+               """ + PRICE_SELECT + """
+               ,
+               s.is_free,
+               s.status,
+               s.created_at,
+               sv.version_name AS version,
+               c.category_name,
+               COALESCE(si.image_url, 'assets/images/default.png') AS image_url
+        FROM Software s
+        LEFT JOIN Category c
+             ON s.category_id = c.category_id
+        LEFT JOIN Software_Image si
+             ON s.software_id = si.software_id
+            AND si.is_thumbnail = 1
+        LEFT JOIN Software_Version sv
+             ON sv.software_id = s.software_id
+            AND sv.is_active = 1
+        """ + PRICE_JOIN + """
+        WHERE s.status = 'PENDING_REVIEW'
+    """);
+
+        List<Object> params = new ArrayList<>();
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            sql.append("""
+            AND (
+                s.name LIKE ?
+                OR s.short_description LIKE ?
+                OR c.category_name LIKE ?
+                OR sv.version_name LIKE ?
+            )
+        """);
+            String kw = "%" + keyword.trim() + "%";
+            params.add(kw);
+            params.add(kw);
+            params.add(kw);
+            params.add(kw);
+        }
+
+        if (categoryId != null) {
+            sql.append(" AND s.category_id = ? ");
+            params.add(categoryId);
+        }
+
+        if ("free".equalsIgnoreCase(priceType)) {
+            sql.append(" AND s.is_free = 1 ");
+        } else if ("paid".equalsIgnoreCase(priceType)) {
+            sql.append(" AND s.is_free = 0 ");
+        }
+
+        sql.append(" ORDER BY s.created_at DESC ");
+
+        try (Connection conn = Db.getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Software s = new Software();
+                    s.setSoftwareId(rs.getInt("software_id"));
+                    s.setName(rs.getString("name"));
+                    s.setShortDescription(rs.getString("short_description"));
+                    s.setPrice(rs.getDouble("price"));
+                    s.setStatus(rs.getString("status"));
+                    s.setVersion(rs.getString("version"));
+                    s.setCategoryName(rs.getString("category_name"));
+                    s.setImageUrl(rs.getString("image_url"));
+                    s.setIsFree(rs.getInt("is_free"));
+
+                    Timestamp ts = rs.getTimestamp("created_at");
+                    if (ts != null) {
+                        s.setCreatedAt(ts.toLocalDateTime());
+                    }
+
+                    list.add(s);
+                }
+            }
+        }
+
+        return list;
+    }
+    public List<Software> getLibraryByUserIdWithIcon(int userId, String sortBy, String sortDir) throws SQLException {
+        String orderBy = "lib.last_purchase DESC, s.software_id DESC";
+        if ("name".equalsIgnoreCase(sortBy)) {
+            orderBy = "LOWER(s.name) " + ("desc".equalsIgnoreCase(sortDir) ? "DESC" : "ASC") + ", s.software_id DESC";
+        } else if ("date".equalsIgnoreCase(sortBy)) {
+            orderBy = "lib.last_purchase " + ("asc".equalsIgnoreCase(sortDir) ? "ASC" : "DESC") + ", s.software_id DESC";
+        }
+
+        String sql
+                = "SELECT s.*, " + CUSTOMER_PRICE_SQL + ", img.image_url AS icon_url, lib.last_purchase AS access_date "
+                + "FROM fivepigs.software s "
+                + "JOIN ( "
+                + "  SELECT l.software_id, MAX(l.purchase_date) AS last_purchase "
+                + "  FROM fivepigs.license_user lu "
+                + "  JOIN fivepigs.license l ON lu.license_id = l.license_id "
+                + "  WHERE lu.user_id = ? "
+                + "    AND (lu.status IS NULL OR UPPER(lu.status) = 'ACTIVE') "
+                + "    AND (l.status IS NULL OR UPPER(l.status) <> 'REVOKED') "
+                + "    AND (l.expire_date IS NULL OR l.expire_date >= NOW()) "
+                + "  GROUP BY l.software_id "
+                + ") lib ON lib.software_id = s.software_id "
+                + "LEFT JOIN fivepigs.software_image img "
+                + "  ON s.software_id = img.software_id AND img.is_thumbnail = 1 "
+                + "ORDER BY " + orderBy;
+
+        List<Software> list = new ArrayList<>();
+        try (Connection c = Db.getConnection(); PreparedStatement st = c.prepareStatement(sql)) {
+
+            st.setInt(1, userId);
+            try (ResultSet rs = st.executeQuery()) {
+                while (rs.next()) {
+                    Software sw = new Software();
+                    sw.setSoftwareId(rs.getInt("software_id"));
+                    sw.setName(rs.getString("name"));
+                    sw.setIsFree(rs.getInt("is_free"));
+                    sw.setPrice(rs.getDouble("price"));
+                    sw.setAvgRating(rs.getDouble("avg_rating"));
+                    sw.setIconUrl(rs.getString("icon_url"));
+                    sw.setCreatedAt(rs.getObject("access_date", LocalDateTime.class));
+                    list.add(sw);
+                }
+            }
+        }
+        return list;
+    }
+    private Software mapSoftwareCard(ResultSet rs) throws SQLException {
+        Software sw = new Software();
+        sw.setSoftwareId(rs.getInt("software_id"));
+        sw.setName(rs.getString("name"));
+        sw.setShortDescription(rs.getString("short_description"));
+        sw.setPrice(rs.getDouble("price"));
+        sw.setIsFree(rs.getInt("is_free"));
+        sw.setAvgRating(rs.getDouble("avg_rating"));
+        sw.setDownloadCount(rs.getInt("download_count"));
+        sw.setIconUrl(rs.getString("icon_url"));
+        return sw;
+    }
+    public Software getTopDownloadedByCategoryWithIcon(int categoryId) throws SQLException {
+        String sql =
+                "SELECT s.*, " + CUSTOMER_PRICE_SQL + ", si.image_url AS icon_url " +
+                        "FROM fivepigs.software s " +
+                        "LEFT JOIN fivepigs.software_image si " +
+                        "  ON s.software_id = si.software_id AND si.is_thumbnail = 1 " +
+                        "WHERE s.category_id = ? " +
+                        "ORDER BY s.download_count DESC, s.avg_rating DESC, s.software_id DESC " +
+                        "LIMIT 1";
+
+        try (Connection c = Db.getConnection();
+             PreparedStatement st = c.prepareStatement(sql)) {
+
+            st.setInt(1, categoryId);
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    Software sw = new Software();
+                    sw.setSoftwareId(rs.getInt("software_id"));
+                    sw.setName(rs.getString("name"));
+                    sw.setShortDescription(rs.getString("short_description"));
+                    sw.setPrice(rs.getDouble("price"));
+                    sw.setIsFree(rs.getInt("is_free"));
+                    sw.setAvgRating(rs.getDouble("avg_rating"));
+                    sw.setDownloadCount(rs.getInt("download_count"));
+                    sw.setIconUrl(rs.getString("icon_url"));
+                    return sw;
+                }
+            }
+        }
+        return null;
+    }
+    
+    public Software getRandomSoftwareByCategoryWithIcon(int categoryId) throws SQLException {
+        String sql =
+                "SELECT s.*, " + CUSTOMER_PRICE_SQL + ", si.image_url AS icon_url " +
+                        "FROM fivepigs.software s " +
+                        "LEFT JOIN fivepigs.software_image si " +
+                        "  ON s.software_id = si.software_id AND si.is_thumbnail = 1 " +
+                        "WHERE s.category_id = ? " +
+                        "ORDER BY RAND() LIMIT 1";
+
+        try (Connection c = Db.getConnection();
+             PreparedStatement st = c.prepareStatement(sql)) {
+            st.setInt(1, categoryId);
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    return mapSoftwareCard(rs);
+                }
+            }
+        }
+        return null;
+    }
+    
 }

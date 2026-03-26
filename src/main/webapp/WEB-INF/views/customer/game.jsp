@@ -36,24 +36,42 @@
 
                 <div class="fixed-layout-grid">
                     <div class="left-column" style="height: var(--sidebar-total-height);">
-
+                        <c:set var="randomGameImage" value="${pageContext.request.contextPath}/assets/images/default_icon.png"/>
+                        <c:if test="${not empty randomGame and not empty randomGame.iconUrl}">
+                            <c:set var="randomGameImage" value="${pageContext.request.contextPath}/assets/${randomGame.iconUrl}"/>
+                        </c:if>
                         <div class="featured-banner"
-                             style="height:100%; background-image: url('https://wallpapers.com/images/hd/call-of-duty-black-ops-cold-war-key-art-4k-gaming-wallpaper-7c64b6w3a2a6z8y5.jpg'); padding:0; background-size:cover; background-position:center; background-repeat:no-repeat; overflow:hidden;">
-
-                            <div
-                                style="background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); height:100%; width:100%; display:flex; flex-direction:column; justify-content:flex-end; padding:30px;">
-                                <span
-                                    style="background: orange; color: black; width:fit-content; padding: 4px 10px; font-size: 12px; font-weight: 700; border-radius: 4px; margin-bottom:10px;">
-                                    SEASON 01
-                                </span>
-                                <h1 style="font-size: 40px; margin-bottom: 10px;">Call of Duty: Black Ops 7</h1>
-                                <p style="opacity: 0.8; max-width: 500px; margin-bottom: 20px;">
-                                    Drop in with Fallout in Season 01 Reloaded.
-                                </p>
-                                <button
-                                    style="padding: 12px 30px; border: none; background: var(--primary-color); color: white; font-weight: 700; border-radius: 8px; cursor: pointer; width:fit-content;">
-                                    Play Now
-                                </button>
+                             style="height:100%; background-image: linear-gradient(to top, rgba(0,0,0,0.88), rgba(0,0,0,0.2)), url('${randomGameImage}'); padding:0; background-size:cover; background-position:center; background-repeat:no-repeat; overflow:hidden;">
+                            <div style="height:100%; width:100%; display:flex; flex-direction:column; justify-content:flex-end; padding:30px;">
+                                <c:choose>
+                                    <c:when test="${not empty randomGame}">
+                                        <span style="background: orange; color: black; width:fit-content; padding: 4px 10px; font-size: 12px; font-weight: 700; border-radius: 4px; margin-bottom:10px;">RANDOM PICK</span>
+                                        <div style="display:flex; align-items:center; gap:16px; margin-bottom:18px;">
+                                            <img src="${randomGameImage}" alt="${randomGame.name}" style="width:78px; height:78px; object-fit:cover; border-radius:18px; border:2px solid rgba(255,255,255,0.22); background:rgba(255,255,255,0.12);">
+                                            <div style="font-size:12px; font-weight:700; letter-spacing:1px; text-transform:uppercase; opacity:0.92;">Random game spotlight</div>
+                                        </div>
+                                        <h1 style="font-size: 40px; margin-bottom: 10px;">${randomGame.name}</h1>
+                                        <p style="opacity: 0.8; max-width: 500px; margin-bottom: 20px;">
+                                            <c:choose>
+                                                <c:when test="${not empty randomGame.shortDescription}">
+                                                    ${randomGame.shortDescription}
+                                                </c:when>
+                                                <c:otherwise>
+                                                    Jump into a featured game hand-picked from the catalog.
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </p>
+                                        <a href="${pageContext.request.contextPath}/product?pid=${randomGame.softwareId}"
+                                           style="padding: 12px 30px; border: none; background: var(--primary-color); color: white; font-weight: 700; border-radius: 8px; cursor: pointer; width:fit-content; text-decoration:none; display:inline-flex;">View product</a>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <span style="background: orange; color: black; width:fit-content; padding: 4px 10px; font-size: 12px; font-weight: 700; border-radius: 4px; margin-bottom:10px;">FEATURED</span>
+                                        <h1 style="font-size: 40px; margin-bottom: 10px;">Featured Games</h1>
+                                        <p style="opacity: 0.8; max-width: 500px; margin-bottom: 20px;">Discover the most exciting games available on FIVEPIGS.</p>
+                                        <a href="${pageContext.request.contextPath}/search?dept=games"
+                                           style="padding: 12px 30px; border: none; background: var(--primary-color); color: white; font-weight: 700; border-radius: 8px; cursor: pointer; width:fit-content; text-decoration:none; display:inline-flex;">Explore</a>
+                                    </c:otherwise>
+                                </c:choose>
                             </div>
                         </div>
                     </div>
@@ -62,8 +80,43 @@
                         <h3 style="margin-bottom:10px;">Now Available</h3>
                         <p style="font-size:12px; opacity:0.7; margin-bottom:20px;">Top Seller this week</p>
                         <div style="margin-top:auto; background:rgba(255,255,255,0.1); padding:15px; border-radius:12px;">
-                            <h4 style="margin-bottom:5px;">Black Ops 6</h4>
-                            <p style="font-size:12px; opacity:0.8;">Action � FPS</p>
+                            <c:choose>
+                                <c:when test="${not empty featuredGame}">
+                                    <a href="${pageContext.request.contextPath}/product?pid=${featuredGame.softwareId}" style="display:flex; gap:14px; align-items:center; text-decoration:none; color:inherit;">
+                                        <c:choose>
+                                            <c:when test="${not empty featuredGame.iconUrl}">
+                                                <img src="${pageContext.request.contextPath}/assets/${featuredGame.iconUrl}" alt="${featuredGame.name}" style="width:68px; height:68px; object-fit:cover; border-radius:16px; background:rgba(255,255,255,0.12);">
+                                            </c:when>
+                                            <c:otherwise>
+                                                <img src="${pageContext.request.contextPath}/assets/images/default_icon.png" alt="${featuredGame.name}" style="width:68px; height:68px; object-fit:cover; border-radius:16px; background:rgba(255,255,255,0.12);">
+                                            </c:otherwise>
+                                        </c:choose>
+                                        <div>
+                                            <h4 style="margin-bottom:5px;">${featuredGame.name}</h4>
+                                            <p style="font-size:12px; opacity:0.8; margin-bottom:8px;">
+                                                <c:choose>
+                                                    <c:when test="${not empty featuredGame.shortDescription}">
+                                                        ${featuredGame.shortDescription}
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        ${featuredGame.downloadCount} downloads
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </p>
+                                            <div style="font-size:12px; font-weight:700;">
+                                                <c:choose>
+                                                    <c:when test="${featuredGame.isFree == 1}">Free</c:when>
+                                                    <c:otherwise>$${featuredGame.price}</c:otherwise>
+                                                </c:choose>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </c:when>
+                                <c:otherwise>
+                                    <h4 style="margin-bottom:5px;">No featured game</h4>
+                                    <p style="font-size:12px; opacity:0.8;">There is no game data to display right now.</p>
+                                </c:otherwise>
+                            </c:choose>
                         </div>
                     </div>
                 </div>
@@ -198,3 +251,5 @@
     <script src="${pageContext.request.contextPath}/assets/js/script.js"></script>
 </body>
 </html>
+
+

@@ -80,7 +80,7 @@ public class VendorUploadProductServlet extends HttpServlet {
             String categoryParam = request.getParameter("category");
             String priceParam = request.getParameter("price");
             String[] genreIds = request.getParameterValues("genres");
-            // ===== VALIDATE =====
+// ===== VALIDATE =====
             String validationError = softwareService.validateUpload(
                     name, description, priceParam, categoryParam
             );
@@ -160,7 +160,7 @@ public class VendorUploadProductServlet extends HttpServlet {
                     softwareFile.getSize()
             );
             // ===== INSERT NOTIFICATION FOR REVIEWER =====
-            int reviewerId = 2; // TODO: replace bằng query role sau
+int reviewerId = 2; // TODO: replace bằng query role sau
 
             String title = "New software submitted - " + name;
             String content = "A new software \"" + name + "\" has been submitted and is waiting for your review.";

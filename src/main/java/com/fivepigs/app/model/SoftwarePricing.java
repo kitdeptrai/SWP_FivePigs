@@ -32,7 +32,7 @@ public class SoftwarePricing {
     private Integer isActive;
     private LocalDateTime createdAt;
 
-    private LocalDateTime createdDate;
+    
 
 
     public Integer getPricingId() {
@@ -102,13 +102,7 @@ public class SoftwarePricing {
         this.createdAt = createdAt;
     }
 
-    public LocalDateTime getCreatedDate() {
-        return createdDate;
-    }
-
-    public void setCreatedDate(LocalDateTime createdDate) {
-        this.createdDate = createdDate;
-    }
+ 
     
 
 }

@@ -48,6 +48,23 @@
                             <p class="software-desc">${software.shortDescription}</p>
 
                             <div class="software-meta-grid">
+
+                                <c:if test="${not empty software.fileUrl}">
+                                    <div class="review-download-box" style="margin-top: 20px;">
+                                        <a href="${pageContext.request.contextPath}/reviewer/software-download?softwareId=${software.softwareId}"
+                                           class="submit-review-btn"
+                                           style="display:inline-flex;align-items:center;gap:8px;text-decoration:none;">
+                                            <i class="fa-solid fa-download"></i>
+                                            Download File 
+                                        </a>
+                                    </div>
+                                </c:if>
+
+                                <c:if test="${empty software.fileUrl}">
+                                    <div class="review-alert error-alert" style="margin-top: 20px;">
+                                        Vendor has not uploaded a software file yet.
+                                    </div>
+                                </c:if>
                                 <div class="meta-box">
                                     <span class="meta-label">Version</span>
                                     <span class="meta-value">${software.version}</span>

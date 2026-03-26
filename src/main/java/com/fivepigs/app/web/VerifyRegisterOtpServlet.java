@@ -2,6 +2,7 @@ package com.fivepigs.app.web;
 
 import com.fivepigs.app.service.UserService;
 import com.fivepigs.app.util.OtpUtil;
+import com.fivepigs.app.dao.NotificationDao;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -70,6 +71,16 @@ public class VerifyRegisterOtpServlet extends HttpServlet {
             String password = (String) session.getAttribute("reg_password");
 
             userService.registerUser(fullName, email, password);
+
+            // Gửi thông báo đến Admin
+            NotificationDao notifDao = new NotificationDao();
+            notifDao.broadcastToAdmins(
+                "New User Registered",
+                "New user " + fullName + " (" + email + ") has registered.",
+                "NEW_USER",
+                "LOW",
+                "/admin/employees"
+            );
 
             session.invalidate();
 

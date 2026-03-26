@@ -27,14 +27,16 @@ import java.util.List;
  *
  * @author MinhPD
  */
-@WebServlet(name = "ProductDetailServlet", urlPatterns = {"/vendor/product_detail"})
+@WebServlet(name = "ProductDetailServlet", urlPatterns = {"/vendor/product_detail", "/vendor_software_detail"})
 public class VendorProductDetailServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            Integer softwareId = Integer.parseInt(request.getParameter("softwareId"));
+            String swIdParam = request.getParameter("softwareId");
+            if (swIdParam == null) swIdParam = request.getParameter("id");
+            Integer softwareId = Integer.parseInt(swIdParam);
             SoftwareDao swdao = new SoftwareDao();
             SoftwareImageDao idao = new SoftwareImageDao();
             ReviewDao rwdao = new ReviewDao();

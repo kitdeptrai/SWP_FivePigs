@@ -19,16 +19,6 @@
                         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
                 </head>
 
-                <body>
-
-
-                    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/vendor/vendor.css">
-                    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/reviewer/pending.css">
-                    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/vendor/notification.css">
-                    <link rel="stylesheet"
-                        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-                    </head>
-
                     <body>
 
                         <div class="layout">
@@ -55,7 +45,8 @@
                                                 <i class="fa-solid fa-check"></i> Mark All Read
                                             </button>
                                         </form>
-<!-- Delete All -->
+
+                                        <!-- Delete All -->
                                         <form action="${pageContext.request.contextPath}/vendor/notification"
                                             method="post" onsubmit="return confirm('Delete ALL notifications?');">
                                             <input type="hidden" name="action" value="deleteAll">
@@ -101,7 +92,7 @@
                                     <button class="chip" data-type="New Assignments">New Assignments</button>
                                     <button class="chip" data-type="In Progress">In Progress</button>
                                     <button class="chip" data-type="Completed">Completed</button>
-<button class="chip" data-type="Updates">Updates</button>
+                                    <button class="chip" data-type="Updates">Updates</button>
                                     <button class="chip" data-type="System">System</button>
                                 </div>
 
@@ -147,7 +138,7 @@
                                                             <c:when test="${n.priority eq 'Medium'}">
                                                                 <span class="badge b-med">Medium</span>
                                                             </c:when>
-<c:otherwise>
+                                                            <c:otherwise>
                                                                 <span class="badge b-low">Low</span>
                                                             </c:otherwise>
                                                         </c:choose>
@@ -191,7 +182,7 @@
                                                                 <c:otherwise>Mark Read</c:otherwise>
                                                             </c:choose>
                                                         </button>
-</form>
+                                                    </form>
 
                                                     <!-- Delete -->
                                                     <form
@@ -241,7 +232,7 @@
 
                                     <div class="mini-card">
                                         <div class="mini-label"><i class="fa-regular fa-circle-check"></i> STATUS</div>
-<div id="mStatus" class="mini-value"></div>
+                                        <div id="mStatus" class="mini-value"></div>
                                     </div>
                                 </div>
 
@@ -295,7 +286,8 @@
                                     if (readFilter === "read") okRead = isRead;
 
                                     let okType = (typeFilter === "all") ? true : (type === typeFilter);
-let okSearch = (q === "") ? true : title.includes(q);
+
+                                    let okSearch = (q === "") ? true : title.includes(q);
 
                                     card.style.display = (okRead && okType && okSearch) ? "flex" : "none";
                                 });
@@ -348,7 +340,7 @@ let okSearch = (q === "") ? true : title.includes(q);
 
                             function goRelated() {
                                 if (currentRelatedUrl) {
-window.location.href = "${pageContext.request.contextPath}" + currentRelatedUrl;
+                                    window.location.href = "${pageContext.request.contextPath}" + currentRelatedUrl;
                                 }
                             }
                         </script>

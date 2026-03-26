@@ -17,6 +17,7 @@ public class SoftwareVersion {
     private Long fileSize;
     private LocalDateTime createdAt;
     private Integer isActive;
+    
 
     public SoftwareVersion() {
     }

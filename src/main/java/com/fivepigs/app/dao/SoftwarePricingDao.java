@@ -52,7 +52,7 @@ public class SoftwarePricingDao {
                 swp.setPlanName(rs.getString("plan_name"));
                 swp.setMaxUsers(rs.getInt("max_users"));
                 swp.setPrice(rs.getDouble("price"));
-                swp.setCreatedDate(rs.getObject("created_at", LocalDateTime.class));
+                swp.setCreatedAt(rs.getObject("created_at", LocalDateTime.class));
                 swp.setIsActive(rs.getInt("is_active"));
                 list.add(swp);
             }

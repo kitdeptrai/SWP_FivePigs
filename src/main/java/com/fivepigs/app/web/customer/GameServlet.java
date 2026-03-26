@@ -47,6 +47,8 @@ public class GameServlet extends HttpServlet {
 
         try {
             List<Software> softwareList = sdao.getSoftwareByCategoryWithIcon("2");
+            Software featuredGame = sdao.getTopDownloadedByCategoryWithIcon(2);
+            Software randomGame = sdao.getRandomSoftwareByCategoryWithIcon(2);
             Map<String, List<Software>> sections = new LinkedHashMap<>();
             List<String> genres = new ArrayList<>();
             List<Software> genreResults = new ArrayList<>();
@@ -56,10 +58,12 @@ public class GameServlet extends HttpServlet {
                 if (selectedGenre == null) {
                     for (String genre : genres) {
                         List<Software> list = sdao.getSoftwareByCategoryAndGenre(2, genre);
+                        sortSoftwareList(list, selectedSort, selectedOrder);
                         sections.put(genre, list);
                     }
                 } else {
                     genreResults = sdao.getSoftwareByCategoryAndGenre(2, selectedGenre);
+                    sortSoftwareList(genreResults, selectedSort, selectedOrder);
                 }
             } catch (SQLException ignored) {
                 request.setAttribute("gameWarning", "Thieu bang genre/software_genre, dang hien thi danh sach game mac dinh.");
@@ -82,6 +86,8 @@ public class GameServlet extends HttpServlet {
             request.setAttribute("genreResults", genreResults);
             request.setAttribute("sections", sections);
             request.setAttribute("softwareToShow", softwareList);
+            request.setAttribute("featuredGame", featuredGame);
+            request.setAttribute("randomGame", randomGame);
         } catch (SQLException e) {
             request.setAttribute("genres", new ArrayList<String>());
             request.setAttribute("selectedGenre", selectedGenre);
@@ -90,6 +96,8 @@ public class GameServlet extends HttpServlet {
             request.setAttribute("genreResults", new ArrayList<Software>());
             request.setAttribute("sections", new LinkedHashMap<String, List<Software>>());
             request.setAttribute("softwareToShow", new ArrayList<Software>());
+            request.setAttribute("featuredGame", null);
+            request.setAttribute("randomGame", null);
             request.setAttribute("gameWarning", "Khong tai duoc du lieu game tu database.");
         }
 

@@ -93,7 +93,7 @@
                 flex:1;
                 height:8px;
                 background:#334155;
-                border-radius:5px;
+border-radius:5px;
                 overflow:hidden;
             }
             .bar-fill{
@@ -206,7 +206,7 @@
                 display: grid;
                 grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
                 gap: 20px;
-                margin-top: 20px;
+margin-top: 20px;
             }
 
             .image-grid img {
@@ -330,7 +330,7 @@
             <div class="main">
 
                 <!-- HEADER -->
-                <div class="product-header">
+<div class="product-header">
                     <img src="/${infoSoftware.softwareImage.imageUrl}">
                     <div class="product-info">
                         <div class="product-title">${infoSoftware.name}</div>
@@ -381,7 +381,7 @@
                     </div>
                     <div class="card">
                         <div class="card-icon warning">
-                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
                             </svg>
                         </div>
@@ -439,7 +439,7 @@
                                     <span>Genres</span>
 
                                     <div class="genre-list">
-                                        <c:forEach var="g" items="${listGenre}">
+<c:forEach var="g" items="${listGenre}">
                                             <p>${g.name}<p>
                                             </c:forEach>
                                     </div>
@@ -518,8 +518,7 @@
                                         <span>${item.createdAt.toLocalDate()}</span>
                                         <span class="dot">•</span>
                                     </div>
-
-                                    <div class="review-content">
+<div class="review-content">
                                         ${item.comment}
                                     </div>
                                 </div>
