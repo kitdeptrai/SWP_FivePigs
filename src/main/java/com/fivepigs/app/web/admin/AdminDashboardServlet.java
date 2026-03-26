@@ -102,6 +102,6 @@ public class AdminDashboardServlet extends DashboardServlet {
 
     @Override
     protected boolean isAuthorized(String roleName) {
-        return "Admin".equals(roleName);
+        return "admin".equalsIgnoreCase(roleName);
     }
 }

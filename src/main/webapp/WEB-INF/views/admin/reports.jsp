@@ -222,7 +222,6 @@
                         <td>#${r.feedbackId}</td>
                         <td>
                             <div><strong><c:out value="${r.subject}"/></strong></div>
-                            <div style="color:#64748b;"><c:out value="${r.message}"/></div>
                         </td>
                         <td>
                             <div><c:out value="${r.userName}"/></div>
@@ -236,25 +235,11 @@
                         <td>
                             <a class="btn-link" href="${pageContext.request.contextPath}/admin/reports?page=${currentPage}&keyword=${keyword}&status=${status}&feedbackId=${r.feedbackId}">View Detail</a>
                             <c:if test="${r.feedbackStatus != 'READ'}">
-                                <a class="btn-link mark-read" href="#mark-read-${r.feedbackId}">Mark as Read</a>
-
-                                <div id="mark-read-${r.feedbackId}" class="modal">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h2>Mark feedback as read</h2>
-                                            <a class="close-modal" href="${pageContext.request.contextPath}/admin/reports">×</a>
-                                        </div>
-                                        <p>Mark this feedback as read and notify the user by email?</p>
-                                        <form method="post" action="${pageContext.request.contextPath}/admin/reports">
-                                            <input type="hidden" name="action" value="markRead"/>
-                                            <input type="hidden" name="feedbackId" value="${r.feedbackId}"/>
-                                            <div class="actions">
-                                                <button type="submit" style="background:#15803d;">Mark as Read</button>
-                                                <a class="small" href="${pageContext.request.contextPath}/admin/reports">Cancel</a>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
+                                <form method="post" action="${pageContext.request.contextPath}/admin/reports" style="display:inline;">
+                                    <input type="hidden" name="action" value="markRead"/>
+                                    <input type="hidden" name="feedbackId" value="${r.feedbackId}"/>
+                                    <button type="submit" class="btn-link mark-read">Mark as Read</button>
+                                </form>
                             </c:if>
                         </td>
                     </tr>

@@ -1054,9 +1054,7 @@ public class AdminDao {
         StringBuilder sql = new StringBuilder(
                 "SELECT o.order_id, o.total_amount, o.order_date, ps.status_name AS payment_status, " +
                         "u.full_name AS customer_name, u.email AS customer_email, " +
-                        "COALESCE((SELECT CAST(sc.config_value AS DECIMAL(10,2)) " +
-                        "          FROM fivepigs.system_config sc " +
-                        "          WHERE sc.config_key = 'commission_percent' LIMIT 1), 10) AS commission_percent " +
+                        "COALESCE(o.commission_percent, 10) AS commission_percent " +
                         "FROM orders o " +
                         "JOIN users u ON o.customer_id = u.user_id " +
                         "JOIN payment_status ps ON o.payment_status_id = ps.payment_status_id " +
