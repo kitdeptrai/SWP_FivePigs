@@ -11,6 +11,7 @@ public class User {
     private Integer roleId;
     private String status; // ACTIVE, BLOCKED
     private LocalDateTime createdAt;
+    private String roleName;
     private String avatar;
 
     public User() {
@@ -24,7 +25,8 @@ public class User {
         this.status = "ACTIVE"; // Mặc định ACTIVE khi đăng ký
     }
 
-    public User(Integer userId, String fullName, String email, String password, Integer roleId, String status, LocalDateTime createdAt, String avatar) {
+    public User(Integer userId, String fullName, String email, String password, Integer roleId, String status,
+            LocalDateTime createdAt, String avatar) {
         this.userId = userId;
         this.fullName = fullName;
         this.email = email;
@@ -34,8 +36,6 @@ public class User {
         this.createdAt = createdAt;
         this.avatar = avatar;
     }
-
-
 
     public Integer getUserId() {
         return userId;
@@ -93,6 +93,13 @@ public class User {
         this.createdAt = createdAt;
     }
 
+    public String getRoleName() {
+        return roleName;
+    }
+
+    public void setRoleName(String roleName) {
+        this.roleName = roleName;
+    }
     public String getAvatar() {
         return avatar;
     }

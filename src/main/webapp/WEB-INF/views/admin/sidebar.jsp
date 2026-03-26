@@ -10,7 +10,7 @@
             <i class="fa-solid fa-gauge"></i>
             <span>Dashboard</span>
         </a>
-        <a href="${pageContext.request.contextPath}/admin/notifications" class="menu-item ${activeMenu == 'notifications' ? 'active' : ''}">
+        <a href="${pageContext.request.contextPath}/admin_notifications" class="menu-item ${activeMenu == 'notifications' ? 'active' : ''}">
             <i class="fa-solid fa-bell"></i>
             <span>Notifications</span>
         </a>

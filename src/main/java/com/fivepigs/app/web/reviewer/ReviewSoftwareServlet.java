@@ -133,17 +133,6 @@ public class ReviewSoftwareServlet extends HttpServlet {
                         + "\". The software did not pass the review and has been rejected.";
                 notificationType = "REJECTED";
                 notificationPriority = "HIGH";
-                
-                if (software != null && software.getVendorId() != null) {
-                    notificationDao.insertNotification(
-                            software.getVendorId(),
-                            "Software Rejected - " + softwareName,
-                            "Unfortunately, your software \"" + softwareName + "\" did not pass the review and has been rejected.",
-                            "REJECTED",
-                            "HIGH",
-                            request.getContextPath() + "/vendor_software_detail?id=" + softwareId
-                    );
-                }
             }
 
             softwareDao.updateSoftwareStatus(softwareId, nextStatus);

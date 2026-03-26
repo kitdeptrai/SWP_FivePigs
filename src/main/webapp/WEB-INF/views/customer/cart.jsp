@@ -47,7 +47,7 @@
                                                 <c:if test="${not empty item.planMaxUsers}">
                                                     <span> â€¢ ${item.planMaxUsers} user<c:if test="${item.planMaxUsers != 1}">s</c:if></span>
                                                 </c:if>
-                                                <span> • 365-day access</span>
+                                                <span> ï¿½ 365-day access</span>
                                                 <br>
                                             </c:if>
                                             <c:choose>

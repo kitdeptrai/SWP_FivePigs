@@ -308,10 +308,11 @@
                             <tr>
                                 <th>License Key</th>
                                 <th>Product</th>
-                                <th>Customer</th>
+                                <th>Plan</th>
+                                <th>Usage</th>
+                                <th>Owner</th>
                                 <th>Activation</th>
                                 <th>Expiry</th>
-
                                 <th>Status</th>
                                 <th>Actions</th>
                             </tr>
@@ -321,67 +322,79 @@
 
                             <c:forEach var="l" items="${listLicense}">
                                 <tr data-status="${l.status}">
+
+                                    <!-- License Key -->
                                     <td>
                                         <div class="license-box">
                                             <span class="license-text">${l.licenseKey}</span>
                                             <button class="copy-icon"
                                                     onclick="copyLicense('${l.licenseKey}', this)">
-                                                <svg xmlns="http://www.w3.org/2000/svg" 
-                                                     width="16" height="16" 
-                                                     fill="none" viewBox="0 0 24 24" 
-                                                     stroke="currentColor">
-                                                <rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/>
-                                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke-width="2"/>
-                                                </svg>
+                                                <i class="fa-regular fa-copy"></i>
                                             </button>
                                         </div>
                                     </td>
 
+                                    <!-- Product -->
                                     <td class="product-name">
                                         ${l.software.name}
                                     </td>
 
+                                    <!-- PLAN -->
+                                    <td>
+                                        <span style="font-weight:600; color:#60a5fa;">
+                                            ${l.softwarePricing.planName}
+                                        </span>
+                                    </td>
+
+                                    <!-- USAGE -->
+                                    <td>
+                                        <span>
+                                            ${l.usedUsers} / ${l.softwarePricing.maxUsers}
+                                        </span>
+                                    </td>
+
+                                    <!-- PRICE -->
+
+
+                                    <!-- CUSTOMER -->
                                     <td class="customer-cell">
+                                        <div>${l.user.fullName}</div>
                                         <div class="customer-email">${l.user.email}</div>
                                     </td>
 
+                                    <!-- PURCHASE -->
                                     <td>
                                         ${l.purchaseDate.toLocalDate()}
                                     </td>
 
+                                    <!-- EXPIRE -->
                                     <td>
                                         ${l.expireDate.toLocalDate()}
                                     </td>
 
+                                    <!-- STATUS -->
                                     <td>
                                         <span class="status ${l.status.toLowerCase()}">
                                             ${l.status}
                                         </span>
                                     </td>
 
+                                    <!-- ACTION -->
                                     <td class="actions">
-
                                         <c:if test="${l.status != 'REVOKED'}">
-                                            <form action="${pageContext.request.contextPath}/change_status_license" method="post" style="display:inline;">
+                                            <form action="${pageContext.request.contextPath}/change_status_license"
+                                                  method="post" style="display:inline;">
 
                                                 <input type="hidden" name="licenseId" value="${l.licenseId}">
                                                 <input type="hidden" name="status" value="REVOKED">
 
                                                 <button type="submit" class="action-btn revoke">
-                                                    <svg width="16" height="16" viewBox="0 0 24 24"
-                                                         fill="none" stroke="#ff4d4f"
-                                                         stroke-width="2"
-                                                         stroke-linecap="round"
-                                                         stroke-linejoin="round">
-                                                    <circle cx="12" cy="12" r="10"></circle>
-                                                    <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
-                                                    </svg>
+                                                    <i class="fa-solid fa-ban"></i>
                                                 </button>
-
                                             </form>
                                         </c:if>
-
                                     </td>
+
                                 </tr>
                             </c:forEach>
 

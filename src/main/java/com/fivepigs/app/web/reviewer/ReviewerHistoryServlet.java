@@ -18,10 +18,9 @@ public class ReviewerHistoryServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request,
-            HttpServletResponse response)
+                         HttpServletResponse response)
             throws ServletException, IOException {
 
-        // 1️⃣ Kiểm tra session
         HttpSession session = request.getSession(false);
 
         if (session == null || session.getAttribute("user") == null) {
@@ -32,7 +31,6 @@ public class ReviewerHistoryServlet extends HttpServlet {
         User user = (User) session.getAttribute("user");
         int reviewerId = user.getUserId();
 
-        // 2️⃣ Lấy page từ request
         int currentPage = 1;
         String pageParam = request.getParameter("page");
 
@@ -46,21 +44,23 @@ public class ReviewerHistoryServlet extends HttpServlet {
                 currentPage = 1;
             }
         }
+
         String keyword = request.getParameter("keyword");
-        if (keyword != null) {
-            keyword = keyword.trim();
-        }
+        String decision = request.getParameter("decision");
+        String fromDate = request.getParameter("fromDate");
+        String toDate = request.getParameter("toDate");
+
+        if (keyword == null) keyword = "";
+        if (decision == null || decision.trim().isEmpty()) decision = "all";
+        if (fromDate == null) fromDate = "";
+        if (toDate == null) toDate = "";
+
+        keyword = keyword.trim();
+        decision = decision.trim();
 
         ReviewHistoryDao dao = new ReviewHistoryDao();
 
-        int totalRecords;
-        List<ReviewHistoryDTO> historyList;
-
-        if (keyword != null && !keyword.isEmpty()) {
-            totalRecords = dao.countSearchHistory(reviewerId, keyword);
-        } else {
-            totalRecords = dao.countHistory(reviewerId);
-        }
+        int totalRecords = dao.countFilteredHistory(reviewerId, keyword, decision, fromDate, toDate);
 
         int totalPages = (int) Math.ceil((double) totalRecords / PAGE_SIZE);
         if (totalPages == 0) {
@@ -73,22 +73,21 @@ public class ReviewerHistoryServlet extends HttpServlet {
 
         int offset = (currentPage - 1) * PAGE_SIZE;
 
-        if (keyword != null && !keyword.isEmpty()) {
-            historyList = dao.searchHistoryByReviewer(reviewerId, keyword, offset, PAGE_SIZE);
-        } else {
-            historyList = dao.getHistoryByReviewer(reviewerId, offset, PAGE_SIZE);
-        }
+        List<ReviewHistoryDTO> historyList = dao.getFilteredHistoryByReviewer(
+                reviewerId, keyword, decision, fromDate, toDate, offset, PAGE_SIZE
+        );
 
-        // 7️⃣ Set attribute
         request.setAttribute("user", user);
         request.setAttribute("historyList", historyList);
         request.setAttribute("currentPage", currentPage);
         request.setAttribute("totalPages", totalPages);
-        request.setAttribute("keyword", keyword);
 
-        // 8️⃣ Forward
-        request.getRequestDispatcher(
-                "/WEB-INF/views/reviewer/reviewer_history.jsp")
+        request.setAttribute("keyword", keyword);
+        request.setAttribute("decision", decision);
+        request.setAttribute("fromDate", fromDate);
+        request.setAttribute("toDate", toDate);
+
+        request.getRequestDispatcher("/WEB-INF/views/reviewer/reviewer_history.jsp")
                 .forward(request, response);
     }
 }

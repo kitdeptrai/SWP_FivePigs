@@ -6,38 +6,47 @@ package com.fivepigs.app.model;
 
 import java.sql.Date;
 import java.time.LocalDateTime;
+
 import java.util.ArrayList;
 import java.util.List;
+
 /**
  *
  * @author MinhPD
  */
 public class License {
-//    license_id INT PRIMARY KEY IDENTITY(1,1),
-//license_key VARCHAR(100) UNIQUE,
-//software_id INT,
-//customer_id INT,
-//purchase_date DATETIME,
-//expire_date DATETIME,
-//status VARCHAR(20),
-//-- ACTIVE, EXPIRED, REVOKED
-//
-//FOREIGN KEY (software_id) REFERENCES Software(software_id),
-//FOREIGN KEY (customer_id) REFERENCES Users(user_id)
+//CREATE TABLE License (
+//    license_id INT AUTO_INCREMENT PRIMARY KEY,
+//    license_key VARCHAR(100) UNIQUE,
+//	pricing_id INT,
+//    software_id INT,
+//    owner_id INT, -- người mua license 
+//    max_users INT DEFAULT 1, -- giới hạn user
+//    purchase_date DATETIME,
+//    expire_date DATETIME,
+//    status VARCHAR(20),
+//	FOREIGN KEY (pricing_id) REFERENCES Software_Pricing(pricing_id),
+//    FOREIGN KEY (software_id) REFERENCES Software(software_id),
+//    FOREIGN KEY (owner_id) REFERENCES Users(user_id)
+//);
+
     private Integer licenseId;
     private String licenseKey;
     private Integer softwareId;
+    private Integer pricingId;
+    private Integer maxUsers;
     private Integer customerId;
     private Integer ownerId;
-    private Integer maxUsers;
     private Integer assignedCount;
     private String planName;
     private LocalDateTime purchaseDate;
     private LocalDateTime expireDate;
     private String status;
-    private User user;
     private Software software;
     private List<User> assignedUsers = new ArrayList<>();
+    private User user;
+    private Integer usedUsers;
+    private SoftwarePricing softwarePricing;
 
     public License() {
     }
@@ -50,6 +59,34 @@ public class License {
         this.purchaseDate = purchaseDate;
         this.expireDate = expireDate;
         this.status = status;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Integer getUsedUsers() {
+        return usedUsers;
+    }
+
+    public void setUsedUsers(Integer usedUsers) {
+        this.usedUsers = usedUsers;
+    }
+
+    public Integer getOwnerId() {
+        return ownerId;
+    }
+
+    public SoftwarePricing getSoftwarePricing() {
+        return softwarePricing;
+    }
+
+    public void setSoftwarePricing(SoftwarePricing softwarePricing) {
+        this.softwarePricing = softwarePricing;
     }
 
     public Integer getLicenseId() {
@@ -84,20 +121,8 @@ public class License {
         this.customerId = customerId;
     }
 
-    public Integer getOwnerId() {
-        return ownerId;
-    }
-
     public void setOwnerId(Integer ownerId) {
         this.ownerId = ownerId;
-    }
-
-    public Integer getMaxUsers() {
-        return maxUsers;
-    }
-
-    public void setMaxUsers(Integer maxUsers) {
-        this.maxUsers = maxUsers;
     }
 
     public Integer getAssignedCount() {
@@ -140,12 +165,20 @@ public class License {
         this.status = status;
     }
 
-    public User getUser() {
-        return user;
+    public Integer getPricingId() {
+        return pricingId;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setPricingId(Integer pricingId) {
+        this.pricingId = pricingId;
+    }
+
+    public Integer getMaxUsers() {
+        return maxUsers;
+    }
+
+    public void setMaxUsers(Integer maxUsers) {
+        this.maxUsers = maxUsers;
     }
 
     public Software getSoftware() {
@@ -164,5 +197,4 @@ public class License {
         this.assignedUsers = assignedUsers;
     }
 
-    
 }
