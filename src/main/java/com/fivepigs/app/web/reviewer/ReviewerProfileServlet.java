@@ -2,6 +2,7 @@ package com.fivepigs.app.web.reviewer;
 
 import com.fivepigs.app.dao.UserDao;
 import com.fivepigs.app.model.User;
+import com.fivepigs.app.util.PasswordUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
@@ -124,8 +125,9 @@ public class ReviewerProfileServlet extends HttpServlet {
                     return;
                 }
 
-                if (!latestUser.getPassword().equals(currentPassword)) {
-                   response.sendRedirect(request.getContextPath() + "/reviewer_profile?msg=current_password_wrong");
+                String currentPasswordHash = PasswordUtil.sha256(currentPassword);
+                if (!latestUser.getPassword().equals(currentPasswordHash)) {
+                    response.sendRedirect(request.getContextPath() + "/reviewer_profile?msg=current_password_wrong");
                     return;
                 }
 
@@ -139,7 +141,8 @@ public class ReviewerProfileServlet extends HttpServlet {
                     return;
                 }
 
-                userDao.updatePasswordByUserId(latestUser.getUserId(), newPassword);
+                String newPasswordHash = PasswordUtil.sha256(newPassword);
+                userDao.updatePasswordByUserId(latestUser.getUserId(), newPasswordHash);
             }
 
             User updatedUser = userDao.findByEmail(email);

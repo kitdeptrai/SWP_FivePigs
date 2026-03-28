@@ -1,6 +1,7 @@
 package com.fivepigs.app.dao;
 
 import com.fivepigs.app.config.Db;
+import com.fivepigs.app.util.PasswordUtil;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -1152,7 +1153,7 @@ public class AdminDao {
             ps.setString(1, fullName);
             ps.setString(2, email);
             ps.setString(3, phone == null || phone.isBlank() ? null : phone.trim());
-            ps.setString(4, password);
+            ps.setString(4, PasswordUtil.sha256(password));
             ps.setInt(5, roleId);
             ps.executeUpdate();
         }

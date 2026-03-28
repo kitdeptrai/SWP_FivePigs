@@ -2,6 +2,7 @@ package com.fivepigs.app.web.approval;
 
 import com.fivepigs.app.model.User;
 import com.fivepigs.app.service.UserService;
+import com.fivepigs.app.util.PasswordUtil;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -65,7 +66,7 @@ public class ApprovalProfileServlet extends HttpServlet {
             userService.resetPassword(user.getEmail(), newPassword);
             
             // Re-fetch or update user session if necessary, but password change shouldn't affect current basic session properties
-            user.setPassword(newPassword);
+            user.setPassword(PasswordUtil.sha256(newPassword));
             session.setAttribute("user", user);
 
             request.setAttribute("success", "Password updated successfully!");
