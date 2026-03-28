@@ -112,6 +112,7 @@ public class VendorUploadProductServlet extends HttpServlet {
             software.setPrice(price);
             software.setIsFree(isFree);
             int softwareId = softwareService.createSoftware(software);
+            softwareService.createDefaultPricing(softwareId, price);
             if (genreIds != null && genreIds.length > 0) {
                 softwareService.addSoftwareGenres(softwareId, genreIds);
             }
@@ -160,7 +161,7 @@ public class VendorUploadProductServlet extends HttpServlet {
                     softwareFile.getSize()
             );
             // ===== INSERT NOTIFICATION FOR REVIEWER =====
-int reviewerId = 2; // TODO: replace bằng query role sau
+            int reviewerId = 2; // TODO: replace bằng query role sau
 
             String title = "New software submitted - " + name;
             String content = "A new software \"" + name + "\" has been submitted and is waiting for your review.";
