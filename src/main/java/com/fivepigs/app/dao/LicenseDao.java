@@ -67,7 +67,7 @@ public class LicenseDao {
                     license.setPlanName(rs.getString("plan_name"));
                     Number assignedCountValue = (Number) rs.getObject("assigned_count");
                     license.setAssignedCount(assignedCountValue == null ? 0 : assignedCountValue.intValue());
-                    map.put(license.getSoftwareId(), license);
+                    map.putIfAbsent(license.getSoftwareId(), license);
                 }
             }
         }

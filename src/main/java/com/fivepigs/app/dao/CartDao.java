@@ -403,7 +403,8 @@ public class CartDao {
     private Integer resolveSelectedPricingId(Connection c, int softwareId, Integer requestedPricingId) throws SQLException {
         if (requestedPricingId != null) {
             try (PreparedStatement st = c.prepareStatement(
-                    "SELECT pricing_id FROM fivepigs.software_pricing WHERE pricing_id = ? AND software_id = ? AND is_active = 1 LIMIT 1")) {
+                    "SELECT pricing_id FROM fivepigs.software_pricing " +
+                            "WHERE pricing_id = ? AND software_id = ? AND is_active = 1 LIMIT 1")) {
                 st.setInt(1, requestedPricingId);
                 st.setInt(2, softwareId);
                 try (ResultSet rs = st.executeQuery()) {
@@ -412,24 +413,31 @@ public class CartDao {
                     }
                 }
             }
+            throw new SQLException("Invalid pricing selection for software_id=" + softwareId + ", pricing_id=" + requestedPricingId);
         }
         return resolveActivePricingId(c, softwareId);
     }
 
     private Integer resolveMaxUsers(Connection c, Integer pricingId) throws SQLException {
         if (pricingId == null) {
-            return 1;
+            throw new SQLException("Missing pricing_id while creating license");
         }
+
         try (PreparedStatement st = c.prepareStatement(
                 "SELECT max_users FROM fivepigs.software_pricing WHERE pricing_id = ? LIMIT 1")) {
             st.setInt(1, pricingId);
             try (ResultSet rs = st.executeQuery()) {
                 if (rs.next()) {
-                    return rs.getInt("max_users");
+                    Number maxUsersValue = (Number) rs.getObject("max_users");
+                    if (maxUsersValue == null || maxUsersValue.intValue() <= 0) {
+                        throw new SQLException("Invalid max_users for pricing_id=" + pricingId);
+                    }
+                    return maxUsersValue.intValue();
                 }
             }
         }
-        return 1;
+
+        throw new SQLException("Pricing not found for pricing_id=" + pricingId);
     }
 
     private int getOrCreatePaidStatusId(Connection c) throws SQLException {
