@@ -157,7 +157,7 @@
         .badge { padding: 4px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; }
         .paid { background: rgba(34,197,94,0.15); color: #15803d; }
 
-        .modal-backdrop {
+        .order-modal-backdrop {
             position: fixed;
             inset: 0;
             background: rgba(15, 23, 42, 0.5);
@@ -167,7 +167,7 @@
             z-index: 1000;
         }
 
-        .modal {
+        .order-modal {
             width: min(900px, 92vw);
             max-height: 85vh;
             overflow: auto;
@@ -178,7 +178,7 @@
             padding: 20px;
         }
 
-        .modal-header {
+        .order-modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -294,11 +294,28 @@
 </div>
 
 <c:if test="${not empty selectedOrderId}">
-    <div class="modal-backdrop">
-        <div class="modal">
-            <div class="modal-header">
+    <div class="order-modal-backdrop">
+        <div class="order-modal">
+            <div class="order-modal-header">
                 <h3 style="margin:0;">Order Detail #${selectedOrderId}</h3>
                 <a class="close-btn" href="${pageContext.request.contextPath}/admin/orders?page=${currentPage}&keyword=${keyword}&fromDate=${fromDate}&toDate=${toDate}">Close</a>
+            </div>
+
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:10px; margin-bottom:14px;">
+                <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:10px 12px;">
+                    <div style="font-size:12px; color:#64748b;">Order ID</div>
+                    <div style="font-weight:700; color:#0f172a;">#${selectedOrderId}</div>
+                </div>
+                <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:10px 12px;">
+                    <div style="font-size:12px; color:#64748b;">Items</div>
+                    <div style="font-weight:700; color:#0f172a;">${orderDetailsCount}</div>
+                </div>
+                <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:10px 12px;">
+                    <div style="font-size:12px; color:#64748b;">Total Detail Value</div>
+                    <div style="font-weight:700; color:#0f172a;">
+                        <fmt:formatNumber value="${orderDetailsTotal}" type="currency" currencySymbol="$" minFractionDigits="2" maxFractionDigits="2"/>
+                    </div>
+                </div>
             </div>
 
             <table class="detail-table">

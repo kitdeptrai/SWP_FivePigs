@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.util.List;
 
 @WebServlet(name = "AdminOrdersServlet", urlPatterns = {"/admin/orders"})
 public class AdminOrdersServlet extends DashboardServlet {
@@ -37,7 +38,11 @@ public class AdminOrdersServlet extends DashboardServlet {
         req.setAttribute("selectedOrderId", selectedOrderId);
 
         if (selectedOrderId != null && !selectedOrderId.isBlank()) {
-            req.setAttribute("orderDetails", adminService.getOrderDetails(selectedOrderId));
+            List<com.fivepigs.app.dao.AdminDao.AdminOrderDetailRow> details = adminService.getOrderDetails(selectedOrderId);
+            req.setAttribute("orderDetails", details);
+            req.setAttribute("orderDetailsCount", details.size());
+            double detailsTotal = details.stream().mapToDouble(d -> d.getPrice()).sum();
+            req.setAttribute("orderDetailsTotal", detailsTotal);
         }
 
         super.doGet(req, resp);
