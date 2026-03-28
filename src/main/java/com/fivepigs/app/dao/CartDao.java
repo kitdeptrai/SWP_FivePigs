@@ -175,6 +175,8 @@ public class CartDao {
                         st.executeUpdate();
                     }
 
+                    insertVendorEarning(c, orderId, item.getSoftwareId(), price, commissionPercent);
+
                     if (!hasActivePaidLicense(c, userId, item.getSoftwareId())) {
                         Integer maxUsers = resolveMaxUsers(c, item.getPricingId());
                         Timestamp expireAt = resolveExpireAt(item.getPlanName());
@@ -232,6 +234,36 @@ public class CartDao {
         }
     }
 
+    private Integer getVendorIdBySoftwareId(Connection c, int softwareId) throws SQLException {
+        try (PreparedStatement st = c.prepareStatement(
+                "SELECT vendor_id FROM fivepigs.software WHERE software_id = ? LIMIT 1")) {
+            st.setInt(1, softwareId);
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("vendor_id");
+                }
+            }
+        }
+        return null;
+    }
+
+    private void insertVendorEarning(Connection c, int orderId, int softwareId, double orderDetailPrice, double commissionRate) throws SQLException {
+        Integer vendorId = getVendorIdBySoftwareId(c, softwareId);
+        if (vendorId == null) {
+            throw new SQLException("Cannot resolve vendor for software_id=" + softwareId);
+        }
+
+        double amount = orderDetailPrice * (100.0 - commissionRate) / 100.0;
+
+        try (PreparedStatement st = c.prepareStatement(
+                "INSERT INTO fivepigs.vendor_earning(vendor_id, software_id, order_id, amount) VALUES(?, ?, ?, ?)")) {
+            st.setInt(1, vendorId);
+            st.setInt(2, softwareId);
+            st.setInt(3, orderId);
+            st.setDouble(4, amount);
+            st.executeUpdate();
+        }
+    }
     public double getCartTotal(int userId) throws SQLException {
         String sql = "SELECT COALESCE(SUM(CASE WHEN s.is_free = 1 THEN 0 ELSE COALESCE(selected_pricing.price, " +
                 "           (SELECT MIN(sp.price) FROM fivepigs.software_pricing sp WHERE sp.software_id = s.software_id AND sp.is_active = 1 AND UPPER(COALESCE(sp.plan_name, '')) <> 'DEMO'), 0) END), 0) AS total " +
@@ -424,7 +456,7 @@ public class CartDao {
 
     private double getCommissionPercentTx(Connection c) throws SQLException {
         try (PreparedStatement st = c.prepareStatement(
-                "SELECT config_value FROM fivepigs.system_config WHERE config_key = 'commission_percent' LIMIT 1")) {
+                "SELECT config_value FROM fivepigs.system_config WHERE config_key = 'commission_rate' LIMIT 1")) {
             try (ResultSet rs = st.executeQuery()) {
                 if (rs.next()) {
                     String raw = rs.getString("config_value");
@@ -432,16 +464,16 @@ public class CartDao {
                         try {
                             double percent = Double.parseDouble(raw.trim());
                             if (percent < 0) {
-                                return 0;
+                                return 0.0;
                             }
-                            return Math.min(percent, 20);
+                            return percent;
                         } catch (NumberFormatException ignored) {
                         }
                     }
                 }
             }
         }
-        return 10.0;
+        return 20.0;
     }
 
     private String generateLicenseKey() {
