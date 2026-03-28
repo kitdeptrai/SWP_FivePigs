@@ -63,4 +63,34 @@ public class GenreDao {
         return list;
     }
 
+    public void deleteSoftwareGenres(int softwareId) throws SQLException {
+
+        String sql = "DELETE FROM Software_Genre WHERE software_id = ?";
+
+        try (Connection conn = Db.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, softwareId);
+            ps.executeUpdate();
+        }
+    }
+
+    public void addSoftwareGenres(int softwareId, String[] genreIds) throws SQLException {
+
+        String sql = """
+        INSERT IGNORE INTO Software_Genre (software_id, genre_id)
+        VALUES (?, ?)
+    """;
+
+        try (Connection conn = Db.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            for (String gid : genreIds) {
+                ps.setInt(1, softwareId);
+                ps.setInt(2, Integer.parseInt(gid));
+                ps.addBatch();
+            }
+
+            ps.executeBatch();
+        }
+    }
+
 }

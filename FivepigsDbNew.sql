@@ -205,14 +205,31 @@ CREATE TABLE Review (
 -- 17. Report
 CREATE TABLE Report (
     report_id INT AUTO_INCREMENT PRIMARY KEY,
-    software_id INT,
-    reporter_id INT,
-    reason LONGTEXT,
-    status VARCHAR(20),
+    software_id INT NOT NULL,
+    reporter_id INT NOT NULL,
+    reviewer_id INT NULL,
+    reason LONGTEXT NOT NULL,
+    status VARCHAR(30) NOT NULL DEFAULT 'ERROR_REVIEW',
+    bug_confirmed TINYINT(1) NULL,
+    reproduce_steps LONGTEXT NULL,
+    reviewer_note LONGTEXT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (software_id) REFERENCES Software(software_id),
-    FOREIGN KEY (reporter_id) REFERENCES Users(user_id)
+    processed_at DATETIME NULL,
+
+    CONSTRAINT fk_report_software
+        FOREIGN KEY (software_id) REFERENCES Software(software_id),
+
+    CONSTRAINT fk_report_reporter
+        FOREIGN KEY (reporter_id) REFERENCES Users(user_id),
+
+    CONSTRAINT fk_report_reviewer
+        FOREIGN KEY (reviewer_id) REFERENCES Users(user_id)
 );
+
+CREATE INDEX idx_report_status ON Report(status);
+CREATE INDEX idx_report_software_id ON Report(software_id);
+CREATE INDEX idx_report_reviewer_id ON Report(reviewer_id);
+CREATE INDEX idx_report_reporter_id ON Report(reporter_id);
 
 -- 18. Notification
 CREATE TABLE Notification (
@@ -226,32 +243,6 @@ CREATE TABLE Notification (
     related_url VARCHAR(255),
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES Users(user_id)
-);
-
--- 19. Vendor Payout
-CREATE TABLE Vendor_Payout (
-    payout_id INT AUTO_INCREMENT PRIMARY KEY,
-    vendor_id INT NOT NULL,
-    amount DECIMAL(12,2) NOT NULL,
-    payment_method VARCHAR(50),       -- BANK / MOMO / PAYPAL
-    payment_account VARCHAR(255),     -- số TK hoặc email paypal
-    status VARCHAR(20) DEFAULT 'PENDING',
-    processed_at DATETIME,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (vendor_id) REFERENCES Users(user_id)
-);
-
-CREATE TABLE Admin_Payout_Audit (
-    audit_id INT AUTO_INCREMENT PRIMARY KEY,
-    payout_id INT NOT NULL,
-    admin_user_id INT NOT NULL,
-    action VARCHAR(30) NOT NULL, -- APPROVE / REJECT / CANCEL
-    from_status VARCHAR(20),
-    to_status VARCHAR(20),
-    note VARCHAR(255),
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (payout_id) REFERENCES Vendor_Payout(payout_id),
-    FOREIGN KEY (admin_user_id) REFERENCES Users(user_id)
 );
 
 CREATE TABLE Vendor_Earning (
@@ -272,7 +263,8 @@ CREATE TABLE System_Config (
     config_key VARCHAR(50) PRIMARY KEY,
     config_value VARCHAR(100)
 );
-
+INSERT INTO System_Config (config_key,config_value)
+VALUES ('commission_rate','20');
 -- 24. pending review
 CREATE TABLE Review_Score (
     review_score_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -319,19 +311,6 @@ CREATE TABLE Review_Guideline_Item (
     sort_order INT DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (guideline_id) REFERENCES Review_Guideline(guideline_id) ON DELETE CASCADE
-);
-
--- 27 software_demo_version
-CREATE TABLE fivepigs.software_demo_version (
-    demo_version_id INT PRIMARY KEY AUTO_INCREMENT,
-    software_id INT NOT NULL,
-    version_name VARCHAR(50) NULL,
-    demo_file_url VARCHAR(255) NOT NULL,
-    release_note TEXT NULL,
-    file_size INT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    is_active TINYINT(1) NOT NULL DEFAULT 1,
-    FOREIGN KEY (software_id) REFERENCES fivepigs.software(software_id)
 );
 
 -- 28 Feedback website

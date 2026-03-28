@@ -13,34 +13,34 @@ VALUES
 
 INSERT INTO Users (full_name, email, password, role_id, phone)
 VALUES 
-('System Admin', 'admin@gmail.com', '123456', 1, '0900000001');
+('System Admin', 'admin@gmail.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 1, '0900000001');
 
 INSERT INTO Users (full_name, email, password, role_id, phone)
 VALUES 
-('Reviewer', 'reviewer@gmail.com', '123456', 5, '0900000002');
+('Reviewer', 'reviewer@gmail.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 5, '0900000002');
 
 INSERT INTO Users (full_name, email, password, role_id, phone)
 VALUES 
-('Approval', 'approval@gmail.com', '123456', 4, '0900000003');
+('Approval', 'approval@gmail.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 4, '0900000003');
 
 INSERT INTO Users (full_name, email, password, role_id, phone)
 VALUES
-('Vendor One', 'vendor1@gmail.com', '123456', 3, '0900000011'),
-('Vendor Two', 'vendor2@gmail.com', '123456', 3, '0900000012'),
-('Vendor Three', 'vendor3@gmail.com', '123456', 3, '0900000013');
+('Vendor One', 'vendor1@gmail.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 3, '0900000011'),
+('Vendor Two', 'vendor2@gmail.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 3, '0900000012'),
+('Vendor Three', 'vendor3@gmail.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 3, '0900000013');
 
 INSERT INTO Users (full_name, email, password, role_id, phone)
 VALUES
-('Customer 1', 'customer1@gmail.com', '123456', 2, '0900000101'),
-('Customer 2', 'customer2@gmail.com', '123456', 2, '0900000102'),
-('Customer 3', 'customer3@gmail.com', '123456', 2, '0900000103'),
-('Customer 4', 'customer4@gmail.com', '123456', 2, '0900000104'),
-('Customer 5', 'customer5@gmail.com', '123456', 2, '0900000105'),
-('Customer 6', 'customer6@gmail.com', '123456', 2, '0900000106'),
-('Customer 7', 'customer7@gmail.com', '123456', 2, '0900000107'),
-('Customer 8', 'customer8@gmail.com', '123456', 2, '0900000108'),
-('Customer 9', 'customer9@gmail.com', '123456', 2, '0900000109'),
-('Customer 10', 'customer10@gmail.com', '123456', 2, '0900000110');
+('Customer 1', 'customer1@gmail.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 2, '0900000101'),
+('Customer 2', 'customer2@gmail.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 2, '0900000102'),
+('Customer 3', 'customer3@gmail.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 2, '0900000103'),
+('Customer 4', 'customer4@gmail.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 2, '0900000104'),
+('Customer 5', 'customer5@gmail.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 2, '0900000105'),
+('Customer 6', 'customer6@gmail.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 2, '0900000106'),
+('Customer 7', 'customer7@gmail.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 2, '0900000107'),
+('Customer 8', 'customer8@gmail.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 2, '0900000108'),
+('Customer 9', 'customer9@gmail.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 2, '0900000109'),
+('Customer 10', 'customer10@gmail.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 2, '0900000110');
 
 
 -- Bang insert Category
@@ -101,49 +101,69 @@ VALUES
 INSERT INTO Software_Pricing (software_id, plan_name, max_users, price)
 VALUES
 
--- ===== FREE SOFTWARE (chỉ BASIC) =====
-(1,'BASIC',1,0),(2,'BASIC',1,0),(3,'BASIC',1,0),(4,'BASIC',1,0),
-(5,'BASIC',1,0),(7,'BASIC',1,0),(8,'BASIC',1,0),(9,'BASIC',1,0),
-(10,'BASIC',1,0),(13,'BASIC',1,0),(14,'BASIC',1,0),(15,'BASIC',1,0),
-(17,'BASIC',1,0),(18,'BASIC',1,0),(19,'BASIC',1,0),
-(21,'BASIC',1,0),(22,'BASIC',1,0),(23,'BASIC',1,0),
-(27,'BASIC',1,0),(28,'BASIC',1,0),
+-- ===== FREE SOFTWARE (ONLY BASIC) =====
+(1,'BASIC',1,0),
+(2,'BASIC',1,0),
+(3,'BASIC',1,0),
+(4,'BASIC',1,0),
+(5,'BASIC',1,0),
+(7,'BASIC',1,0),
+(8,'BASIC',1,0),
+(9,'BASIC',1,0),
+(10,'BASIC',1,0),
 
--- ===== PAID SOFTWARE =====
+(13,'BASIC',1,0),
+(14,'BASIC',1,0),
+(15,'BASIC',1,0),
+(17,'BASIC',1,0),
+(18,'BASIC',1,0),
+(19,'BASIC',1,0),
 
--- Netflix
+(21,'BASIC',1,0),
+(22,'BASIC',1,0),
+(23,'BASIC',1,0),
+(27,'BASIC',1,0),
+(28,'BASIC',1,0),
+
+-- ===== PAID SOFTWARE (BASIC + DEMO) =====
 (6,'BASIC',1,9.99),
-(6,'TEAM',4,19.99),
+(6,'DEMO',1,0),
 
--- Resident Evil
-(11,'BASIC',1,59.99),
+(11,'BASIC',1,19.99),
+(11,'DEMO',1,0),
 
--- GTA V
 (12,'BASIC',1,39.99),
+(12,'DEMO',1,0),
 
--- Minecraft
-(16,'BASIC',1,26.95),
+(16,'BASIC',1,14.99),
+(16,'DEMO',1,0),
 
--- Elden Ring
-(20,'BASIC',1,59.99),
+(20,'BASIC',1,49.99),
+(20,'DEMO',1,0),
 
--- Photoshop
 (24,'BASIC',1,29.99),
-(24,'PRO',3,59.99),
+(24,'DEMO',1,0),
 
--- Notion
-(25,'BASIC',1,8.99),
+(25,'BASIC',1,12.99),
+(25,'DEMO',1,0),
 
+(26,'BASIC',1,8.99),
+(26,'DEMO',1,0),
 
--- Slack
-(26,'BASIC',1,6.99),
-(26,'TEAM',5,15.99),
-
--- Cyberpunk
 (29,'BASIC',1,59.99),
+(29,'DEMO',1,0),
 
--- Among Us
-(30,'BASIC',1,4.99);
+(30,'BASIC',1,4.99),
+(30,'DEMO',1,0);
+
+INSERT IGNORE INTO Software_Pricing (software_id, plan_name, max_users, price)
+VALUES
+(6,  'TEAM', 4, 19.99),
+(11, 'TEAM', 4, 39.99),
+(12, 'TEAM', 4, 79.99),
+(16, 'TEAM', 4, 29.99),
+(20, 'TEAM', 4, 99.99);
+
 
 INSERT INTO Software_Detail 
 (software_id, description, system_requirement, release_note)
@@ -425,56 +445,6 @@ VALUES
 (30,2,'Multiplayer and matchmaking system tested');
 
 
-<<<<<<< HEAD:FinalDataFivePigs.sql
-=======
-
-INSERT INTO Software_Image (software_id,image_url,is_thumbnail) VALUES
-(11,'images/RE9_icon.jpg',1),
-(11,'images/RE9_detail1.jpg',0),
-(11,'images/RE9_detail2.jpg',0),
-(11,'images/RE9_detail3.jpg',0),
-(11,'images/RE9_detail4.jpg',0);
-
--- Warzone (ID = 13)
-INSERT INTO Software_Image (software_id,image_url,is_thumbnail) VALUES
-(13,'images/Warzone_icon.png',1),
-(13,'images/Warzone_detail1.jpg',0),
-(13,'images/Warzone_detail2.jpg',0),
-(13,'images/Warzone_detail3.jpg',0),
-(13,'images/Warzone_detail4.jpg',0);
-
--- PUBG (ID = 19)
-INSERT INTO Software_Image (software_id,image_url,is_thumbnail) VALUES
-(19,'images/pubg_icon.png',1),
-(19,'images/pubg_detail1.png',0),
-(19,'images/pubg_detail2.webp',0),
-(19,'images/pubg_detail3.jpg',0),
-(19,'images/pubg_detail4.jpg',0);
-
--- Minecraft (ID = 16)
-INSERT INTO Software_Image (software_id,image_url,is_thumbnail) VALUES
-(16,'images/minecraft.webp',1),
-(16,'images/Minecraft_info1.jpg',0),
-(16,'images/Minecraft_info2.jpg',0),
-(16,'images/minecraft_info3.png',0),
-(16,'images/minecraft_info4.jpg',0);
-
--- Facebook (ID = 1)
-INSERT INTO Software_Image (software_id,image_url,is_thumbnail) VALUES
-(1,'images/facebook_icon.png',1),
-(1,'images/facebook_detail1.png',0),
-(1,'images/facebook_detail2.webp',0),
-(1,'images/facebook_detail3.jpg',0);
-
--- Instagram (ID = 2)
-INSERT INTO Software_Image (software_id,image_url,is_thumbnail) VALUES
-(2,'images/instagram_icon.jpg',1),
-(2,'images/ins_detail1.webp',0),
-(2,'images/ins_detail2.webp',0),
-(2,'images/ins_detail3.webp',0),
-(2,'images/ins_detail4.webp',0);
-
->>>>>>> daab0f27da907699b6d350bf9fc271ab7199585a:DataFivePigs.sql
 -- Resident Evil Requiem (ID = 11)
 INSERT INTO Software_Image (software_id,image_url,is_thumbnail) VALUES
 (11,'uploads/images/RE9_icon.jpg',1),
@@ -521,10 +491,6 @@ INSERT INTO Software_Image (software_id,image_url,is_thumbnail) VALUES
 (2,'uploads/images/ins_detail2.webp',0),
 (2,'uploads/images/ins_detail3.webp',0),
 (2,'uploads/images/ins_detail4.webp',0);
-<<<<<<< HEAD:FinalDataFivePigs.sql
-=======
-
->>>>>>> daab0f27da907699b6d350bf9fc271ab7199585a:DataFivePigs.sql
 
 INSERT INTO Software_Review_Process (software_id, reviewer_id, test_result)
 VALUES
@@ -549,7 +515,13 @@ VALUES
 (18,2,'FPS gameplay tested'),
 (19,2,'Realistic shooter gameplay tested'),
 (20,2,'RPG gameplay mechanics verified');
-
+ INSERT INTO Reviewer_Assignment (software_id, reviewer_id, status, assigned_at, due_at, note)
+VALUES
+(21, 2, 'ASSIGNED', NOW(), DATE_ADD(NOW(), INTERVAL 3 DAY), 'Review Discord'),
+(22, 2, 'ASSIGNED', NOW(), DATE_ADD(NOW(), INTERVAL 3 DAY), 'Review Snapchat'),
+(23, 2, 'IN_PROGRESS', NOW(), DATE_ADD(NOW(), INTERVAL 3 DAY), 'Review Zoom'),
+(24, 2, 'ASSIGNED', NOW(), DATE_ADD(NOW(), INTERVAL 5 DAY), 'Review Photoshop'),
+(25, 2, 'ASSIGNED', NOW(), DATE_ADD(NOW(), INTERVAL 5 DAY), 'Review Notion');
 INSERT INTO Review_Score
 (software_id, reviewer_id,
 no_malware, no_copyright_violation, no_spam_content,
@@ -648,10 +620,10 @@ VALUES
 (20,3,'APPROVED','RPG game high quality');
 
 INSERT INTO Payment_Status (status_name) VALUES
-('Pending'),
-('Paid'),
-('Failed'),
-('Refunded');
+('PAID'),
+('PENDING'),
+('FAILED'),
+('REFUNDED');
 
 
 
@@ -757,92 +729,122 @@ INSERT INTO Review (software_id, customer_id, rating, comment) VALUES
 (20,7,5,'Amazing world'),
 (20,8,5,'Perfect gameplay');
 
-INSERT INTO Vendor_Payout
-(vendor_id, amount, payment_method, payment_account, status, processed_at)
-VALUES
-(4, 79.17, 'BANK', '123456789 - Vietcombank', 'PAID', NOW()),
-(5, 359.94, 'MOMO', '0901234567', 'PAID', NOW()),
-(6, 103.98, 'BANK', '987654321 - Techcombank', 'PENDING', NULL);
+INSERT INTO Orders (customer_id, payment_status_id, total_amount, order_date) VALUES
+(7, 1, 29.99, NOW()),
+(8, 1, 19.99, NOW()),
+(9, 1, 39.99, NOW()),
+(10, 1, 14.99, NOW()),
+(11, 1, 49.99, NOW()),
+(12, 1, 29.99, NOW()),
+(13, 1, 12.99, NOW()),
+(14, 1, 8.99, NOW()),
+(15, 1, 59.99, NOW()),
+(16, 1, 4.99, NOW()),
+
+(7, 1, 19.99, NOW()),
+(8, 1, 39.99, NOW()),
+(9, 1, 14.99, NOW()),
+(10, 1, 49.99, NOW()),
+(11, 1, 29.99, NOW()),
+(12, 1, 12.99, NOW()),
+(13, 1, 8.99, NOW()),
+(14, 1, 59.99, NOW()),
+(15, 1, 4.99, NOW()),
+(16, 1, 29.99, NOW());
+INSERT INTO Orders (customer_id, payment_status_id, total_amount, order_date) VALUES
+(7,1,39.99,NOW()),
+(8,1,79.99,NOW()),
+(9,1,29.99,NOW()),
+(10,1,99.99,NOW()),
+(11,1,39.99,NOW());
+INSERT INTO Order_Detail (order_id, software_id, price) VALUES
+(1, 6, 9.99),(1, 11, 19.99),
+(2, 12, 39.99),(2, 16, 14.99),
+(3, 20, 49.99),(3, 24, 29.99),
+(4, 25, 12.99),(4, 26, 8.99),
+(5, 29, 59.99),(5, 30, 4.99),
+
+(6, 6, 9.99),(6, 12, 39.99),
+(7, 11, 19.99),(7, 16, 14.99),
+(8, 20, 49.99),(8, 24, 29.99),
+(9, 25, 12.99),(9, 29, 59.99),
+(10, 30, 4.99),(10, 6, 9.99),
+
+(11, 12, 39.99),(11, 11, 19.99),
+(12, 16, 14.99),(12, 20, 49.99),
+(13, 24, 29.99),(13, 25, 12.99),
+(14, 26, 8.99),(14, 29, 59.99),
+(15, 30, 4.99),(15, 6, 9.99),
+
+(16, 11, 19.99),(16, 12, 39.99),
+(17, 16, 14.99),(17, 20, 49.99),
+(18, 24, 29.99),(18, 25, 12.99),
+(19, 26, 8.99),(19, 29, 59.99),
+(20, 30, 4.99),(20, 6, 9.99);
+INSERT INTO Order_Detail (order_id, software_id, price, pricing_id)
+SELECT 22,11,39.99,pricing_id FROM Software_Pricing WHERE software_id=11 AND plan_name='TEAM'
+UNION ALL
+SELECT 23,12,79.99,pricing_id FROM Software_Pricing WHERE software_id=12 AND plan_name='TEAM'
+UNION ALL
+SELECT 24,16,29.99,pricing_id FROM Software_Pricing WHERE software_id=16 AND plan_name='TEAM'
+UNION ALL
+SELECT 25,20,99.99,pricing_id FROM Software_Pricing WHERE software_id=20 AND plan_name='TEAM';
 
 
+UPDATE Order_Detail od
+JOIN Software_Pricing sp 
+  ON od.software_id = sp.software_id 
+ AND sp.price = od.price
+SET od.pricing_id = sp.pricing_id;
+
+
+-- tạo license
 INSERT INTO License 
-(license_key, pricing_id, software_id, owner_id, purchase_date, expire_date, status)
-VALUES
-
--- ===== Netflix (BASIC) =====
-('LIC-NF-001',21,6,7,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'ACTIVE'),
-('LIC-NF-002',21,6,8,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'ACTIVE'),
-
--- ===== Netflix (TEAM) =====
-('LIC-NF-T01',22,6,9,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'ACTIVE'),
-
--- ===== Resident Evil =====
-('LIC-RE-001',23,11,10,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'ACTIVE'),
-('LIC-RE-002',23,11,11,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'ACTIVE'),
-
--- ===== GTA V =====
-('LIC-GTA-001',24,12,12,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'ACTIVE'),
-('LIC-GTA-002',24,12,13,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'ACTIVE'),
-
--- ===== Minecraft =====
-('LIC-MC-001',25,16,14,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'ACTIVE'),
-
--- ===== Elden Ring =====
-('LIC-ER-001',26,20,15,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'ACTIVE'),
-
--- ===== Photoshop =====
-('LIC-PS-001',27,24,16,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'ACTIVE'),
-('LIC-PS-PRO01',28,24,7,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'ACTIVE'),
-
--- ===== Slack =====
-('LIC-SLK-001',30,26,10,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'ACTIVE'),
-('LIC-SLK-T01',31,26,11,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'ACTIVE'),
-
--- ===== Cyberpunk =====
-('LIC-CYB-001',32,29,12,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'ACTIVE'),
-
--- ===== Among Us =====
-('LIC-AM-001',33,30,13,NOW(),DATE_ADD(NOW(),INTERVAL 1 YEAR),'ACTIVE');
+(license_key, pricing_id, software_id, owner_id, purchase_date, expire_date, status,max_users)
+SELECT 
+    CONCAT('LIC-', SUBSTRING(UUID(),1,8)),
+    od.pricing_id,
+    od.software_id,
+    o.customer_id,
+    NOW(),
+    DATE_ADD(NOW(), INTERVAL 1 YEAR),
+    'ACTIVE',sp.max_users
+FROM Order_Detail od
+JOIN Orders o ON od.order_id = o.order_id
+JOIN Software_Pricing sp ON od.pricing_id=sp.pricing_id;
 
 
-INSERT INTO Vendor_Payout 
-(payout_id, vendor_id, amount, payment_method, payment_account, status, processed_at, created_at)
-VALUES
-(1001,4,120.50,'BANK','VCB-10001111','PAID','2026-02-01 10:05:00','2026-02-01 09:00:00'),
-(1002,5,280.00,'MOMO','0900000012','PAID','2026-02-02 11:10:00','2026-02-02 09:20:00'),
-(1003,6,95.75,'PAYPAL','vendor3@gmail.com','PAID','2026-02-03 15:00:00','2026-02-03 08:45:00'),
-(1004,4,340.10,'BANK','ACB-10004444','PAID','2026-02-04 16:30:00','2026-02-04 10:00:00'),
-(1005,5,150.25,'MOMO','0900000012','PAID','2026-02-05 14:20:00','2026-02-05 09:40:00'),
-(1006,6,420.00,'BANK','TCB-10006666','PAID','2026-02-06 13:15:00','2026-02-06 09:10:00'),
-(1007,4,78.90,'PAYPAL','vendor1@gmail.com','PAID','2026-02-07 12:00:00','2026-02-07 09:05:00'),
-(1008,5,510.40,'BANK','BIDV-10008888','PAID','2026-02-08 17:45:00','2026-02-08 10:20:00'),
-(1009,6,230.30,'MOMO','0900000013','PAID','2026-02-09 11:50:00','2026-02-09 09:30:00'),
-(1010,4,199.99,'BANK','VIB-10001010','PAID','2026-02-10 15:35:00','2026-02-10 10:10:00'),
-(1011,5,88.80,'MOMO','0900000012','PENDING',NULL,'2026-02-11 09:15:00'),
-(1012,6,132.45,'PAYPAL','vendor3@gmail.com','PENDING',NULL,'2026-02-12 10:05:00'),
-(1013,4,260.00,'BANK','VCB-10001111','PENDING',NULL,'2026-02-13 11:25:00'),
-(1014,5,315.60,'BANK','BIDV-10008888','PENDING',NULL,'2026-02-14 08:55:00'),
-(1015,6,44.20,'MOMO','0900000013','PENDING',NULL,'2026-02-15 09:40:00'),
-(1016,4,505.00,'PAYPAL','vendor1@gmail.com','PENDING',NULL,'2026-02-16 13:00:00'),
-(1017,5,72.15,'BANK','ACB-10005555','PENDING',NULL,'2026-02-17 14:45:00'),
-(1018,6,189.00,'BANK','TCB-10006666','PENDING',NULL,'2026-02-18 10:35:00'),
-(1019,4,640.70,'MOMO','0900000011','PENDING',NULL,'2026-02-19 15:25:00'),
-(1020,5,54.99,'PAYPAL','vendor2@gmail.com','PENDING',NULL,'2026-02-20 16:05:00');
+INSERT INTO License_User (license_id, user_id)
+SELECT 
+license_id,
+owner_id
+FROM License;
 
--- Seed 10 successful admin payout audits (APPROVE)
-INSERT INTO Admin_Payout_Audit
-(audit_id, payout_id, admin_user_id, action, from_status, to_status, note, created_at)
-VALUES
-(2001,1001,1,'APPROVE','PENDING','PAID','Approved monthly payout request','2026-02-01 10:06:00'),
-(2002,1002,1,'APPROVE','PENDING','PAID','Approved monthly payout request','2026-02-02 11:11:00'),
-(2003,1003,1,'APPROVE','PENDING','PAID','Approved monthly payout request','2026-02-03 15:01:00'),
-(2004,1004,1,'APPROVE','PENDING','PAID','Approved monthly payout request','2026-02-04 16:31:00'),
-(2005,1005,1,'APPROVE','PENDING','PAID','Approved monthly payout request','2026-02-05 14:21:00'),
-(2006,1006,1,'APPROVE','PENDING','PAID','Approved monthly payout request','2026-02-06 13:16:00'),
-(2007,1007,1,'APPROVE','PENDING','PAID','Approved monthly payout request','2026-02-07 12:01:00'),
-(2008,1008,1,'APPROVE','PENDING','PAID','Approved monthly payout request','2026-02-08 17:46:00'),
-(2009,1009,1,'APPROVE','PENDING','PAID','Approved monthly payout request','2026-02-09 11:51:00'),
-(2010,1010,1,'APPROVE','PENDING','PAID','Approved monthly payout request','2026-02-10 15:36:00');
+INSERT INTO License_User (license_id, user_id)
+SELECT license_id, user_id
+FROM (
+    SELECT 
+        l.license_id,
+        u.user_id,
+        sp.max_users,
+        ROW_NUMBER() OVER (PARTITION BY l.license_id ORDER BY RAND()) as rn
+    FROM License l
+    JOIN Software_Pricing sp ON l.pricing_id = sp.pricing_id
+    JOIN Users u ON u.user_id BETWEEN 7 AND 16
+    WHERE sp.plan_name = 'TEAM'
+    AND u.user_id != l.owner_id
+) t
+WHERE t.rn <= t.max_users - 1; 
+
+INSERT INTO Vendor_Earning (vendor_id, software_id, order_id, amount)
+SELECT
+s.vendor_id,
+od.software_id,
+od.order_id,
+ROUND(od.price * 0.8, 2)
+FROM Order_Detail od
+JOIN Software s ON od.software_id = s.software_id
+WHERE od.price > 0;
 
 INSERT INTO Report (software_id, reporter_id, reason, status, created_at)
 VALUES
@@ -971,4 +973,79 @@ VALUES
 'REJECTED',
 'HIGH',
 '/approval_pending_detail?softwareId=21');
+
+INSERT INTO Notification
+(user_id, title, content, is_read, type, priority, related_url, created_at)
+VALUES
+(2,
+ 'New software submitted - Discord',
+ 'A new software "Discord" has been submitted and is waiting for your review.',
+ 0,
+ 'SUBMITTED',
+ 'HIGH',
+ '/reviewer_pending',
+ DATE_SUB(NOW(), INTERVAL 8 HOUR)),
+
+(2,
+ 'Review completed - Slack',
+ 'You have completed the review for "Slack". The software passed review and is now waiting for final approval.',
+ 1,
+ 'PENDING_APPROVAL',
+ 'MEDIUM',
+ '/reviewer_history',
+ DATE_SUB(NOW(), INTERVAL 7 HOUR)),
+
+(2,
+ 'Review completed - Snapchat',
+ 'You have completed the review for "Snapchat". The software did not pass the review and has been rejected.',
+ 0,
+ 'REJECTED',
+ 'HIGH',
+ '/reviewer_history',
+ DATE_SUB(NOW(), INTERVAL 6 HOUR)),
+
+(2,
+ 'Pending final approval - Zoom',
+ 'You have completed the review for "Zoom". The software is now waiting for final approval from the approver.',
+ 0,
+ 'PENDING_APPROVAL',
+ 'MEDIUM',
+ '/reviewer_pending',
+ DATE_SUB(NOW(), INTERVAL 5 HOUR)),
+
+(2,
+ 'New software submitted - Adobe Photoshop',
+ 'A new software "Adobe Photoshop" has been submitted and is waiting for your review.',
+ 1,
+ 'SUBMITTED',
+ 'LOW',
+ '/reviewer_pending',
+ DATE_SUB(NOW(), INTERVAL 4 HOUR)),
+
+(2,
+ 'Approval completed - Twitch',
+ 'The final approval process for "Twitch" has been completed successfully.',
+ 1,
+ 'APPROVED',
+ 'LOW',
+ '/reviewer_history',
+ DATE_SUB(NOW(), INTERVAL 3 HOUR)),
+
+(2,
+ 'Submission rejected by approver - Cyberpunk 2077',
+ 'The approver rejected "Cyberpunk 2077" after reviewing your submitted review result.',
+ 0,
+ 'REJECTED',
+ 'HIGH',
+ '/reviewer_history',
+ DATE_SUB(NOW(), INTERVAL 2 HOUR)),
+
+(2,
+ 'Waiting for admin decision - Among Us',
+ 'Your completed review for "Among Us" has been sent and is pending final approval.',
+ 0,
+ 'PENDING_APPROVAL',
+ 'MEDIUM',
+ '/reviewer_pending',
+ DATE_SUB(NOW(), INTERVAL 1 HOUR));
 

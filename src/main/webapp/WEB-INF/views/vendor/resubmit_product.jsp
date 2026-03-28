@@ -163,6 +163,47 @@
                 margin-bottom:20px;
             }
 
+            .genre-grid{
+                display:grid;
+                grid-template-columns:repeat(auto-fill, minmax(140px,1fr));
+                gap:14px;
+                margin-bottom:20px;
+            }
+
+            .genre-card{
+                background:#0f172a;
+                border:1px solid #334155;
+                border-radius:10px;
+                padding:14px;
+                text-align:center;
+                cursor:pointer;
+                transition:0.25s;
+                position:relative;
+            }
+
+            .genre-card:hover{
+                border-color:#6366f1;
+                transform:translateY(-2px);
+            }
+
+            .genre-card input{
+                display:none;
+            }
+
+            .genre-name{
+                font-size:14px;
+                color:#cbd5e1;
+                font-weight:500;
+            }
+
+            .genre-card input:checked + .genre-name{
+                color:#fff;
+            }
+
+            .genre-card.active{
+                background:linear-gradient(145deg,#4f46e5,#6366f1);
+                border-color:#6366f1;
+            }
         </style>
     </head>
 
@@ -244,6 +285,24 @@
                                 </option>
 
                             </select>
+                            <label>Genres *</label>
+
+                            <div class="genre-grid">
+
+                                <c:forEach var="g" items="${listGenre}">
+                                    <label class="genre-card">
+
+                                        <input type="checkbox"
+                                               name="genres"
+                                               value="${g.genreId}"
+                                               ${fn:contains(selectedGenres, g.genreId) ? 'checked' : ''}>
+
+                                        <span class="genre-name">${g.name}</span>
+
+                                    </label>
+                                </c:forEach>
+
+                            </div>
 
                             <label>Price *</label>
 
@@ -349,7 +408,16 @@
         </div>
 
         <script>
+            document.querySelectorAll('.genre-card input').forEach(input => {
+                input.addEventListener('change', function () {
+                    this.parentElement.classList.toggle('active', this.checked);
+                });
 
+                // auto active khi load (checked sẵn)
+                if (input.checked) {
+                    input.parentElement.classList.add('active');
+                }
+            });
             function nextStep(step) {
 
                 if (step === 1) {

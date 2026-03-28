@@ -4,6 +4,7 @@ import com.fivepigs.app.dao.FeedbackDao;
 import com.fivepigs.app.dao.NotificationDao;
 import com.fivepigs.app.dao.UserDao;
 import com.fivepigs.app.model.User;
+import com.fivepigs.app.util.PasswordUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -107,13 +108,15 @@ public class SettingsServlet extends HttpServlet {
             return;
         }
 
-        if (!currentPassword.equals(latest.getPassword())) {
+        String currentPasswordHash = PasswordUtil.sha256(currentPassword);
+        if (!currentPasswordHash.equals(latest.getPassword())) {
             response.sendRedirect(redirectBase + "&msg=wrong_current_password");
             return;
         }
 
-        userDao.updatePassword(sessionUser.getEmail(), newPassword);
-        latest.setPassword(newPassword);
+        String newPasswordHash = PasswordUtil.sha256(newPassword);
+        userDao.updatePassword(sessionUser.getEmail(), newPasswordHash);
+        latest.setPassword(newPasswordHash);
         request.getSession().setAttribute("user", latest);
         response.sendRedirect(redirectBase + "&msg=password_updated");
     }

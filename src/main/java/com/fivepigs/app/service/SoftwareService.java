@@ -9,6 +9,7 @@ package com.fivepigs.app.service;
  * @author MinhPD
  */
 import com.fivepigs.app.config.Db;
+import com.fivepigs.app.dao.GenreDao;
 import com.fivepigs.app.dao.SoftwareDao;
 import com.fivepigs.app.model.Software;
 import jakarta.servlet.http.Part;
@@ -18,7 +19,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 public class SoftwareService {
-
+    private final GenreDao gdao=new GenreDao();
     private final SoftwareDao dao;
 
     public SoftwareService() {
@@ -155,8 +156,7 @@ public class SoftwareService {
                 softwareId,
                 name,
                 shortDescription,
-                categoryId,
-                price
+                categoryId
         );
 
         dao.updateSoftwareDetail(
@@ -165,5 +165,18 @@ public class SoftwareService {
                 systemRequire,
                 releaseNote
         );
+    }
+
+    public void createDefaultPricing(int softwareId, double price) throws SQLException {
+        dao.insertDefaultPricing(softwareId, price);
+    }
+
+    public void updatePricingAfterResubmit(int softwareId, double price) throws SQLException {
+        dao.updatePricingAfterResubmit(softwareId, price);
+    }
+
+    public void updateSoftwareGenres(int softwareId, String[] genreIds) throws SQLException {
+        gdao.deleteSoftwareGenres(softwareId);
+        gdao.addSoftwareGenres(softwareId, genreIds);
     }
 }
