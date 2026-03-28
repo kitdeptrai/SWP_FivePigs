@@ -1555,7 +1555,7 @@ body {
 .notification-title-row-customer h3 {
     margin: 0;
     font-size: 18px;
-    font-weight: 800;
+    font-weight: 600;
     color: #1f2937;
 }
 
@@ -1563,10 +1563,19 @@ body {
     margin: 0 0 8px;
     color: #5f6980;
     line-height: 1.55;
+    font-weight: 400;
 }
 
 .notification-content-customer small {
     color: #97a0b5;
+}
+
+.notification-card-customer.unread .notification-title-row-customer h3,
+.notification-card-customer.unread .notification-content-customer p,
+.notification-card-customer.unread .notification-content-customer small{
+    font-weight: 3000;
+  font-weight: bold;
+  color: black;
 }
 
 .notification-pill-customer {

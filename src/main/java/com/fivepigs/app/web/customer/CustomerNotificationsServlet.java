@@ -46,6 +46,7 @@ public class CustomerNotificationsServlet extends HttpServlet {
         String selectedOrder = normalizeOrder(request.getParameter("order"));
         if ("markAllRead".equals(action)) {
             notificationDao.markAllRead(user.getUserId());
+
         } else if ("delete".equals(action)) {
             Integer notificationId = parseInt(request.getParameter("notificationId"));
             if (notificationId != null) {
@@ -53,7 +54,7 @@ public class CustomerNotificationsServlet extends HttpServlet {
             }
         } else if ("deleteAll".equals(action)) {
             notificationDao.deleteAll(user.getUserId());
-        }
+        } else if("readmark".equals(action))
         response.sendRedirect(request.getContextPath() + "/notifications?order=" + selectedOrder);
     }
 

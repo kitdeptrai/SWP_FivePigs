@@ -36,7 +36,6 @@ public class Software {
     private Integer pricingId;
     private String planName;
     private Integer planMaxUsers;
-    private Integer durationDays;
     private Double price;
     private Integer isFree;
     private String status;
@@ -269,14 +268,6 @@ public class Software {
 
     public void setPlanMaxUsers(Integer planMaxUsers) {
         this.planMaxUsers = planMaxUsers;
-    }
-
-    public Integer getDurationDays() {
-        return durationDays;
-    }
-
-    public void setDurationDays(Integer durationDays) {
-        this.durationDays = durationDays;
     }
 
     public Double getPrice() {

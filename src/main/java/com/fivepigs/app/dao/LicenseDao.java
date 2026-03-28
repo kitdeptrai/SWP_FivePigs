@@ -210,9 +210,7 @@ public class LicenseDao {
                 }
 
                 int maxUsers = demoPricing.getMaxUsers() == null || demoPricing.getMaxUsers() <= 0 ? 1 : demoPricing.getMaxUsers();
-                LocalDateTime expireAt = demoPricing.getDurationDays() == null || demoPricing.getDurationDays() <= 0
-                        ? null
-                        : LocalDateTime.now().plusDays(demoPricing.getDurationDays());
+                LocalDateTime expireAt = LocalDateTime.now().plusDays(3);
 
                 int licenseId;
                 try (PreparedStatement ps = c.prepareStatement(

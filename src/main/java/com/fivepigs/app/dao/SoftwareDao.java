@@ -944,6 +944,46 @@ public class SoftwareDao {
         return list;
     }
 
+    public Software getRandomSoftwareWithIcon() throws SQLException {
+        String sql =
+                "SELECT s.*, " + CUSTOMER_PRICE_SQL + ", si.image_url AS icon_url " +
+                        "FROM fivepigs.software s " +
+                        "LEFT JOIN fivepigs.software_image si " +
+                        "  ON s.software_id = si.software_id AND si.is_thumbnail = 1 " +
+                        "ORDER BY RAND() LIMIT 1";
+
+        try (Connection c = Db.getConnection();
+             PreparedStatement st = c.prepareStatement(sql);
+             ResultSet rs = st.executeQuery()) {
+            if (rs.next()) {
+                return mapSoftwareCard(rs);
+            }
+        }
+        return null;
+    }
+
+
+
+    public Software getTopDownloadedWithIcon() throws SQLException {
+        String sql =
+                "SELECT s.*, " + CUSTOMER_PRICE_SQL + ", si.image_url AS icon_url " +
+                        "FROM fivepigs.software s " +
+                        "LEFT JOIN fivepigs.software_image si " +
+                        "  ON s.software_id = si.software_id AND si.is_thumbnail = 1 " +
+                        "ORDER BY s.download_count DESC, s.avg_rating DESC, s.software_id DESC " +
+                        "LIMIT 1";
+
+        try (Connection c = Db.getConnection();
+             PreparedStatement st = c.prepareStatement(sql);
+             ResultSet rs = st.executeQuery()) {
+            if (rs.next()) {
+                return mapSoftwareCard(rs);
+            }
+        }
+        return null;
+    }
+
+
     public List<Software> getTopDownloadWithIcon(int limit) throws SQLException {
         String sql
                 = "SELECT s.*, " + CUSTOMER_PRICE_SQL + ", img.image_url AS icon_url "

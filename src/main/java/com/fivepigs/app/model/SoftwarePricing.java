@@ -17,10 +17,10 @@ public class SoftwarePricing {
 //    price DECIMAL(10,2) NOT NULL,
 //    is_active TINYINT(1) DEFAULT 1,
 //    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-//    
+//
 //    FOREIGN KEY (software_id) REFERENCES Software(software_id)
 //);
-    
+
 
     private Integer pricingId;
     private Integer softwareId;
@@ -32,7 +32,7 @@ public class SoftwarePricing {
     private Integer isActive;
     private LocalDateTime createdAt;
 
-    
+
 
 
     public Integer getPricingId() {
@@ -102,7 +102,7 @@ public class SoftwarePricing {
         this.createdAt = createdAt;
     }
 
- 
-    
+
+
 
 }
