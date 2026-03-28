@@ -51,6 +51,7 @@ public class VNPayReturnServlet extends HttpServlet {
 
                     userDao.updateRoleByUserId(user.getUserId(), vendorRoleId);
                     user.setRoleId(vendorRoleId);
+                    user.setRoleName("Vendor");
                     if (session != null) {
                         session.setAttribute("user", user);
                         session.setAttribute("roleName", "Vendor");
