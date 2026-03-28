@@ -4,6 +4,7 @@
  */
 package com.fivepigs.app.web.vendor;
 
+import com.fivepigs.app.dao.GenreDao;
 import com.fivepigs.app.dao.SoftwareDao;
 import com.fivepigs.app.model.Software;
 import com.fivepigs.app.model.User;
@@ -19,8 +20,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part;
 import java.io.File;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collection;
+import com.fivepigs.app.config.Db;
+import java.sql.PreparedStatement;
 
 /**
  *
@@ -42,10 +46,11 @@ public class VendorResubmitProductServlet extends HttpServlet {
             throws ServletException, IOException {
         try {
             Integer softwareId = Integer.parseInt(request.getParameter("softwareId"));
+            GenreDao gdao = new GenreDao();
             SoftwareDao swdao = new SoftwareDao();
             Software software = swdao.getSoftwareDetailBySoftwareIdVendor(softwareId);
             request.setAttribute("softwareId", softwareId);
-
+            request.setAttribute("listGenre", gdao.getAllGenre());
             request.setAttribute("software", software);
 
             request.getRequestDispatcher("/WEB-INF/views/vendor/resubmit_product.jsp").forward(request, response);
@@ -74,7 +79,7 @@ public class VendorResubmitProductServlet extends HttpServlet {
             String systemRequire = request.getParameter("systemRequire");
             String categoryParam = request.getParameter("category");
             String priceParam = request.getParameter("price");
-
+            String[] genreIds = request.getParameterValues("genres");
             // ===== VALIDATE =====
             String validationError = softwareService.validateUpload(
                     name, description, priceParam, categoryParam
@@ -87,7 +92,7 @@ public class VendorResubmitProductServlet extends HttpServlet {
 
             int categoryId = Integer.parseInt(categoryParam);
             double price = Double.parseDouble(priceParam);
-            
+
             Part softwareFile = request.getPart("softwareFile");
             Part thumbnail = request.getPart("thumbnail");
             String fileError = softwareService.validateFiles(softwareFile, thumbnail);
@@ -101,9 +106,9 @@ public class VendorResubmitProductServlet extends HttpServlet {
                     softwareId,
                     name,
                     shortDesc,
-                    categoryId,
-                    price
+                    categoryId
             );
+            softwareService.updatePricingAfterResubmit(softwareId, price);
 
             // ===== UPDATE DETAIL =====
             softwareDao.updateSoftwareDetail(
@@ -112,7 +117,9 @@ public class VendorResubmitProductServlet extends HttpServlet {
                     systemRequire,
                     releaseNote
             );
-
+            if (genreIds != null) {
+                softwareService.updateSoftwareGenres(softwareId, genreIds);
+            }
             // ===== FILES =====
             // ===== NEW THUMBNAIL =====
             if (thumbnail != null && thumbnail.getSize() > 0) {
@@ -155,7 +162,12 @@ public class VendorResubmitProductServlet extends HttpServlet {
                         softwareFile.getSize()
                 );
             }
+            int reviewerId = 2; // TODO: sau này query role
 
+            String title = "Software resubmitted - " + name;
+            String content = "Software \"" + name + "\" has been resubmitted after rejection and is waiting for review.";
+
+            insertNotification(reviewerId, title, content);
             response.sendRedirect(
                     request.getContextPath()
                     + "/vendor/product_detail?softwareId=" + softwareId
@@ -215,5 +227,21 @@ public class VendorResubmitProductServlet extends HttpServlet {
         filePart.write(fullPath);
 
         return "uploads/" + folder + "/" + fileName;
+    }
+
+    private void insertNotification(int userId, String title, String content) throws Exception {
+
+        String sql = "INSERT INTO Notification "
+                + "(user_id, title, content, is_read, type, priority, related_url) "
+                + "VALUES (?, ?, ?, 0, 'RESUBMITTED', 'HIGH', '/reviewer_pending')";
+
+        try (Connection conn = Db.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+            ps.setString(2, title);
+            ps.setString(3, content);
+
+            ps.executeUpdate();
+        }
     }
 }

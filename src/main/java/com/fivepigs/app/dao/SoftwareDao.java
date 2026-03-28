@@ -605,7 +605,7 @@ public class SoftwareDao {
         return null;
     }
 
-     public Software getSoftwareDetailBySoftwareId(int softwareId) throws SQLException {
+    public Software getSoftwareDetailBySoftwareId(int softwareId) throws SQLException {
         String sql = """
                 SELECT s.software_id,
                        s.name,
@@ -739,10 +739,11 @@ public class SoftwareDao {
     }
 
     private final String Get_All_Product = "SELECT s.*, " + CUSTOMER_PRICE_SQL + " FROM fivepigs.software s";
-    private final String GET_SOFTWARE_BY_ID = "SELECT s.*, " + CUSTOMER_PRICE_SQL + " FROM fivepigs.software s\n" +
-            "WHERE software_id = ?";
-    private final String Get_SoftwareImage_By_Id = "SELECT * FROM fivepigs.software_image\n" +
-            "WHERE software_id = ?";
+    private final String GET_SOFTWARE_BY_ID = "SELECT s.*, " + CUSTOMER_PRICE_SQL + " FROM fivepigs.software s\n"
+            + "WHERE software_id = ?";
+    private final String Get_SoftwareImage_By_Id = "SELECT * FROM fivepigs.software_image\n"
+            + "WHERE software_id = ?";
+
     public List<Software> GET_ALL_SOFTWARE() throws SQLException {
         List<Software> list = new ArrayList<>();
         try (Connection c = Db.getConnection(); PreparedStatement st = c.prepareStatement(Get_All_Product); ResultSet rs = st.executeQuery()) {
@@ -944,17 +945,16 @@ public class SoftwareDao {
     }
 
     public List<Software> getTopDownloadWithIcon(int limit) throws SQLException {
-        String sql =
-                "SELECT s.*, " + CUSTOMER_PRICE_SQL + ", img.image_url AS icon_url " +
-                        "FROM fivepigs.software s " +
-                        "LEFT JOIN fivepigs.software_image img " +
-                        "  ON s.software_id = img.software_id AND img.is_thumbnail = 1 " +
-                        "ORDER BY s.download_count DESC " +
-                        "LIMIT ?";
+        String sql
+                = "SELECT s.*, " + CUSTOMER_PRICE_SQL + ", img.image_url AS icon_url "
+                + "FROM fivepigs.software s "
+                + "LEFT JOIN fivepigs.software_image img "
+                + "  ON s.software_id = img.software_id AND img.is_thumbnail = 1 "
+                + "ORDER BY s.download_count DESC "
+                + "LIMIT ?";
 
         List<Software> list = new ArrayList<>();
-        try (Connection c = Db.getConnection();
-             PreparedStatement st = c.prepareStatement(sql)) {
+        try (Connection c = Db.getConnection(); PreparedStatement st = c.prepareStatement(sql)) {
             st.setInt(1, limit);
             try (ResultSet rs = st.executeQuery()) {
                 while (rs.next()) {
@@ -972,7 +972,6 @@ public class SoftwareDao {
         }
         return list;
     }
-
 
     public List<Software> getBestSellingWithIcon(int limit) throws SQLException {
         String sql = """
@@ -1164,16 +1163,15 @@ public class SoftwareDao {
     public List<String> getGenresByCategory(int categoryId) throws SQLException {
         List<String> list = new ArrayList<>();
 
-        String sql =
-                "SELECT DISTINCT g.name " +
-                        "FROM fivepigs.genre g " +
-                        "JOIN fivepigs.software_genre sg ON g.genre_id = sg.genre_id " +
-                        "JOIN fivepigs.software s ON sg.software_id = s.software_id " +
-                        "WHERE s.category_id = ? " +
-                        "ORDER BY g.name";
+        String sql
+                = "SELECT DISTINCT g.name "
+                + "FROM fivepigs.genre g "
+                + "JOIN fivepigs.software_genre sg ON g.genre_id = sg.genre_id "
+                + "JOIN fivepigs.software s ON sg.software_id = s.software_id "
+                + "WHERE s.category_id = ? "
+                + "ORDER BY g.name";
 
-        try (Connection c = Db.getConnection();
-             PreparedStatement st = c.prepareStatement(sql)) {
+        try (Connection c = Db.getConnection(); PreparedStatement st = c.prepareStatement(sql)) {
 
             st.setInt(1, categoryId);
             ResultSet rs = st.executeQuery();
@@ -1186,22 +1184,20 @@ public class SoftwareDao {
         return list;
     }
 
-
-     public List<Software> getSoftwareByCategoryAndGenre(int categoryId, String genreName) throws SQLException {
+    public List<Software> getSoftwareByCategoryAndGenre(int categoryId, String genreName) throws SQLException {
         List<Software> list = new ArrayList<>();
 
-        String sql =
-                "SELECT s.*, " + CUSTOMER_PRICE_SQL + ", si.image_url AS icon_url " +
-                        "FROM fivepigs.software s " +
-                        "JOIN fivepigs.software_genre sg ON s.software_id = sg.software_id " +
-                        "JOIN fivepigs.genre g ON sg.genre_id = g.genre_id " +
-                        "LEFT JOIN fivepigs.software_image si " +
-                        "ON s.software_id = si.software_id AND si.is_thumbnail = 1 " +
-                        "WHERE s.category_id = ? AND g.name = ? " +
-                        "ORDER BY s.download_count DESC";
+        String sql
+                = "SELECT s.*, " + CUSTOMER_PRICE_SQL + ", si.image_url AS icon_url "
+                + "FROM fivepigs.software s "
+                + "JOIN fivepigs.software_genre sg ON s.software_id = sg.software_id "
+                + "JOIN fivepigs.genre g ON sg.genre_id = g.genre_id "
+                + "LEFT JOIN fivepigs.software_image si "
+                + "ON s.software_id = si.software_id AND si.is_thumbnail = 1 "
+                + "WHERE s.category_id = ? AND g.name = ? "
+                + "ORDER BY s.download_count DESC";
 
-        try (Connection c = Db.getConnection();
-             PreparedStatement st = c.prepareStatement(sql)) {
+        try (Connection c = Db.getConnection(); PreparedStatement st = c.prepareStatement(sql)) {
 
             st.setInt(1, categoryId);
             st.setString(2, genreName);
@@ -1236,15 +1232,14 @@ public class SoftwareDao {
     }
 
     public List<SoftwarePricing> getActivePricingBySoftwareId(int softwareId) throws SQLException {
-        String sql = "SELECT pricing_id, software_id, plan_name, max_users, price, is_active, created_at " +
-                "FROM fivepigs.software_pricing " +
-                "WHERE software_id = ? AND is_active = 1 " +
-                "  AND UPPER(COALESCE(plan_name, '')) <> 'DEMO' " +
-                "ORDER BY price ASC, pricing_id ASC";
+        String sql = "SELECT pricing_id, software_id, plan_name, max_users, price, is_active, created_at "
+                + "FROM fivepigs.software_pricing "
+                + "WHERE software_id = ? AND is_active = 1 "
+                + "  AND UPPER(COALESCE(plan_name, '')) <> 'DEMO' "
+                + "ORDER BY price ASC, pricing_id ASC";
 
         List<SoftwarePricing> list = new ArrayList<>();
-        try (Connection c = Db.getConnection();
-             PreparedStatement st = c.prepareStatement(sql)) {
+        try (Connection c = Db.getConnection(); PreparedStatement st = c.prepareStatement(sql)) {
             st.setInt(1, softwareId);
             try (ResultSet rs = st.executeQuery()) {
                 while (rs.next()) {
@@ -1272,14 +1267,14 @@ public class SoftwareDao {
         }
         return list;
     }
-    public SoftwarePricing getDemoPricingBySoftwareId(int softwareId) throws SQLException {
-        String sql = "SELECT pricing_id, software_id, plan_name, max_users, price, is_active, created_at " +
-                "FROM fivepigs.software_pricing " +
-                "WHERE software_id = ? AND is_active = 1 AND UPPER(COALESCE(plan_name, '')) = 'DEMO' " +
-                "ORDER BY pricing_id ASC LIMIT 1";
 
-        try (Connection c = Db.getConnection();
-             PreparedStatement st = c.prepareStatement(sql)) {
+    public SoftwarePricing getDemoPricingBySoftwareId(int softwareId) throws SQLException {
+        String sql = "SELECT pricing_id, software_id, plan_name, max_users, price, is_active, created_at "
+                + "FROM fivepigs.software_pricing "
+                + "WHERE software_id = ? AND is_active = 1 AND UPPER(COALESCE(plan_name, '')) = 'DEMO' "
+                + "ORDER BY pricing_id ASC LIMIT 1";
+
+        try (Connection c = Db.getConnection(); PreparedStatement st = c.prepareStatement(sql)) {
             st.setInt(1, softwareId);
             try (ResultSet rs = st.executeQuery()) {
                 if (rs.next()) {
@@ -1575,11 +1570,11 @@ public class SoftwareDao {
     }
 
     public void updateSoftware(int id, String name,
-            String shortDesc, int categoryId, double price) throws SQLException {
+            String shortDesc, int categoryId) throws SQLException {
 
         String sql = """
                     UPDATE Software
-                    SET name=?, short_description=?, category_id=?, price=?, status='PENDING_REVIEW'
+                    SET name=?, short_description=?, category_id=?, status='PENDING_REVIEW'
                     WHERE software_id=?
                 """;
 
@@ -1588,8 +1583,7 @@ public class SoftwareDao {
             ps.setString(1, name);
             ps.setString(2, shortDesc);
             ps.setInt(3, categoryId);
-            ps.setDouble(4, price);
-            ps.setInt(5, id);
+            ps.setInt(4, id);
 
             ps.executeUpdate();
         }
@@ -1853,6 +1847,7 @@ public class SoftwareDao {
 
         return list;
     }
+
     public List<Software> getLibraryByUserIdWithIcon(int userId, String sortBy, String sortDir) throws SQLException {
         String orderBy = "lib.last_purchase DESC, s.software_id DESC";
         if ("name".equalsIgnoreCase(sortBy)) {
@@ -1898,6 +1893,7 @@ public class SoftwareDao {
         }
         return list;
     }
+
     private Software mapSoftwareCard(ResultSet rs) throws SQLException {
         Software sw = new Software();
         sw.setSoftwareId(rs.getInt("software_id"));
@@ -1910,18 +1906,18 @@ public class SoftwareDao {
         sw.setIconUrl(rs.getString("icon_url"));
         return sw;
     }
-    public Software getTopDownloadedByCategoryWithIcon(int categoryId) throws SQLException {
-        String sql =
-                "SELECT s.*, " + CUSTOMER_PRICE_SQL + ", si.image_url AS icon_url " +
-                        "FROM fivepigs.software s " +
-                        "LEFT JOIN fivepigs.software_image si " +
-                        "  ON s.software_id = si.software_id AND si.is_thumbnail = 1 " +
-                        "WHERE s.category_id = ? " +
-                        "ORDER BY s.download_count DESC, s.avg_rating DESC, s.software_id DESC " +
-                        "LIMIT 1";
 
-        try (Connection c = Db.getConnection();
-             PreparedStatement st = c.prepareStatement(sql)) {
+    public Software getTopDownloadedByCategoryWithIcon(int categoryId) throws SQLException {
+        String sql
+                = "SELECT s.*, " + CUSTOMER_PRICE_SQL + ", si.image_url AS icon_url "
+                + "FROM fivepigs.software s "
+                + "LEFT JOIN fivepigs.software_image si "
+                + "  ON s.software_id = si.software_id AND si.is_thumbnail = 1 "
+                + "WHERE s.category_id = ? "
+                + "ORDER BY s.download_count DESC, s.avg_rating DESC, s.software_id DESC "
+                + "LIMIT 1";
+
+        try (Connection c = Db.getConnection(); PreparedStatement st = c.prepareStatement(sql)) {
 
             st.setInt(1, categoryId);
             try (ResultSet rs = st.executeQuery()) {
@@ -1941,18 +1937,17 @@ public class SoftwareDao {
         }
         return null;
     }
-    
-    public Software getRandomSoftwareByCategoryWithIcon(int categoryId) throws SQLException {
-        String sql =
-                "SELECT s.*, " + CUSTOMER_PRICE_SQL + ", si.image_url AS icon_url " +
-                        "FROM fivepigs.software s " +
-                        "LEFT JOIN fivepigs.software_image si " +
-                        "  ON s.software_id = si.software_id AND si.is_thumbnail = 1 " +
-                        "WHERE s.category_id = ? " +
-                        "ORDER BY RAND() LIMIT 1";
 
-        try (Connection c = Db.getConnection();
-             PreparedStatement st = c.prepareStatement(sql)) {
+    public Software getRandomSoftwareByCategoryWithIcon(int categoryId) throws SQLException {
+        String sql
+                = "SELECT s.*, " + CUSTOMER_PRICE_SQL + ", si.image_url AS icon_url "
+                + "FROM fivepigs.software s "
+                + "LEFT JOIN fivepigs.software_image si "
+                + "  ON s.software_id = si.software_id AND si.is_thumbnail = 1 "
+                + "WHERE s.category_id = ? "
+                + "ORDER BY RAND() LIMIT 1";
+
+        try (Connection c = Db.getConnection(); PreparedStatement st = c.prepareStatement(sql)) {
             st.setInt(1, categoryId);
             try (ResultSet rs = st.executeQuery()) {
                 if (rs.next()) {
@@ -1962,5 +1957,90 @@ public class SoftwareDao {
         }
         return null;
     }
-    
+
+    public void insertDefaultPricing(int softwareId, double price) throws SQLException {
+
+        String sql = "INSERT INTO Software_Pricing (software_id, plan_name, max_users, price) VALUES (?, ?, ?, ?)";
+
+        try (Connection conn = Db.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            // ===== BASIC PLAN =====
+            ps.setInt(1, softwareId);
+            ps.setString(2, "BASIC");
+            ps.setInt(3, 1); // default user
+            ps.setDouble(4, price);
+            ps.executeUpdate();
+
+            // ===== DEMO PLAN (only if paid) =====
+            if (price > 0) {
+                ps.setInt(1, softwareId);
+                ps.setString(2, "DEMO");
+                ps.setInt(3, 1);
+                ps.setDouble(4, 0);
+                ps.executeUpdate();
+            }
+        }
+    }
+
+    public void updatePricingAfterResubmit(int softwareId, double price) throws SQLException {
+
+        try (Connection conn = Db.getConnection()) {
+
+            // 1. Update BASIC
+            String updateBasic = """
+            UPDATE Software_Pricing
+            SET price = ?
+            WHERE software_id = ? AND plan_name = 'BASIC'
+        """;
+
+            try (PreparedStatement ps = conn.prepareStatement(updateBasic)) {
+                ps.setDouble(1, price);
+                ps.setInt(2, softwareId);
+                ps.executeUpdate();
+            }
+
+            // 2. Check DEMO tồn tại chưa
+            String checkDemo = """
+            SELECT COUNT(*) FROM Software_Pricing
+            WHERE software_id = ? AND plan_name = 'DEMO'
+        """;
+
+            boolean hasDemo = false;
+
+            try (PreparedStatement ps = conn.prepareStatement(checkDemo)) {
+                ps.setInt(1, softwareId);
+                var rs = ps.executeQuery();
+                if (rs.next()) {
+                    hasDemo = rs.getInt(1) > 0;
+                }
+            }
+
+            // 3. Nếu có giá > 0 mà chưa có DEMO → insert
+            if (price > 0 && !hasDemo) {
+                String insertDemo = """
+                INSERT INTO Software_Pricing (software_id, plan_name, max_users, price)
+                VALUES (?, 'DEMO', 1, 0)
+            """;
+
+                try (PreparedStatement ps = conn.prepareStatement(insertDemo)) {
+                    ps.setInt(1, softwareId);
+                    ps.executeUpdate();
+                }
+            }
+
+            // 4. Nếu price = 0 → có thể xoá DEMO (optional)
+            if (price == 0 && hasDemo) {
+                String deleteDemo = """
+                DELETE FROM Software_Pricing
+                WHERE software_id = ? AND plan_name = 'DEMO'
+            """;
+
+                try (PreparedStatement ps = conn.prepareStatement(deleteDemo)) {
+                    ps.setInt(1, softwareId);
+                    ps.executeUpdate();
+                }
+            }
+        }
+    }
+
 }
