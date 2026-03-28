@@ -61,12 +61,13 @@ public class CartServlet extends HttpServlet {
         try {
             if ("add".equals(action)) {
                 Integer softwareId = parseInt(param(request, "softwareId"));
+                Integer pricingId = parseInt(param(request, "pricingId"));
                 if (softwareId == null) {
                     softwareId = parseInt(param(request, "appId"));
                 }
 
                 if (softwareId != null) {
-                    boolean added = cartDao.addToCart(userId, softwareId);
+                    boolean added = cartDao.addToCart(userId, softwareId, pricingId);
                     redirect = appendMsg(redirect, added ? "added" : "exists");
                 }
                 response.sendRedirect(redirect);
