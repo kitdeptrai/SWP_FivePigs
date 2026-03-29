@@ -303,7 +303,7 @@
                 <!-- ===== TABLE ===== -->
                 <div class="table-card">
 
-                    <table class="dashboard-table">
+                    <table class="license-table">
                         <thead>
                             <tr>
                                 <th>License Key</th>
@@ -381,10 +381,18 @@
 
                                     <!-- ACTION -->
                                     <td class="actions">
+
+                                        <!-- View Users -->
+                                        <a href="${pageContext.request.contextPath}/vendor/user_license_management?licenseId=${l.licenseId}"
+                                           class="action-btn"
+                                           title="Manage Users">
+                                            <i class="fa-solid fa-users"></i>
+                                        </a>
+
+                                        <!-- Revoke -->
                                         <c:if test="${l.status != 'REVOKED'}">
                                             <form action="${pageContext.request.contextPath}/change_status_license"
                                                   method="post" style="display:inline;">
-
                                                 <input type="hidden" name="licenseId" value="${l.licenseId}">
                                                 <input type="hidden" name="status" value="REVOKED">
 
@@ -393,6 +401,7 @@
                                                 </button>
                                             </form>
                                         </c:if>
+
                                     </td>
 
                                 </tr>

@@ -75,7 +75,7 @@
                                 <input type="hidden" name="order" value="${selectedOrder}">
                                 <input type="hidden" name="action" value="delete">
                                 <input type="hidden" name="notificationId" value="${n.notificationId}">
-                                <button type="submit" name="readmark" class="install-btn" style="padding:10px 18px; box-shadow:none;>Mark read</button>
+                                <button type="submit" name="readmark" class="install-btn" style="padding:10px 18px; box-shadow:none;">Mark read</button>
                                 <button type="submit" class="library-report-cancel" style="padding:8px 12px;">Delete</button>
                             </form>
                         </div>
