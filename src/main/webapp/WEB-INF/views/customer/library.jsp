@@ -92,7 +92,7 @@
                             <div class="lib-thumb ${loop.index % 3 == 0 ? 'bg-mc' : (loop.index % 3 == 1 ? 'bg-cod' : 'bg-music')}">
                                 <c:choose>
                                     <c:when test="${not empty sw.iconUrl}">
-                                        <img src="${pageContext.request.contextPath}/assets/${sw.iconUrl}" alt="${sw.name}"
+                                        <img src="${pageContext.request.contextPath}/${sw.iconUrl}" alt="${sw.name}"
                                              style="width:68px;height:68px;border-radius:14px;object-fit:cover;box-shadow:0 8px 18px rgba(0,0,0,.15);">
                                     </c:when>
                                     <c:otherwise>

@@ -80,7 +80,7 @@
                                 <a href="${pageContext.request.contextPath}/product?pid=${featuredApp.softwareId}" style="display:flex; gap:14px; align-items:center; text-decoration:none; color:inherit;">
                                     <c:choose>
                                         <c:when test="${not empty featuredApp.iconUrl}">
-                                            <img src="${pageContext.request.contextPath}/assets/${featuredApp.iconUrl}" alt="${featuredApp.name}" style="width:68px; height:68px; object-fit:cover; border-radius:16px; background:rgba(255,255,255,0.12);">
+                                            <img src="${pageContext.request.contextPath}/${featuredApp.iconUrl}" alt="${featuredApp.name}" style="width:68px; height:68px; object-fit:cover; border-radius:16px; background:rgba(255,255,255,0.12);">
                                         </c:when>
                                         <c:otherwise>
                                             <img src="${pageContext.request.contextPath}/assets/images/default_icon.png" alt="${featuredApp.name}" style="width:68px; height:68px; object-fit:cover; border-radius:16px; background:rgba(255,255,255,0.12);">
@@ -159,7 +159,7 @@
                                     <a href="${pageContext.request.contextPath}/product?pid=${sw.softwareId}" class="app-list-item filtered-app-card">
                                         <c:choose>
                                             <c:when test="${not empty sw.iconUrl}">
-                                                <img src="${pageContext.request.contextPath}/assets/${sw.iconUrl}" class="app-icon-lg">
+                                                <img src="${pageContext.request.contextPath}/${sw.iconUrl}" class="app-icon-lg">
                                             </c:when>
                                             <c:otherwise>
                                                 <img src="${pageContext.request.contextPath}/assets/images/default_icon.png" class="app-icon-lg">
@@ -206,7 +206,7 @@
                                 <a href="${pageContext.request.contextPath}/product?pid=${sw.softwareId}" class="app-list-item">
                                     <c:choose>
                                         <c:when test="${not empty sw.iconUrl}">
-                                            <img src="${pageContext.request.contextPath}/assets/${sw.iconUrl}" class="app-icon-lg">
+                                            <img src="${pageContext.request.contextPath}/${sw.iconUrl}" class="app-icon-lg">
                                         </c:when>
                                         <c:otherwise>
                                             <img src="${pageContext.request.contextPath}/assets/images/default_icon.png" class="app-icon-lg">

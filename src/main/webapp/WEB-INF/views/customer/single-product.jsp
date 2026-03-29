@@ -67,7 +67,7 @@
         <div class="product-hero">
             <c:choose>
                 <c:when test="${not empty icon}">
-                    <img src="${pageContext.request.contextPath}/assets/${icon.imageUrl}" class="hero-icon" alt="${detail.name} Icon">
+                    <img src="${pageContext.request.contextPath}/${icon.imageUrl}" class="hero-icon" alt="${detail.name} Icon">
                 </c:when>
                 <c:otherwise>
                     <div class="hero-icon" style="display:flex;align-items:center;justify-content:center;background:#f5f6fb;">
@@ -160,7 +160,7 @@
             <c:choose>
                 <c:when test="${not empty screenshots}">
                     <c:forEach var="img" items="${screenshots}">
-                        <img src="${pageContext.request.contextPath}/assets/${img.imageUrl}" alt="${detail.name} screenshot">
+                        <img src="${pageContext.request.contextPath}/${img.imageUrl}" alt="${detail.name} screenshot">
                     </c:forEach>
                 </c:when>
                 <c:otherwise>

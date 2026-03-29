@@ -67,7 +67,7 @@
                 <div class="sub-banners-row">
                     <c:set var="topAppImage" value="${pageContext.request.contextPath}/assets/images/default_icon.png"/>
                     <c:if test="${not empty topApp and not empty topApp.iconUrl}">
-                        <c:set var="topAppImage" value="${pageContext.request.contextPath}/assets/${topApp.iconUrl}"/>
+                        <c:set var="topAppImage" value="${pageContext.request.contextPath}/${topApp.iconUrl}"/>
                     </c:if>
                     <c:url var="topAppUrl" value="/search"/>
                     <c:if test="${not empty topApp}">
@@ -77,7 +77,7 @@
                     </c:if>
                     <c:set var="topGameImage" value="${pageContext.request.contextPath}/assets/images/default_icon.png"/>
                     <c:if test="${not empty topGame and not empty topGame.iconUrl}">
-                        <c:set var="topGameImage" value="${pageContext.request.contextPath}/assets/${topGame.iconUrl}"/>
+                        <c:set var="topGameImage" value="${pageContext.request.contextPath}/${topGame.iconUrl}"/>
                     </c:if>
                     <c:url var="topGameUrl" value="/search">
                         <c:param name="dept" value="games"/>
@@ -139,7 +139,7 @@
                         <a href="${pageContext.request.contextPath}/product?pid=${sw.softwareId}" class="trend-item" style="text-decoration:none; color:inherit;">
                             <c:choose>
                                 <c:when test="${not empty sw.iconUrl}">
-                                    <img src="${pageContext.request.contextPath}/assets/${sw.iconUrl}" class="trend-icon">
+                                    <img src="${pageContext.request.contextPath}/${sw.iconUrl}" class="trend-icon">
                                 </c:when>
                                 <c:otherwise>
                                     <img src="${pageContext.request.contextPath}/assets/images/default_icon.png" class="trend-icon">
@@ -169,7 +169,7 @@
                         <a href="${pageContext.request.contextPath}/product?pid=${sw.softwareId}" class="trend-item" style="text-decoration:none; color:inherit;">
                             <c:choose>
                                 <c:when test="${not empty sw.iconUrl}">
-                                    <img src="${pageContext.request.contextPath}/assets/${sw.iconUrl}" class="trend-icon">
+                                    <img src="${pageContext.request.contextPath}/${sw.iconUrl}" class="trend-icon">
                                 </c:when>
                                 <c:otherwise>
                                     <img src="${pageContext.request.contextPath}/assets/images/default_icon.png" class="trend-icon">
@@ -199,7 +199,7 @@
                 <a href="${pageContext.request.contextPath}/product?pid=${sw.softwareId}" class="app-list-item">
                     <c:choose>
                         <c:when test="${not empty sw.iconUrl}">
-                            <img src="${pageContext.request.contextPath}/assets/${sw.iconUrl}" class="app-icon-lg">
+                            <img src="${pageContext.request.contextPath}/${sw.iconUrl}" class="app-icon-lg">
                         </c:when>
                         <c:otherwise>
                             <img src="${pageContext.request.contextPath}/assets/images/default_icon.png" class="app-icon-lg">
