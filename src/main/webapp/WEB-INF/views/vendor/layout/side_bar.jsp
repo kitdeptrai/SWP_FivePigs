@@ -33,7 +33,7 @@
 
         <li>
             <a href="/vendor/transaction_management" class="${pageContext.request.requestURI.contains('transaction_management') ? 'active' : ''}">
-                <i class="fa-regular fa-star"></i> Transaction
+                <i class="fa-solid fa-money-bill-wave"></i> Order
             </a>
         </li>
 
