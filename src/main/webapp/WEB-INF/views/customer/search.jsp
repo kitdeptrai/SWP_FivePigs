@@ -78,7 +78,7 @@
                             <a href="${pageContext.request.contextPath}/product?pid=${sw.softwareId}" class="app-list-item" style="padding:12px; border-radius:14px; border:1px solid #eceff6; background:#fff;">
                                 <c:choose>
                                     <c:when test="${not empty sw.iconUrl}">
-                                        <img src="${pageContext.request.contextPath}/assets/${sw.iconUrl}" class="app-icon-lg">
+                                        <img src="${pageContext.request.contextPath}/${sw.iconUrl}" class="app-icon-lg">
                                     </c:when>
                                     <c:otherwise>
                                         <img src="${pageContext.request.contextPath}/assets/images/default_icon.png" class="app-icon-lg">

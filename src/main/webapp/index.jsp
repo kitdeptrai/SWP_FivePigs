@@ -1,1 +1,1 @@
-<% response.sendRedirect(request.getContextPath() + "/customer_dashboard"); %>
+<% response.sendRedirect(request.getContextPath() + "/home"); %>

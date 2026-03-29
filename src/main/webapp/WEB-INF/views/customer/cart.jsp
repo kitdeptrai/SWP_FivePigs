@@ -38,7 +38,7 @@
                         <c:forEach var="item" items="${cartItems}">
                             <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #eee;gap:12px;">
                                 <div style="display:flex;align-items:center;gap:10px;min-width:0;">
-                                    <img src="${pageContext.request.contextPath}/assets/${item.iconUrl}" alt="${item.name}" style="width:54px;height:54px;border-radius:12px;object-fit:cover;" onerror="this.src='${pageContext.request.contextPath}/assets/images/default_icon.png'">
+                                    <img src="${pageContext.request.contextPath}/${item.iconUrl}" alt="${item.name}" style="width:54px;height:54px;border-radius:12px;object-fit:cover;" onerror="this.src='${pageContext.request.contextPath}/assets/images/default_icon.png'">
                                     <div>
                                         <div style="font-weight:700;">${item.name}</div>
                                         <div style="font-size:13px;color:#666;">
