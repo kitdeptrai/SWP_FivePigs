@@ -171,6 +171,63 @@ public class ReviewScoreDao {
         return null;
     }
 
+    public ReviewScore getReviewScoreBySoftwareId(int softwareId) throws SQLException {
+        String sql = """
+            SELECT rs.review_score_id,
+                   rs.software_id,
+                   rs.reviewer_id,
+                   rs.no_malware,
+                   rs.no_copyright_violation,
+                   rs.no_spam_content,
+                   rs.ui_ux_score,
+                   rs.technical_score,
+                   rs.performance_score,
+                   rs.documentation_score,
+                   rs.total_score,
+                   rs.decision,
+                   rs.review_note,
+                   rs.created_at,
+                   u.full_name AS reviewer_name,
+                   s.name AS software_name
+            FROM Review_Score rs
+            JOIN Software s ON rs.software_id = s.software_id
+            LEFT JOIN Users u ON u.user_id = rs.reviewer_id
+            WHERE rs.software_id = ?
+            ORDER BY rs.created_at DESC
+            LIMIT 1
+        """;
+
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, softwareId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    ReviewScore r = new ReviewScore();
+                    r.setReviewScoreId(rs.getInt("review_score_id"));
+                    r.setSoftwareId(rs.getInt("software_id"));
+                    r.setReviewerId(rs.getInt("reviewer_id"));
+                    r.setNoMalware(rs.getInt("no_malware") == 1);
+                    r.setNoCopyrightViolation(rs.getInt("no_copyright_violation") == 1);
+                    r.setNoSpamContent(rs.getInt("no_spam_content") == 1);
+                    r.setUiUxScore(rs.getInt("ui_ux_score"));
+                    r.setTechnicalScore(rs.getInt("technical_score"));
+                    r.setPerformanceScore(rs.getInt("performance_score"));
+                    r.setDocumentationScore(rs.getInt("documentation_score"));
+                    r.setTotalScore(rs.getDouble("total_score"));
+                    r.setDecision(rs.getString("decision"));
+                    r.setReviewNote(rs.getString("review_note"));
+                    r.setSoftwareName(rs.getString("software_name"));
+                    r.setCreatedAt(rs.getTimestamp("created_at"));
+                    r.setReviewerName(rs.getString("reviewer_name"));
+                    return r;
+                }
+            }
+        }
+        return null;
+    }
+
     public int countReviewsByReviewer(int reviewerId) throws SQLException {
         String sql = "SELECT COUNT(*) FROM Review_Score WHERE reviewer_id = ?";
 

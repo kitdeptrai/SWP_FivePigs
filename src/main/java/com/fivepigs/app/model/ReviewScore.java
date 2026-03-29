@@ -14,6 +14,7 @@ public class ReviewScore {
 
     
     private String softwareName;
+    private String reviewerName;
     private String shortDescription;
     private double price;
     private String categoryName;
@@ -31,6 +32,14 @@ public class ReviewScore {
 
     public void setSoftwareName(String softwareName) {
         this.softwareName = softwareName;
+    }
+
+    public String getReviewerName() {
+        return reviewerName;
+    }
+
+    public void setReviewerName(String reviewerName) {
+        this.reviewerName = reviewerName;
     }
 
     public String getShortDescription() {

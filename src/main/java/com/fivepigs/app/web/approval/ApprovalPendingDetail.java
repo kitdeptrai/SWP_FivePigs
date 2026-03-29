@@ -71,10 +71,15 @@ public class ApprovalPendingDetail extends HttpServlet {
 
         try {
             ApprovalDao adao = new ApprovalDao();
+            com.fivepigs.app.dao.ReviewScoreDao reviewScoreDao = new com.fivepigs.app.dao.ReviewScoreDao();
+
             Integer softwareId = Integer.parseInt(request.getParameter("softwareId"));
             Software s = adao.getPendingDetail(softwareId);
+            com.fivepigs.app.model.ReviewScore reviewScore = reviewScoreDao.getReviewScoreBySoftwareId(softwareId);
+
             request.setAttribute("pendingDetail", s);
             request.setAttribute("softwareId", softwareId);
+            request.setAttribute("reviewScore", reviewScore);
             request.getRequestDispatcher("/WEB-INF/views/Approval/approval_pending_detail.jsp")
                     .forward(request, response);
 

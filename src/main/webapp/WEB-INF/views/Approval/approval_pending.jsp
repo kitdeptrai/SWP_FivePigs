@@ -48,7 +48,7 @@
                                  data-name="${it.appName}"
                                  data-reviewer="${it.user.fullName}"
                                  data-category="${it.category.categoryName}"
-                                 data-date="${it.reviewerProcess.reviewed_at}"
+                                 data-date="${it.formattedCreatedAt}"
                                  style="margin-bottom:18px;">
                                 <div class="pending-card-inner">
 
@@ -78,12 +78,12 @@
                                             Reviewed by <b><c:out value="${it.user.fullName}"/></b>
                                         </span>
 
-                                        <!-- Hiển thị thời gian đánh giá -->
+                                        <!-- Hiển thị ngày thêm (created_at) -->
                                         <div class="submitted">
-                                            Submitted
+                                            Added on
                                             <c:choose>
-                                                <c:when test="${it.reviewerProcess != null && it.reviewerProcess.reviewed_at != null}">
-                                                    <c:out value="${it.reviewerProcess.reviewed_at}"/>
+                                                <c:when test="${it.createdAt != null}">
+                                                    <c:out value="${it.formattedCreatedAt}"/>
                                                 </c:when>
                                                 <c:otherwise>—</c:otherwise>
                                             </c:choose>
@@ -99,6 +99,7 @@
                                 </div>
                             </div>
                         </c:forEach>
+
                         <div class="pagination" id="pending-pagination"></div>
                     </div>
                 </div>

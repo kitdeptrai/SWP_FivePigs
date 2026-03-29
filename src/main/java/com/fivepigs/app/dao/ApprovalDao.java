@@ -206,6 +206,7 @@ public class ApprovalDao {
             s.software_id,
             s.name AS app_name,
             s.short_description,
+            s.created_at,
             c.category_name,
             u.full_name AS reviewer_name,
             rp.reviewed_at,
@@ -229,7 +230,7 @@ public class ApprovalDao {
           LEFT JOIN Users u ON u.user_id = rp.reviewer_id
           LEFT JOIN Category c ON c.category_id = s.category_id
           WHERE s.status = 'PENDING_APPROVAL'
-          ORDER BY rp.reviewed_at DESC, s.created_at DESC;        
+          ORDER BY s.created_at DESC;        
     """;
 
         List<Software> list = new ArrayList<>();
@@ -246,6 +247,9 @@ public class ApprovalDao {
                 s.setSoftwareId(rs.getInt("software_id"));
                 s.setAppName(rs.getString("app_name"));
                 s.setShortDescription(rs.getString("short_description"));
+
+                Timestamp createdTs = rs.getTimestamp("created_at");
+                s.setCreatedAt(createdTs != null ? createdTs.toLocalDateTime() : null);
 
                 c.setCategoryName(rs.getString("category_name"));
                 u.setFullName(rs.getString("reviewer_name"));
