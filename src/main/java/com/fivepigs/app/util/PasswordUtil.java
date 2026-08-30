@@ -21,15 +21,5 @@ public final class PasswordUtil {
         }
     }
 
-    // ===== BCrypt (khuyến nghị) =====
-    // Cần dependency: org.mindrot:jbcrypt:0.4
-    //
-    // public static String bcryptHash(String raw) {
-    //     return org.mindrot.jbcrypt.BCrypt.hashpw(raw, org.mindrot.jbcrypt.BCrypt.gensalt(12));
-    // }
-    //
-    // public static boolean bcryptCheck(String raw, String hashed) {
-    //     if (raw == null || hashed == null) return false;
-    //     return org.mindrot.jbcrypt.BCrypt.checkpw(raw, hashed);
-    // }
+
 }

@@ -14,6 +14,7 @@ import java.util.List;
 public class AdminDao {
 
     // ===== Dashboard =====
+    // Lấy toàn bộ user_id có role admin để gửi notification broadcast nội bộ.
 
     public List<Integer> getAdminUserIds() {
         String sql = "SELECT u.user_id FROM users u JOIN role r ON u.role_id = r.role_id WHERE LOWER(r.role_name) IN ('admin')";
@@ -30,6 +31,7 @@ public class AdminDao {
         return adminIds;
     }
 
+    // Doanh thu admin = phí vendor cố định + hoa hồng 10% trên các đơn PAID.
     public double getTotalRevenue() {
         String sql = "SELECT " +
                 "COALESCE((SELECT COUNT(*) * 5.0 " +
@@ -52,6 +54,7 @@ public class AdminDao {
         }
     }
 
+    // Tổng số phần mềm trên hệ thống.
     public int getTotalProducts() {
         String sql = "SELECT COUNT(*) FROM software";
         try (Connection conn = Db.getConnection();
@@ -64,6 +67,7 @@ public class AdminDao {
         }
     }
 
+    // Tổng số người dùng.
     public int getTotalUsers() {
         String sql = "SELECT COUNT(*) FROM users";
         try (Connection conn = Db.getConnection();
@@ -76,6 +80,7 @@ public class AdminDao {
         }
     }
 
+    // Số user đăng ký trong ngày hiện tại (theo DB server time).
     public int getNewUsersToday() {
         String sql = "SELECT COUNT(*) FROM users WHERE DATE(created_at) = CURDATE()";
         try (Connection conn = Db.getConnection();
@@ -88,6 +93,7 @@ public class AdminDao {
         }
     }
 
+    // Tổng lượt tải toàn hệ thống.
     public int getTotalDownloads() {
         String sql = "SELECT COALESCE(SUM(download_count), 0) FROM software";
         try (Connection conn = Db.getConnection();
@@ -100,6 +106,7 @@ public class AdminDao {
         }
     }
 
+    // Đếm report chưa xử lý xong để hiển thị badge cảnh báo cho admin.
     public int getUnreadOrPendingReports() {
         String sql = "SELECT COUNT(*) FROM report WHERE status IN ('UNREAD', 'PENDING')";
         try (Connection conn = Db.getConnection();
@@ -112,6 +119,7 @@ public class AdminDao {
         }
     }
 
+    // Lấy doanh thu 3 tháng gần nhất (đã sort tăng dần theo tháng để dễ vẽ chart).
     public List<RevenueByMonthRow> getRevenueByMonth() {
         String sql = "SELECT * FROM (" +
                 "SELECT DATE_FORMAT(o.order_date, '%Y-%m') AS month_label, COALESCE(SUM(o.total_amount), 0) AS revenue " +
@@ -135,6 +143,7 @@ public class AdminDao {
         return rows;
     }
 
+    // Top 5 ứng dụng theo download_count.
     public List<TopAppRow> getTop5AppsBestSeller() {
         String sql = "SELECT s.name AS app_name, s.download_count " +
                 "FROM software s " +
@@ -156,6 +165,7 @@ public class AdminDao {
         return rows;
     }
 
+    // Đọc cấu hình commission_percent và ép về khoảng 0..20 để tránh dữ liệu lỗi.
     public double getCommissionPercent() {
         String sql = "SELECT config_value FROM fivepigs.system_config WHERE config_key = 'commission_percent' LIMIT 1";
         try (Connection conn = Db.getConnection();
@@ -180,6 +190,7 @@ public class AdminDao {
         return 10.0;
     }
 
+    // Ghi cấu hình commission_percent; nếu chưa có bản ghi thì insert mới.
     public void setCommissionPercent(double commissionPercent, Integer userId) throws SQLException {
         double normalizedPercent = Math.max(0, Math.min(20, commissionPercent));
 
@@ -203,6 +214,7 @@ public class AdminDao {
     }
 
     // ===== Users/Employees Management =====
+    // Kiểm tra email đã tồn tại chưa (dùng khi tạo nhân sự).
 
     public boolean emailExists(String email) {
         String sql = "SELECT 1 FROM users WHERE email = ?";
@@ -218,6 +230,7 @@ public class AdminDao {
         }
     }
 
+    // Tìm role_id từ tên role (không phân biệt hoa/thường).
     public Integer getRoleIdByName(String roleName) {
         // Match role_name case-insensitively
         String sql = "SELECT role_id FROM Role WHERE LOWER(role_name) = LOWER(?)";
@@ -236,6 +249,7 @@ public class AdminDao {
         }
     }
 
+    // Chuẩn hóa role name để xử lý typo "aproval" thành "Approval".
     private static String normalizeRoleName(String roleName) {
         if (roleName == null) return null;
         String r = roleName.trim();
@@ -244,6 +258,7 @@ public class AdminDao {
         return r;
     }
 
+    // Danh sách nhân viên thuộc nhóm reviewer/approval.
     public List<UserRow> listEmployees() {
         // Employees: reviewer + aproval
         String sql = "SELECT u.user_id, u.full_name, u.email, u.phone, u.status, u.created_at, r.role_name " +
@@ -271,6 +286,7 @@ public class AdminDao {
         return rows;
     }
 
+    // Đếm tổng nhân viên theo bộ lọc để tính phân trang.
     public int countEmployees(String keyword, String role, String status) {
         StringBuilder sql = new StringBuilder(
                 "SELECT COUNT(*) FROM users u JOIN role r ON u.role_id = r.role_id " +
@@ -308,6 +324,7 @@ public class AdminDao {
         }
     }
 
+    // Lấy danh sách nhân viên phân trang, dùng chung cho màn admin/employees.
     public List<UserRow> listEmployeesPaged(int limit, int offset, String keyword, String role, String status) {
         StringBuilder sql = new StringBuilder(
                 "SELECT u.user_id, u.full_name, u.email, u.phone, u.status, u.created_at, r.role_name " +
@@ -361,6 +378,7 @@ public class AdminDao {
         return rows;
     }
 
+    // Danh sách user thuộc 2 nhóm chính Customer/Vendor.
     public List<UserRow> listUsers() {
         // Users: Customer + Vendor
         String sql = "SELECT u.user_id, u.full_name, u.email, u.phone, u.status, u.created_at, r.role_name " +
@@ -388,6 +406,7 @@ public class AdminDao {
         return rows;
     }
 
+    // Danh sách vendor phục vụ màn admin/vendors.
     public List<UserRow> listVendors() {
         String sql = "SELECT u.user_id, u.full_name, u.email, u.phone, u.status, u.created_at, r.role_name " +
                 "FROM users u JOIN role r ON u.role_id = r.role_id " +
@@ -414,6 +433,7 @@ public class AdminDao {
         return rows;
     }
 
+    // Đếm vendor theo bộ lọc để tính phân trang.
     public int countVendors(String keyword, String status) {
         StringBuilder sql = new StringBuilder(
                 "SELECT COUNT(*) FROM users u JOIN role r ON u.role_id = r.role_id " +
@@ -447,6 +467,7 @@ public class AdminDao {
         }
     }
 
+    // Lấy danh sách vendor phân trang.
     public List<UserRow> listVendorsPaged(int limit, int offset, String keyword, String status) {
         StringBuilder sql = new StringBuilder(
                 "SELECT u.user_id, u.full_name, u.email, u.phone, u.status, u.created_at, r.role_name " +
@@ -497,6 +518,7 @@ public class AdminDao {
     }
 
     // ===== Products Management =====
+    // Đếm số report sản phẩm theo trạng thái + keyword.
 
     public int countProducts(String keyword, String status) {
         StringBuilder sql = new StringBuilder(
@@ -537,6 +559,7 @@ public class AdminDao {
         }
     }
 
+    // Danh sách report sản phẩm phân trang để admin theo dõi/duyệt.
     public List<AdminProductReportRow> listProductsPaged(int limit, int offset, String keyword, String status) {
         StringBuilder sql = new StringBuilder(
                 "SELECT r.report_id, r.software_id, r.reason, r.status AS report_status, r.created_at AS report_created_at, " +
@@ -595,6 +618,7 @@ public class AdminDao {
         return rows;
     }
 
+    // Cập nhật trạng thái report theo cơ chế optimistic check (fromStatus -> toStatus).
     public boolean updateReportStatus(int reportId, String fromStatus, String toStatus) throws SQLException {
         String sql = "UPDATE report SET status = ? WHERE report_id = ? AND UPPER(status) = ?";
         try (Connection conn = Db.getConnection();
@@ -606,6 +630,7 @@ public class AdminDao {
         }
     }
 
+    // Lấy chi tiết đầy đủ của một report (software, vendor, reporter).
     public AdminReportDetailRow getReportDetail(int reportId) {
         String sql = "SELECT r.report_id, r.software_id, r.reason, r.status AS report_status, r.created_at AS report_created_at, " +
                 "s.name AS software_name, s.status AS software_status, " +
@@ -643,6 +668,7 @@ public class AdminDao {
         return null;
     }
 
+    // Đánh dấu report đã đọc, chỉ update khi chưa phải READ.
     public boolean markReportAsRead(int reportId) throws SQLException {
         String sql = "UPDATE report SET status = 'READ' WHERE report_id = ? AND UPPER(COALESCE(status, '')) <> 'READ'";
         try (Connection conn = Db.getConnection();
@@ -652,6 +678,7 @@ public class AdminDao {
         }
     }
 
+    // Đếm feedback user theo bộ lọc để phân trang.
     public int countUserFeedback(String keyword, String status) {
         StringBuilder sql = new StringBuilder(
                 "SELECT COUNT(*) " +
@@ -689,6 +716,7 @@ public class AdminDao {
         }
     }
 
+    // Danh sách feedback user phân trang cho màn admin/reports.
     public List<AdminUserFeedbackRow> listUserFeedbackPaged(int limit, int offset, String keyword, String status) {
         StringBuilder sql = new StringBuilder(
                 "SELECT uf.feedback_id, uf.subject, uf.message, COALESCE(uf.status, 'NEW') AS feedback_status, uf.created_at AS feedback_created_at, " +
@@ -743,6 +771,7 @@ public class AdminDao {
         return rows;
     }
 
+    // Lấy chi tiết một feedback để xem nội dung và thông tin người gửi.
     public AdminUserFeedbackDetailRow getUserFeedbackDetail(int feedbackId) {
         String sql = "SELECT uf.feedback_id, uf.user_id, uf.subject, uf.message, COALESCE(uf.status, 'NEW') AS feedback_status, uf.created_at AS feedback_created_at, " +
                 "u.full_name AS user_name, u.email AS user_email " +
@@ -773,6 +802,7 @@ public class AdminDao {
         return null;
     }
 
+    // Đánh dấu feedback đã đọc, tránh update lặp khi đã READ.
     public boolean markUserFeedbackAsRead(int feedbackId) throws SQLException {
         String sql = "UPDATE user_feedback SET status = 'READ' WHERE feedback_id = ? AND UPPER(COALESCE(status, 'NEW')) <> 'READ'";
         try (Connection conn = Db.getConnection();
@@ -782,6 +812,7 @@ public class AdminDao {
         }
     }
 
+    // Lấy thông tin chi tiết sản phẩm cho trang admin/product_detail.
     public AdminProductDetailRow getProductDetail(int softwareId) {
         String sql = "SELECT s.software_id, s.name, s.short_description, COALESCE(sp.price, 0) AS price, s.is_free, s.status, s.download_count, s.avg_rating, s.created_at, " +
                 "u.full_name AS vendor_name, c.category_name, sv.version_name, sd.description, sd.system_requirement, si.image_url " +
@@ -824,6 +855,7 @@ public class AdminDao {
         return null;
     }
 
+    // Cập nhật nhanh trạng thái phần mềm (ACTIVE/INACTIVE/...).
     public void updateProductStatus(int softwareId, String status) throws SQLException {
         String sql = "UPDATE software SET status = ? WHERE software_id = ?";
         try (Connection conn = Db.getConnection();
@@ -834,6 +866,7 @@ public class AdminDao {
         }
     }
 
+    // Cập nhật metadata sản phẩm từ form chỉnh sửa admin.
     public void updateProduct(int softwareId, String name, String shortDescription, Integer categoryId, double price, int isFree, String status) throws SQLException {
         String sql = "UPDATE software SET name = ?, short_description = ?, category_id = ?, price = ?, is_free = ?, status = ? WHERE software_id = ?";
         try (Connection conn = Db.getConnection();
@@ -854,6 +887,7 @@ public class AdminDao {
     }
 
     // ===== Payout Management =====
+    // Đếm yêu cầu payout theo trạng thái, từ khóa và khoảng ngày tạo.
 
     public int countVendorPayouts(String status, String keyword, java.sql.Date fromDate, java.sql.Date toDate) {
         StringBuilder sql = new StringBuilder(
@@ -895,6 +929,7 @@ public class AdminDao {
         }
     }
 
+    // Danh sách payout phân trang; cho phép sắp xếp payout_id tăng/giảm.
     public List<VendorPayoutRow> listVendorPayoutsPaged(int limit, int offset, String status, String keyword, java.sql.Date fromDate, java.sql.Date toDate, String sortById) {
         StringBuilder sql = new StringBuilder(
                 "SELECT vp.payout_id, vp.vendor_id, u.full_name AS vendor_name, u.email AS vendor_email, " +
@@ -958,6 +993,7 @@ public class AdminDao {
         return rows;
     }
 
+    // Duyệt payout theo transaction để đảm bảo trạng thái nhất quán khi nhiều admin thao tác.
     public ApprovePayoutResult approveVendorPayout(int payoutId, Integer adminUserId) throws SQLException {
         String selectSql = "SELECT UPPER(status) AS status FROM vendor_payout WHERE payout_id = ?";
         String updateSql = "UPDATE vendor_payout SET status = 'PAID', processed_at = ? WHERE payout_id = ? AND UPPER(status) = 'PENDING'";
@@ -1010,6 +1046,7 @@ public class AdminDao {
     }
 
     // ===== Orders Management =====
+    // Đếm số đơn PAID theo keyword + khoảng ngày.
 
     public int countSuccessfulOrders(String keyword, java.sql.Date fromDate, java.sql.Date toDate) {
         StringBuilder sql = new StringBuilder(
@@ -1051,6 +1088,7 @@ public class AdminDao {
         }
     }
 
+    // Danh sách đơn PAID phân trang; tính sẵn phần tiền admin nhận theo commission_percent.
     public List<AdminOrderRow> listSuccessfulOrdersPaged(int limit, int offset, String keyword, java.sql.Date fromDate, java.sql.Date toDate) {
         StringBuilder sql = new StringBuilder(
                 "SELECT o.order_id, o.total_amount, o.order_date, ps.status_name AS payment_status, " +
@@ -1113,6 +1151,7 @@ public class AdminDao {
         return rows;
     }
 
+    // Lấy các dòng sản phẩm thuộc một đơn hàng.
     public List<AdminOrderDetailRow> listOrderDetails(int orderId) {
         String sql = "SELECT od.order_detail_id, od.software_id, s.name AS software_name, od.price " +
                 "FROM order_detail od " +
@@ -1141,6 +1180,7 @@ public class AdminDao {
     }
 
     // ===== CRUD =====
+    // Tạo nhân viên mới (reviewer/approval), mật khẩu được băm SHA-256 trước khi lưu.
 
     public void createEmployee(String fullName, String email, String phone, String roleName, String password) throws SQLException {
         Integer roleId = getRoleIdByName(normalizeRoleName(roleName));
@@ -1159,6 +1199,7 @@ public class AdminDao {
         }
     }
 
+    // Lấy thông tin user theo id để hiển thị form sửa.
     public UserRow findUserById(int userId) {
         String sql = "SELECT u.user_id, u.full_name, u.email, u.phone, u.status, u.created_at, r.role_name " +
                 "FROM users u JOIN role r ON u.role_id = r.role_id " +
@@ -1185,6 +1226,7 @@ public class AdminDao {
         return null;
     }
 
+    // Cập nhật trạng thái user.
     public void setUserStatus(int userId, String status) throws SQLException {
         String sql = "UPDATE users SET status = ? WHERE user_id = ?";
         try (Connection conn = Db.getConnection();
@@ -1195,6 +1237,7 @@ public class AdminDao {
         }
     }
 
+    // Cập nhật hồ sơ user và role; có normalize role để tương thích dữ liệu cũ.
     public void updateUser(int userId, String fullName, String phone, String status, String roleName) throws SQLException {
         String normalizedRoleName = normalizeRoleName(roleName);
         Integer roleId = getRoleIdByName(normalizedRoleName);
