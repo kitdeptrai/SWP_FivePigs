@@ -1049,3 +1049,46 @@ VALUES
  '/reviewer_pending',
  DATE_SUB(NOW(), INTERVAL 1 HOUR));
 
+-- add 10 report
+INSERT INTO Report (software_id, reporter_id, reviewer_id, reason, status, created_at)
+VALUES
+    (4, 7, NULL, 'Video bị lag khi xem ở 1080p.', 'ERROR_REVIEW', NOW()),
+    (5, 8, NULL, 'Không thể đăng nhập bằng Google account.', 'ERROR_REVIEW', NOW()),
+    (6, 9, NULL, 'Ứng dụng bị crash khi xem phim.', 'ERROR_REVIEW', NOW()),
+    (7, 10, NULL, 'Không gửi được tin nhắn nhóm.', 'ERROR_REVIEW', NOW()),
+    (8, 11, NULL, 'Thông báo không hoạt động.', 'ERROR_REVIEW', NOW()),
+    (9, 12, NULL, 'GPS định vị sai vị trí.', 'ERROR_REVIEW', NOW()),
+    (10, 13, NULL, 'Cuộc gọi bị mất tiếng.', 'ERROR_REVIEW', NOW()),
+
+-- đã xử lý
+    (11, 14, 2, 'Game bị lag khi combat boss.', 'RESOLVED', NOW()),
+    (12, 15, 2, 'Bug xuyên tường.', 'ERROR_APPROVAL', NOW()),
+    (13, 16, 2, 'Matchmaking quá lâu.', 'ERROR_REJECTED', NOW());
+
+INSERT INTO Report (software_id, reporter_id, reason, status, created_at)
+VALUES
+    (1, 7, 'App bị crash khi mở lần đầu.', 'PENDING', NOW()),
+    (2, 8, 'Không load được hình ảnh.', 'PENDING', NOW()),
+    (3, 9, 'Video không phát được.', 'PENDING', NOW()),
+    (4, 10, 'Ứng dụng bị lag khi cuộn.', 'PENDING', NOW()),
+    (5, 11, 'Không đăng nhập được.', 'PENDING', NOW()),
+    (6, 12, 'Không phát được video.', 'PENDING', NOW()),
+    (7, 13, 'Tin nhắn gửi chậm.', 'PENDING', NOW()),
+    (8, 14, 'Không nhận được notification.', 'PENDING', NOW()),
+    (9, 15, 'Sai vị trí GPS.', 'PENDING', NOW()),
+    (10, 16, 'Call bị mất tiếng.', 'PENDING', NOW());
+
+INSERT INTO user_feedback (user_id, subject, message, status)
+VALUES
+    (7, 'UI Design', 'Giao diện hơi rối, khó dùng.', 'NEW'),
+    (8, 'Performance', 'Trang load chậm vào giờ cao điểm.', 'NEW'),
+    (9, 'Search', 'Tìm kiếm chưa chính xác.', 'NEW'),
+    (10, 'Payment', 'Thanh toán đôi khi bị lỗi.', 'NEW'),
+    (11, 'Notification', 'Thông báo quá nhiều.', 'NEW'),
+    (12, 'Feature', 'Cần thêm dark mode.', 'NEW'),
+    (13, 'Download', 'Download bị gián đoạn.', 'NEW'),
+    (14, 'Security', 'Nên thêm 2FA.', 'NEW'),
+    (15, 'UX', 'Flow mua hàng hơi dài.', 'NEW'),
+    (16, 'Bug report', 'Không attach được file khi report.', 'NEW');
+
+

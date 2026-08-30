@@ -15,9 +15,11 @@ public class AdminVendorsServlet extends DashboardServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // Đọc tham số lọc nhà cung cấp từ query string.
         String keyword = req.getParameter("keyword");
         String status = req.getParameter("status");
 
+        // Lấy danh sách vendor theo trang + filter.
         AdminService.PageResult<?> pageResult = adminService.getVendorsPage(
                 req.getParameter("page"),
                 10,
@@ -25,11 +27,13 @@ public class AdminVendorsServlet extends DashboardServlet {
                 status
         );
 
+        // Set dữ liệu list + paging + filter để JSP render.
         req.setAttribute("users", pageResult.getItems());
         req.setAttribute("currentPage", pageResult.getCurrentPage());
         req.setAttribute("totalPages", pageResult.getTotalPages());
         req.setAttribute("keyword", keyword);
         req.setAttribute("status", status);
+        // Dùng flow chung dashboard để auth + forward view.
         super.doGet(req, resp);
     }
 
